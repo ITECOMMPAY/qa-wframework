@@ -69,7 +69,13 @@ class exampleCest
                         ->openSite()
                         ->closePopup()
                         ->openVehiclesMenu()
+                        ->checkPrices()
                         ->selectVehicle('Alias: Challenger')
+                        ->setZip()
+                        ->checkZip()
+                        ->startBuildingModel()
+                        ->selectBuyOption()
+                        ->selectModel('Alias: SRT HELLCAT REDEYE WIDEBODY')
                         ;
     }
 }

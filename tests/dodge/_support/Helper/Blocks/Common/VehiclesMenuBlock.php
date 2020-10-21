@@ -1,12 +1,13 @@
 <?php
 
 
-namespace dodge\Helper\Blocks;
+namespace dodge\Helper\Blocks\Common;
 
 
 use Common\Module\WFramework\WebObjects\Primitive\WArray;
 use Common\Module\WFramework\WebObjects\Primitive\WButton;
 use dodge\DodgeTester;
+use dodge\Helper\Blocks\DodgeBlock;
 use dodge\Helper\Elements\DodgeVehicleCard\DodgeVehicleCard;
 use dodge\Helper\TestSteps\DodgeSteps;
 

@@ -1,12 +1,13 @@
 <?php
 
 
-namespace dodge\Helper\Blocks;
+namespace dodge\Helper\Blocks\Common;
 
 
 use Common\Module\WFramework\WebObjects\Primitive\WButton;
 use dodge\DodgeTester;
 use dodge\Helper\AliasMaps\TabsHeaders\HeaderTabsMap;
+use dodge\Helper\Blocks\DodgeBlock;
 use dodge\Helper\Elements\DodgeTabs\DodgeTabs;
 use dodge\Helper\TestSteps\DodgeSteps;
 
@@ -26,6 +27,7 @@ class HeaderBlock extends DodgeBlock
     {
         DodgeSteps::$frontPageSteps
                                 ->openSite()
+                                ->closePopup()
                                 ;
     }
 

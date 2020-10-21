@@ -14,12 +14,27 @@ class DodgeSteps extends StepsGroup
     /** @var VehiclesMenuSteps */
     public static $vehiclesMenuSteps;
 
+    /** @var VehiclePageSteps */
+    public static $vehiclePageSteps;
+
+    /** @var SelectModelSteps */
+    public static $selectModelSteps;
+
+    /** @var BuildModelSteps */
+    public static $buildModelSteps;
+
     public function _inject(
         FrontPageSteps $frontPageSteps,
-        VehiclesMenuSteps $vehiclesMenuSteps
+        VehiclesMenuSteps $vehiclesMenuSteps,
+        VehiclePageSteps $vehiclePageSteps,
+        SelectModelSteps $selectModelSteps,
+        BuildModelSteps $buildModelSteps
     )
     {
         static::$frontPageSteps = $frontPageSteps;
         static::$vehiclesMenuSteps = $vehiclesMenuSteps;
+        static::$vehiclePageSteps = $vehiclePageSteps;
+        static::$selectModelSteps = $selectModelSteps;
+        static::$buildModelSteps = $buildModelSteps;
     }
 }

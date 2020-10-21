@@ -274,7 +274,7 @@ function getScrollParent(element, includeHidden) {
     
     if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return element;
 
-    if (style.position === "fixed") return document.body;
+    if (style.position === "fixed") return document.documentElement;
     for (var parent = element; (parent = parent.parentElement);) {
         style = getComputedStyle(parent);
         if (excludeStaticParent && style.position === "static") {
@@ -283,7 +283,7 @@ function getScrollParent(element, includeHidden) {
         if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
     }
 
-    return document.body;
+    return document.documentElement;
 }
 
 arguments[0].scrollIntoView(true);
@@ -293,9 +293,11 @@ if (arguments[1] === 0)
     return;
 }
 
-let scrollParent = getScrollParent(arguments[0], true);
+let scrollParent = getScrollParent(arguments[0], false);
 
-if (Math.abs(scrollParent.getBoundingClientRect().y - arguments[0].getBoundingClientRect().y) >= arguments[1])
+let scrollParentY = scrollParent.getBoundingClientRect().y > 0 ? scrollParent.getBoundingClientRect().y : 0;
+
+if (Math.abs(scrollParentY - arguments[0].getBoundingClientRect().y) >= arguments[1])
 {
     return;
 }

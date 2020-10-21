@@ -6,8 +6,8 @@ namespace dodge\Helper\TestSteps;
 
 use Common\Module\WFramework\StepsGroup\StepsGroup;
 use dodge\DodgeTester;
-use dodge\Helper\Blocks\ChooseYourSiteBlock;
-use dodge\Helper\Blocks\HeaderBlock;
+use dodge\Helper\Blocks\FrontPage\ChooseYourSiteBlock;
+use dodge\Helper\Blocks\Common\HeaderBlock;
 
 class FrontPageSteps extends StepsGroup
 {

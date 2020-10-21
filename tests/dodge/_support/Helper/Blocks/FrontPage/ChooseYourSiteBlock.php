@@ -1,11 +1,12 @@
 <?php
 
 
-namespace dodge\Helper\Blocks;
+namespace dodge\Helper\Blocks\FrontPage;
 
 
 use Common\Module\WFramework\WebObjects\Primitive\WButton;
 use dodge\DodgeTester;
+use dodge\Helper\Blocks\DodgeBlock;
 use dodge\Helper\TestSteps\DodgeSteps;
 
 class ChooseYourSiteBlock extends DodgeBlock

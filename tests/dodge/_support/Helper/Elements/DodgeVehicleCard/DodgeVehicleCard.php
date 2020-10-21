@@ -29,7 +29,7 @@ class DodgeVehicleCard extends WButton
     {
         WLogger::logDebug($this . " -> получаем название авто");
 
-        $name = $this->nameLabel->getAllText();
+        $name = $this->nameLabel->getCurrentValueString();
 
         WLogger::logDebug($this . " -> имеет название: $name");
 

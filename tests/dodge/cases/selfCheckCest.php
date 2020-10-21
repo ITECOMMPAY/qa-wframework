@@ -23,8 +23,7 @@ class selfCheckCest
     protected $pageObjectsSubDir = '_support/Helper/Blocks/';
 
     protected $ignoredPageObjects = [
-        'bof\Helper\Blocks\BofBlock',
-        'bof\Helper\Blocks\Gate\MerchantAccounts\MACreationBlock\MACreationDataReviewBlock'
+        'dodge\Helper\Blocks\DodgeBlock',
     ];
 
     protected $takeScreenshots = true; // Если в true - то для каждого успешно открытого PO, будет сохранён скриншот
@@ -69,7 +68,7 @@ class selfCheckCest
     {
         $I->wantToTest('Указанный PageObject имеет валидные локаторы');
 
-        $pageObject = '\bof\Helper\Blocks\Gate\Payments\DWH\PaymentsDWHTableBlock\PaymentsDWHTableBlock'; // Полное имя класса PO, который нужно валидировать
+        $pageObject = '\dodge\Helper\Blocks\SelectModelPage\SelectModelBlock'; // Полное имя класса PO, который нужно валидировать
                                                                       // (правой кнопкой по имени класса -> Copy/Paste Special -> Copy Reference)
 
 
