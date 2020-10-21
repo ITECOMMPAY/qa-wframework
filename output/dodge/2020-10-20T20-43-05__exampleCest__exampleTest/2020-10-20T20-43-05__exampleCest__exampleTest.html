@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style>
+        .title {
+            background-color: #ef9a9a;
+            color: #212121;
+            padding: 32px 18px 32px;
+            overflow: hidden;
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            font-size: 2.6rem;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .notice,
+        .info,
+        .debug,
+        .warning,
+        .error,
+        .alert,
+        .critical {
+            margin-left: 18px;
+            padding: 12px 18px 12px;
+            overflow: hidden;
+            display: block;
+            background-color: #efebe9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            font-weight: normal;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .alert {
+            border-left: 18px solid #ffa726;
+            background-color: #fff3e0;
+        }
+
+        .critical {
+            border-left: 18px solid #42a5f5;
+            background-color: #e3f2fd;
+        }
+
+        .error {
+            border-left: 18px solid #f44336;
+            background-color: #ffcdd2;
+            font-size: 0.8rem;
+            font-weight: bold;
+            font-family: Consolas, "courier new";
+        }
+
+        .warning {
+            border-left: 18px solid #ef9a9a;
+            background-color: #ffebee;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .notice {
+            border-left: 18px solid #efebe9;
+            background-color: #fafafa;
+        }
+
+        .info {
+            margin-left: 54px;
+            border-left: 18px solid #bcaaa4;
+            background-color: #f5f5f5;
+            display: none;
+        }
+
+        .debug {
+            margin-left: 90px;
+            border-left: 18px solid #8d6e63;
+            background-color: #eeeeee;
+            display: none;
+            font-family: Consolas, "courier new";
+        }
+
+        .left-panel {
+            width: 50%;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .right-panel {
+            width: 50%;
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            height: 60vh;
+        }
+
+        #video-insert {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .right-panel img {
+            max-width: 100%;
+            max-height: 100%;
+            margin: auto;
+            display: inline-block;
+            vertical-align: middle;
+            padding: 20% 0px 0px 0px;
+        }
+
+        .accordion {
+            cursor: pointer;
+            border-bottom: 12px solid transparent;
+            padding: 12px 12px 0px;
+        }
+
+        .accordion.active {
+            border-top: 12px solid transparent;
+            border-bottom: none;
+            padding: 0px 12px 12px;
+        }
+
+        .current-frame {
+            border-right: 18px solid #474747;
+        }
+    </style>
+</head>
+
+<body>
+  <div class="title">
+    2020-10-20T20-43-05__exampleCest__exampleTest
+  </div>
+
+  <div class="wrapper">
+
+    <div class="left-panel">
+        
+<div class="notice accordion" data-shot="00000000">
+    <p>Открываем главную страницу сайта</p>
+</div>
+        
+<div class="notice accordion" data-shot="00000001">
+    <p>Проверяем, что главная страница отобразилась</p>
+</div>
+        
+<div class="info accordion" data-shot="00000002">
+    <p>HeaderBlock (Блок хидера) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;//div[@id=&#039;main_navigation&#039;]&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000003">
+    <p>HeaderBlock (Блок хидера) / WButton (DODGE) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;.//a[@data-lid=&#039;top-nav-top-nav-dodge-logo&#039;]&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000004">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;.//ul&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000005">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) / WArray (Коллекция элементов: Вкладка) -&gt; должен существовать хотя бы один элемент</p>
+</div>
+        
+<div class="info accordion" data-shot="00000006">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) / WArray (Коллекция элементов: Вкладка) -&gt; обращаемся к низлежащему API</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия не выполнятся для коллекции элементов</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Обновляем коллекцию элементов</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Обновляем коллекцию элементов, с xpath: &#039;.//li&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие (коллекции): sizeGreaterThan<br> -&gt; true [ожидаемое: коллекция содержит больше 0 элементов | актуальное: коллекция содержит 6 элементов]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000007">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) / WArray (Коллекция элементов: Вкладка) -&gt; получаем первый элемент</p>
+</div>
+        
+<div class="info accordion" data-shot="00000008">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) / WArray (Коллекция элементов: Вкладка) -&gt; получаем массив элементов</p>
+</div>
+        
+<div class="info accordion" data-shot="00000009">
+    <p>/ DodgeTab (Вкладка [0]) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000010">
+    <p>HeaderBlock (Блок хидера) / WButton (Build &amp; Price) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;.//a[@data-lid=&#039;top-nav-build-and-price&#039;]&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="notice accordion" data-shot="00000011">
+    <p>Ожидаем всплывающее окно Choose Your Site и закрываем его</p>
+</div>
+        
+<div class="info accordion" data-shot="00000012">
+    <p>ChooseYourSiteBlock (Всплывающее окно Choose Your Site) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;//div[contains(@class, &#039;ISL-popup modal-ISL-overlay-BS&#039;)]&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000013">
+    <p>ChooseYourSiteBlock (Всплывающее окно Choose Your Site) / WButton (X) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;.//button[string()=&#039;Close&#039;]&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000014">
+    <p>ChooseYourSiteBlock (Всплывающее окно Choose Your Site) / WButton (X) -&gt; кликаем</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем тэг элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Тэг элемента: button</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем значение атрибута: innerHTML</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Атрибут имеет значение: &quot;&lt;span class=\&quot;gcss-sr-only\&quot;&gt;Close&lt;\/span&gt;&quot;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Кликаем на элементе</p>
+</div>
+        
+<div class="info accordion" data-shot="00000015">
+    <p>ChooseYourSiteBlock (Всплывающее окно Choose Your Site) -&gt; НЕ должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: hidden<br> -&gt; true [ожидаемое: не должен отображаться | актуальное: не отображается]</p>
+</div>
+        
+<div class="notice accordion" data-shot="00000016">
+    <p>Открываем меню Vehicles</p>
+</div>
+        
+<div class="info accordion" data-shot="00000017">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) -&gt; выбираем вкладку: Vehicles</p>
+</div>
+        
+<div class="info accordion" data-shot="00000018">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) -&gt; получаем вкладку: Vehicles</p>
+</div>
+        
+<div class="info accordion" data-shot="00000019">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) / WArray (Коллекция элементов: Вкладка) -&gt; должен существовать хотя бы один элемент</p>
+</div>
+        
+<div class="info accordion" data-shot="00000020">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) / WArray (Коллекция элементов: Вкладка) -&gt; обращаемся к низлежащему API</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия не выполнятся для коллекции элементов</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Обновляем коллекцию элементов</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Обновляем коллекцию элементов, с xpath: &#039;.//li&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие (коллекции): sizeGreaterThan<br> -&gt; true [ожидаемое: коллекция содержит больше 0 элементов | актуальное: коллекция содержит 6 элементов]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000021">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) / WArray (Коллекция элементов: Вкладка) -&gt; получаем ассоциативный массив элементов, где ключи будут получены путём вызова: getAllText - для каждого элемента коллекции</p>
+</div>
+        
+<div class="info accordion" data-shot="00000022">
+    <p>HeaderBlock (Блок хидера) / DodgeTabs (Панель вкладок) / WArray (Коллекция элементов: Вкладка) -&gt; получаем массив элементов</p>
+</div>
+        
+<div class="info accordion" data-shot="00000023">
+    <p>/ DodgeTab (Вкладка [0]) -&gt; НЕ существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; true [ожидаемое: должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: НЕ exist<br> -&gt; false [ожидаемое: НЕ должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000024">
+    <p>/ DodgeTab (Вкладка [0]) -&gt; получаем весь текст (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем сырой текст элемента (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получили сырой текст: Vehicles</p>
+</div>
+        
+<div class="info accordion" data-shot="00000025">
+    <p>/ DodgeTab (Вкладка [0]) -&gt; имеет весь текст: &#039;Vehicles&#039;</p>
+</div>
+        
+<div class="info accordion" data-shot="00000026">
+    <p>/ DodgeTab (Вкладка [1]) -&gt; НЕ существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; true [ожидаемое: должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: НЕ exist<br> -&gt; false [ожидаемое: НЕ должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000027">
+    <p>/ DodgeTab (Вкладка [1]) -&gt; получаем весь текст (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем сырой текст элемента (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получили сырой текст: SHOPPING TOOLS</p>
+</div>
+        
+<div class="info accordion" data-shot="00000028">
+    <p>/ DodgeTab (Вкладка [1]) -&gt; имеет весь текст: &#039;SHOPPING TOOLS&#039;</p>
+</div>
+        
+<div class="info accordion" data-shot="00000029">
+    <p>/ DodgeTab (Вкладка [2]) -&gt; НЕ существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; true [ожидаемое: должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: НЕ exist<br> -&gt; false [ожидаемое: НЕ должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000030">
+    <p>/ DodgeTab (Вкладка [2]) -&gt; получаем весь текст (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем сырой текст элемента (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получили сырой текст: Dodge Garage(Open in a new window)</p>
+</div>
+        
+<div class="info accordion" data-shot="00000031">
+    <p>/ DodgeTab (Вкладка [2]) -&gt; имеет весь текст: &#039;Dodge Garage(Open in a new window)&#039;</p>
+</div>
+        
+<div class="info accordion" data-shot="00000032">
+    <p>/ DodgeTab (Вкладка [3]) -&gt; НЕ существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; true [ожидаемое: должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: НЕ exist<br> -&gt; false [ожидаемое: НЕ должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000033">
+    <p>/ DodgeTab (Вкладка [3]) -&gt; получаем весь текст (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем сырой текст элемента (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получили сырой текст: OWNERS</p>
+</div>
+        
+<div class="info accordion" data-shot="00000034">
+    <p>/ DodgeTab (Вкладка [3]) -&gt; имеет весь текст: &#039;OWNERS&#039;</p>
+</div>
+        
+<div class="info accordion" data-shot="00000035">
+    <p>/ DodgeTab (Вкладка [4]) -&gt; НЕ существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; true [ожидаемое: должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: НЕ exist<br> -&gt; false [ожидаемое: НЕ должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000036">
+    <p>/ DodgeTab (Вкладка [4]) -&gt; получаем весь текст (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем сырой текст элемента (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получили сырой текст: MERCHANDISE(Open in a new window)</p>
+</div>
+        
+<div class="info accordion" data-shot="00000037">
+    <p>/ DodgeTab (Вкладка [4]) -&gt; имеет весь текст: &#039;MERCHANDISE(Open in a new window)&#039;</p>
+</div>
+        
+<div class="info accordion" data-shot="00000038">
+    <p>/ DodgeTab (Вкладка [5]) -&gt; НЕ существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; true [ожидаемое: должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: НЕ exist<br> -&gt; false [ожидаемое: НЕ должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000039">
+    <p>/ DodgeTab (Вкладка [5]) -&gt; получаем весь текст (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем сырой текст элемента (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получили сырой текст: DODGE MUSCLE</p>
+</div>
+        
+<div class="info accordion" data-shot="00000040">
+    <p>/ DodgeTab (Вкладка [5]) -&gt; имеет весь текст: &#039;DODGE MUSCLE&#039;</p>
+</div>
+        
+<div class="info accordion" data-shot="00000041">
+    <p>/ DodgeTab (Вкладка [0]) -&gt; кликаем</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем тэг элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Тэг элемента: li</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем значение атрибута: innerHTML</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Атрибут имеет значение: &quot;&lt;a data-flyout-content-path=\&quot;\/includes\/header.dataprops.MainNavigation.main_navigation.partial.NavFlyout.vehicles.par.V1602802890964.html\&quot; aria-expanded=\&quot;false\&quot; aria-haspopup=\&quot;true\&quot; class=\&quot;main-nav-link\&quot; data-lid=\&quot;top-nav-vehicles-open\&quot; data-lpos=\&quot;main-navigation\&quot; data-adobe-linktype=\&quot;nav\&quot; href=\&quot;#\&quot; id=\&quot;vehicles\&quot; role=\&quot;button\&quot; target=\&quot;\&quot;&gt;&lt;span&gt;Vehicles&lt;\/span&gt;&lt;span class=\&quot;icon gcss-icon-chevron-down\&quot; data-cats-id=\&quot;gcss-icon-chevron-down\&quot; aria-hidden=\&quot;true\&quot;&gt;&lt;\/span&gt;&lt;\/a&gt;&quot;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Кнопка является ссылкой и локатор данного элемента не указывает на ссылку. Пробуем кликнуть по ссылке.</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;.//a&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Кликаем на элементе</p>
+</div>
+        
+<div class="info accordion" data-shot="00000042">
+    <p>/ DodgeTab (Вкладка [0]) -&gt; вкладка должна быть выбрана</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем значение атрибута: class</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Атрибут имеет значение: &quot;flyout active&quot;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: вкладка выбрана<br> -&gt; true [ожидаемое: должна быть выбрана | актуальное: выбрана]</p>
+</div>
+        
+<div class="notice accordion" data-shot="00000043">
+    <p>Проверяем, что меню Vehicles - отобразилось</p>
+</div>
+        
+<div class="info accordion" data-shot="00000044">
+    <p>VehiclesMenuBlock (Меню Vehicles) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;//div[@id=&#039;flyout-vehicles&#039;]&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000045">
+    <p>VehiclesMenuBlock (Меню Vehicles) / WButton (Close) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;.//button[text()=&#039;close&#039;]&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000046">
+    <p>VehiclesMenuBlock (Меню Vehicles) / WArray (Коллекция элементов: Карточка авто) -&gt; должен существовать хотя бы один элемент</p>
+</div>
+        
+<div class="info accordion" data-shot="00000047">
+    <p>VehiclesMenuBlock (Меню Vehicles) / WArray (Коллекция элементов: Карточка авто) -&gt; обращаемся к низлежащему API</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия не выполнятся для коллекции элементов</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Обновляем коллекцию элементов</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Обновляем коллекцию элементов, с xpath: &#039;.//div[@data-cats-id=&#039;navcards&#039;]//div[@data-cats-id=&#039;grid&#039;]/div&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие (коллекции): sizeGreaterThan<br> -&gt; true [ожидаемое: коллекция содержит больше 0 элементов | актуальное: коллекция содержит 22 элементов]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000048">
+    <p>VehiclesMenuBlock (Меню Vehicles) / WArray (Коллекция элементов: Карточка авто) -&gt; получаем первый элемент</p>
+</div>
+        
+<div class="info accordion" data-shot="00000049">
+    <p>VehiclesMenuBlock (Меню Vehicles) / WArray (Коллекция элементов: Карточка авто) -&gt; получаем массив элементов</p>
+</div>
+        
+<div class="info accordion" data-shot="00000050">
+    <p>/ DodgeVehicleCard (Карточка авто [0]) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000051">
+    <p>/ DodgeVehicleCard (Карточка авто [0]) / WLabel (Название авто) -&gt; должен отображаться</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия выполнятся для элемента</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скроллим к элементу</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;.//div/span[@data-cats-id=&#039;vehicle-name&#039;]&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: visible<br> -&gt; true [ожидаемое: должен быть виден | актуальное: виден]</p>
+</div>
+        
+<div class="notice accordion" data-shot="00000052">
+    <p>Выбираем авто: Charger</p>
+</div>
+        
+<div class="info accordion" data-shot="00000053">
+    <p>VehiclesMenuBlock (Меню Vehicles) / WArray (Коллекция элементов: Карточка авто) -&gt; должна иметь больше или равно 5 элементов</p>
+</div>
+        
+<div class="info accordion" data-shot="00000054">
+    <p>VehiclesMenuBlock (Меню Vehicles) / WArray (Коллекция элементов: Карточка авто) -&gt; обращаемся к низлежащему API</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ждём пока заданные условия не выполнятся для коллекции элементов</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Обновляем коллекцию элементов</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Обновляем коллекцию элементов, с xpath: &#039;.//div[@data-cats-id=&#039;navcards&#039;]//div[@data-cats-id=&#039;grid&#039;]/div&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие (коллекции): sizeGreaterThanOrEqual<br> -&gt; true [ожидаемое: коллекция содержит больше или равно 5 элементов | актуальное: коллекция содержит 22 элементов]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000055">
+    <p>VehiclesMenuBlock (Меню Vehicles) / WArray (Коллекция элементов: Карточка авто) -&gt; получаем ассоциативный массив элементов, где ключи будут получены путём вызова: getVehicleName - для каждого элемента коллекции</p>
+</div>
+        
+<div class="info accordion" data-shot="00000056">
+    <p>VehiclesMenuBlock (Меню Vehicles) / WArray (Коллекция элементов: Карточка авто) -&gt; получаем массив элементов</p>
+</div>
+        
+<div class="info accordion" data-shot="00000057">
+    <p>/ DodgeVehicleCard (Карточка авто [0]) -&gt; НЕ существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; true [ожидаемое: должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: НЕ exist<br> -&gt; false [ожидаемое: НЕ должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>/ DodgeVehicleCard (Карточка авто [0]) -&gt; получаем название авто</p>
+</div>
+        
+<div class="info accordion" data-shot="00000058">
+    <p>/ DodgeVehicleCard (Карточка авто [0]) / WLabel (Название авто) -&gt; получаем весь текст (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем сырой текст элемента (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;.//div/span[@data-cats-id=&#039;vehicle-name&#039;]&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получили сырой текст: Charger</p>
+</div>
+        
+<div class="info accordion" data-shot="00000059">
+    <p>/ DodgeVehicleCard (Карточка авто [0]) / WLabel (Название авто) -&gt; имеет весь текст: &#039;Charger&#039;</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>/ DodgeVehicleCard (Карточка авто [0]) -&gt; имеет название: Charger</p>
+</div>
+        
+<div class="info accordion" data-shot="00000060">
+    <p>/ DodgeVehicleCard (Карточка авто [1]) -&gt; НЕ существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; true [ожидаемое: должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: НЕ exist<br> -&gt; false [ожидаемое: НЕ должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>/ DodgeVehicleCard (Карточка авто [1]) -&gt; получаем название авто</p>
+</div>
+        
+<div class="info accordion" data-shot="00000061">
+    <p>/ DodgeVehicleCard (Карточка авто [1]) / WLabel (Название авто) -&gt; получаем весь текст (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем сырой текст элемента (включая невидимый)</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Ищем элемент с xpath: &#039;.//div/span[@data-cats-id=&#039;vehicle-name&#039;]&#039;</p>
+</div>
+        
+<div class="warning" data-shot="00000062">
+    <p>Начинаем дебаг</p>
+</div>
+        
+<div class="info accordion" data-shot="00000063">
+    <p>VehiclesMenuBlock (Меню Vehicles) -&gt; существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; true [ожидаемое: должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000064">
+    <p>/ DodgeVehicleCard (Карточка авто [1]) -&gt; существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; true [ожидаемое: должен присутствовать | актуальное: присутствует]</p>
+</div>
+        
+<div class="info accordion" data-shot="00000065">
+    <p>/ DodgeVehicleCard (Карточка авто [1]) / WLabel (Название авто) -&gt; существует?</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Проверяем, что для элемента выполняются заданные условия</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Условие: exist<br> -&gt; false [ожидаемое: должен присутствовать | актуальное: отсутствует]</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Получаем значение атрибута: innerHTML</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Атрибут имеет значение: &quot;&lt;div data-cats-id=\&quot;sdp-column\&quot; class=\&quot;key-stat-wrapper normal small gcss-theme-light sdp-grid\&quot;&gt;&lt;div data-cats-id=\&quot;key-stat-wrapper\&quot; class=\&quot;sdp-row\&quot;&gt;&lt;div class=\&quot;sdp-col sdp-col-xs-6 sdp-col-sm-6 sdp-col-md-12 sdp-col-lg-12\&quot;&gt;&lt;div class=\&quot;align-center\&quot;&gt;&lt;span class=\&quot;label\&quot; data-cats-id=\&quot;key-stat-label\&quot;&gt;UP TO HWY MPG&lt;\/span&gt;&lt;\/div&gt;&lt;div class=\&quot;icon-value-container align-center\&quot;&gt;&lt;span class=\&quot;icon gcss-icon-gas-pump\&quot; data-cats-id=\&quot;gcss-icon-gas-pump\&quot; aria-hidden=\&quot;true\&quot;&gt;&lt;\/span&gt;&lt;span class=\&quot;value\&quot;&gt;30&lt;div class=\&quot;disclosure\&quot;&gt;&lt;span data-component=\&quot;DisclosureBubble\&quot; data-has-dynamically-rendered=\&quot;\&quot;&gt;&lt;span class=\&quot;disclosure-bubble-wrapper gcss-theme-light\&quot;&gt;&lt;span class=\&quot;bubble gcss-colors-element-disclosure-bubble\&quot; data-cats-id=\&quot;disclosure\&quot; role=\&quot;button\&quot; tabindex=\&quot;0\&quot; aria-expanded=\&quot;false\&quot; aria-owns=\&quot;disclosure-panel--d5dd5d46-bf6c-4385-92dc-c78a196cf803\&quot;&gt;&lt;span class=\&quot;bubble-number gcss-colors-text-disclosure-bubble gcss-typography-label-9\&quot;&gt;&lt;span class=\&quot;gcss-sr-only\&quot;&gt;( Disclosure&lt;\/span&gt;9&lt;span class=\&quot;gcss-sr-only\&quot;&gt;)&lt;\/span&gt;&lt;\/span&gt;&lt;\/span&gt;&lt;\/span&gt;&lt;\/span&gt;&lt;\/div&gt;&lt;\/span&gt;&lt;\/div&gt;&lt;\/div&gt;&lt;\/div&gt;&lt;\/div&gt;&quot;</p>
+</div>
+        
+<div class="error" data-shot="00000066">
+    <p>Class &#039;Common\Helpers\Dindent\Indenter&#039; not found</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Преобразуем скриншоты в видео</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Команда для запуска: ffmpeg -framerate 1 -i /home/nabu/Projects/PhpstormProjects/wframework/output/dodge/2020-10-20T20-43-05__exampleCest__exampleTest/screenshots/%08d.png -c:v libx264 -tune stillimage -movflags +faststart -vf fps=1 -pix_fmt yuv422p /home/nabu/Projects/PhpstormProjects/wframework/output/dodge/2020-10-20T20-43-05__exampleCest__exampleTest/screenshots/video.mp4</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Скриншоты были успешно преобразованы в видео</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Удаляем все скриншоты кроме последнего</p>
+</div>
+    </div>
+
+    <div class="right-panel">
+                    <video id="video-insert" controls>
+                        <source src="./screenshots/video.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+            </div>
+
+            <script>
+
+                const LogLevelsEnum = {
+                    "debug": 100,
+                    "info": 200,
+                    "notice": 250,
+                    "warning": 300,
+                    "error": 400,
+                    "critical": 500,
+                    "alert": 550,
+                    "emergency": 600
+                }
+
+                Object.freeze(LogLevelsEnum);
+
+                var screenshotNumberToElement = [];
+
+                function updateScreenshotsList() {
+                    for (const key in LogLevelsEnum) {
+                        let elements = document.getElementsByClassName(key);
+
+                        for (i = 0; i < elements.length; i++) {
+                            let element = elements[i];
+
+                            let screenshotNumber = getScreenshotNumber(element);
+
+                            if (screenshotNumber === null) {
+                                continue;
+                            }
+
+                            screenshotNumberToElement[screenshotNumber] = element;
+
+                            element.addEventListener("mouseover", onHoverSeekVideoCallback);
+                        }
+                    }
+
+                    if (screenshotNumberToElement.length === 0) {
+                        hideVideoPanel();
+                    }
+                }
+
+                function hideVideoPanel() {
+                    logVideo.style.display = "none";
+
+                    let leftPanel = document.getElementsByClassName('left-panel');
+                    leftPanel[0].style.width = "100%";
+
+                    let rightPanel = document.getElementsByClassName('right-panel');
+                    rightPanel[0].style.width = "0%";
+                }
+
+                function getScreenshotNumber(element) {
+                    if (!element.hasAttribute("data-shot")) {
+                        return null;
+                    }
+
+                    let result = parseInt(element.getAttribute("data-shot"), 10);
+
+                    if (Number.isNaN(result)) {
+                        return null;
+                    }
+
+                    return result;
+                }
+
+                function canBeFolded(key) {
+                    return key === "info" || key === 'notice';
+                }
+
+                function addAccordions() {
+                    for (const key in LogLevelsEnum) {
+                        if (!canBeFolded(key)) {
+                            continue;
+                        }
+
+                        let elements = document.getElementsByClassName(key);
+
+                        for (i = 0; i < elements.length; i++) {
+
+                            let element = elements[i];
+
+                                if (!hasSubLevels(element, key)) {
+                                    if (!!window.chrome == false) {
+                                        element.classList.remove("accordion")
+                                    }
+                                    continue;
+                                }
+
+                            element.addEventListener("click", function () {
+                                if (this.classList.toggle("active")) {
+                                    expandSubLevels(this, key);
+                                }
+                                else {
+                                    collapseSubLevels(this, key);
+                                }
+                            });
+                        }
+                    }
+                }
+
+                function hasSubLevels(element, levelName) {
+                    let nextSibling = element.nextElementSibling;
+                    let levelCriticality = LogLevelsEnum[levelName];
+
+                    if (nextSibling == null) {
+                        return false;
+                    }
+
+                    let classList = nextSibling.classList;
+
+                    if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
+                        let subLevelName = classList[0];
+                        let subLevelCriticality = LogLevelsEnum[subLevelName];
+
+                        if (subLevelCriticality >= levelCriticality && canBeFolded(subLevelName)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
+                function collapseSubLevels(element, levelName) {
+                    let nextSibling = element.nextElementSibling;
+                    let levelCriticality = LogLevelsEnum[levelName];
+
+                    while (nextSibling != null) {
+                        let classList = nextSibling.classList;
+
+                        if (classList.contains(levelName)) {
+                            break;
+                        }
+
+                        if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
+                            let subLevelName = classList[0];
+                            let subLevelCriticality = LogLevelsEnum[subLevelName];
+
+                            if (subLevelCriticality > levelCriticality && canBeFolded(subLevelName)) {
+                                break;
+                            }
+
+                            if (subLevelCriticality < levelCriticality) {
+                                nextSibling.classList.remove("active");
+                                nextSibling.style.display = "none";
+                            }
+                        }
+
+                        nextSibling = nextSibling.nextElementSibling;
+                    }
+                }
+
+                function expandSubLevels(element, levelName) {
+                    let nextSibling = element.nextElementSibling;
+                    let levelCriticality = LogLevelsEnum[levelName];
+
+                    let levelIndex = Object.keys(LogLevelsEnum).indexOf(levelName);
+                    let previousLevel = Object.keys(LogLevelsEnum)[levelIndex - 1];
+
+                    if (previousLevel === undefined) {
+                        return;
+                    }
+
+                    while (nextSibling != null) {
+                        let classList = nextSibling.classList;
+
+                        if (classList.contains(levelName)) {
+                            break;
+                        }
+
+                        if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
+                            let subLevelName = classList[0];
+                            let subLevelCriticality = LogLevelsEnum[classList[0]];
+
+                            if (subLevelCriticality > levelCriticality && canBeFolded(subLevelName)) {
+                                break;
+                            }
+
+                            if (classList[0] == previousLevel) {
+                                nextSibling.style.display = "block";
+                            }
+                        }
+
+                        nextSibling = nextSibling.nextElementSibling;
+                    }
+                }
+
+                function expandParentLevels(element) {
+                    let classList = element.classList;
+
+                    if (classList[0] === undefined || !(classList[0] in LogLevelsEnum)) {
+                        return;
+                    }
+
+                    let levelName = classList[0];
+                    let levelCriticality = LogLevelsEnum[levelName];
+
+                    let previousSibling = element.previousElementSibling;
+
+                    while (previousSibling != null) {
+                        let classList = previousSibling.classList;
+
+                        if (levelCriticality >= LogLevelsEnum["notice"]) {
+                            return;
+                        }
+
+                        if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
+                            let previousSiblingLevelName = classList[0];
+                            let previousSiblingCriticality = LogLevelsEnum[classList[0]];
+
+                            if (previousSiblingCriticality > levelCriticality && previousSiblingCriticality <= LogLevelsEnum["notice"])
+                            {
+                                expandSubLevels(previousSibling, previousSiblingLevelName);
+
+                                if (previousSibling.classList.toggle("active")) {
+                                    expandSubLevels(previousSibling, previousSiblingLevelName);
+                                }
+
+                                levelCriticality = previousSiblingCriticality;
+                            }
+                        }
+
+                        previousSibling = previousSibling.previousElementSibling;
+                    }
+                }
+
+                function checkResult() {
+                    let errors = document.getElementsByClassName("error");
+
+                    if (errors.length > 0) {
+                        return;
+                    }
+
+                    let elements = document.querySelectorAll('.title');
+
+                    for (i = 0; i < elements.length; i++) {
+                        elements[i].style.backgroundColor = "#1de9b6";
+                    }
+                }
+
+                var logVideo = document.getElementById("video-insert");
+
+                addAccordions();
+                updateScreenshotsList();
+                checkResult();
+
+                logVideo.ontimeupdate = function () { onTimeUpdateCallback() };
+
+                var previousTime = -1;
+
+                function removePreviousSeekMark() {
+                    previousDiv = screenshotNumberToElement[previousTime];
+
+                    if (previousDiv != null) {
+                        previousDiv.classList.remove("current-frame");
+                    }
+                }
+
+                function onTimeUpdateCallback() {
+                    let currentTime = Math.floor(logVideo.currentTime);
+
+                    if (currentTime === previousTime) {
+                        return;
+                    }
+
+                    removePreviousSeekMark();
+
+                    previousTime = currentTime;
+
+                    let screenshotDiv = screenshotNumberToElement[currentTime];
+
+                    if (screenshotDiv == null) {
+                        return;
+                    }
+
+                    expandParentLevels(screenshotDiv);
+
+                    screenshotDiv.scrollIntoView(true);
+
+                    screenshotDiv.classList.add("current-frame");
+                }
+
+                function onHoverSeekVideoCallback(event) {
+                    element = event.currentTarget;
+
+                    let currentTime = getScreenshotNumber(element);
+
+                    if (currentTime === null) {
+                        return;
+                    }
+
+                    removePreviousSeekMark();
+
+                    previousTime = currentTime;
+
+                    logVideo.currentTime = currentTime;
+
+                    let screenshotDiv = screenshotNumberToElement[currentTime];
+                    screenshotDiv.classList.add("current-frame");
+                }
+            </script>
+
+        </body>
+
+</html>

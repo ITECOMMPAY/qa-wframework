@@ -1,0 +1,15 @@
+# `BrowserStack` environment config
+modules:
+    config:
+        Common\Module\WFramework\Modules\WebTestingModule:
+            host: 'hub-cloud.browserstack.com'
+            port: 80
+            url: 'https://www.dodge.com/'
+            useBrowserStack: true
+            capabilities:
+                browserstack.user: '***user***'
+                browserstack.key: '***key***'
+                browserstack.local: false
+                browserstack.timezone: 'UTC'
+                window_size: "maximize"
+                browserstack.use_w3c: false

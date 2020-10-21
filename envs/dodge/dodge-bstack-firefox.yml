@@ -1,0 +1,8 @@
+# `chrome` environment config
+modules:
+    config:
+        Common\Module\WFramework\Modules\WebTestingModule:
+            browser: firefox
+            capabilities:
+                browser: 'Firefox'
+                browser_version: '62.0'

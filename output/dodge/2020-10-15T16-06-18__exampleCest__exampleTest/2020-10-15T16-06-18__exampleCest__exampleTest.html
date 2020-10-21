@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style>
+        .title {
+            background-color: #ef9a9a;
+            color: #212121;
+            padding: 32px 18px 32px;
+            overflow: hidden;
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            font-size: 2.6rem;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .notice,
+        .info,
+        .debug,
+        .warning,
+        .error,
+        .alert,
+        .critical {
+            margin-left: 18px;
+            padding: 12px 18px 12px;
+            overflow: hidden;
+            display: block;
+            background-color: #efebe9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            font-weight: normal;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .alert {
+            border-left: 18px solid #ffa726;
+            background-color: #fff3e0;
+        }
+
+        .critical {
+            border-left: 18px solid #42a5f5;
+            background-color: #e3f2fd;
+        }
+
+        .error {
+            border-left: 18px solid #f44336;
+            background-color: #ffcdd2;
+            font-size: 0.8rem;
+            font-weight: bold;
+            font-family: Consolas, "courier new";
+        }
+
+        .warning {
+            border-left: 18px solid #ef9a9a;
+            background-color: #ffebee;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .notice {
+            border-left: 18px solid #efebe9;
+            background-color: #fafafa;
+        }
+
+        .info {
+            margin-left: 54px;
+            border-left: 18px solid #bcaaa4;
+            background-color: #f5f5f5;
+            display: none;
+        }
+
+        .debug {
+            margin-left: 90px;
+            border-left: 18px solid #8d6e63;
+            background-color: #eeeeee;
+            display: none;
+            font-family: Consolas, "courier new";
+        }
+
+        .left-panel {
+            width: 50%;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .right-panel {
+            width: 50%;
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            height: 60vh;
+        }
+
+        #video-insert {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .right-panel img {
+            max-width: 100%;
+            max-height: 100%;
+            margin: auto;
+            display: inline-block;
+            vertical-align: middle;
+            padding: 20% 0px 0px 0px;
+        }
+
+        .accordion {
+            cursor: pointer;
+            border-bottom: 12px solid transparent;
+            padding: 12px 12px 0px;
+        }
+
+        .accordion.active {
+            border-top: 12px solid transparent;
+            border-bottom: none;
+            padding: 0px 12px 12px;
+        }
+
+        .current-frame {
+            border-right: 18px solid #474747;
+        }
+    </style>
+</head>
+
+<body>
+  <div class="title">
+    2020-10-15T16-06-18__exampleCest__exampleTest
+  </div>
+
+  <div class="wrapper">
+
+    <div class="left-panel">
+        
+<div class="debug" data-shot="">
+    <p>Преобразуем скриншоты в видео</p>
+</div>
+        
+<div class="debug" data-shot="">
+    <p>Команда для запуска: ffmpeg -framerate 1 -i /home/nabu/Projects/PhpstormProjects/wframework/output/dodge/2020-10-15T16-06-18__exampleCest__exampleTest/screenshots/%08d.png -c:v libx264 -tune stillimage -movflags +faststart -vf fps=1 -pix_fmt yuv422p /home/nabu/Projects/PhpstormProjects/wframework/output/dodge/2020-10-15T16-06-18__exampleCest__exampleTest/screenshots/video.mp4</p>
+</div>
+    </div>
+
+    <div class="right-panel">
+                    <video id="video-insert" controls>
+                        <source src="./screenshots/video.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+            </div>
+
+            <script>
+
+                const LogLevelsEnum = {
+                    "debug": 100,
+                    "info": 200,
+                    "notice": 250,
+                    "warning": 300,
+                    "error": 400,
+                    "critical": 500,
+                    "alert": 550,
+                    "emergency": 600
+                }
+
+                Object.freeze(LogLevelsEnum);
+
+                var screenshotNumberToElement = [];
+
+                function updateScreenshotsList() {
+                    for (const key in LogLevelsEnum) {
+                        let elements = document.getElementsByClassName(key);
+
+                        for (i = 0; i < elements.length; i++) {
+                            let element = elements[i];
+
+                            let screenshotNumber = getScreenshotNumber(element);
+
+                            if (screenshotNumber === null) {
+                                continue;
+                            }
+
+                            screenshotNumberToElement[screenshotNumber] = element;
+
+                            element.addEventListener("mouseover", onHoverSeekVideoCallback);
+                        }
+                    }
+
+                    if (screenshotNumberToElement.length === 0) {
+                        hideVideoPanel();
+                    }
+                }
+
+                function hideVideoPanel() {
+                    logVideo.style.display = "none";
+
+                    let leftPanel = document.getElementsByClassName('left-panel');
+                    leftPanel[0].style.width = "100%";
+
+                    let rightPanel = document.getElementsByClassName('right-panel');
+                    rightPanel[0].style.width = "0%";
+                }
+
+                function getScreenshotNumber(element) {
+                    if (!element.hasAttribute("data-shot")) {
+                        return null;
+                    }
+
+                    let result = parseInt(element.getAttribute("data-shot"), 10);
+
+                    if (Number.isNaN(result)) {
+                        return null;
+                    }
+
+                    return result;
+                }
+
+                function canBeFolded(key) {
+                    return key === "info" || key === 'notice';
+                }
+
+                function addAccordions() {
+                    for (const key in LogLevelsEnum) {
+                        if (!canBeFolded(key)) {
+                            continue;
+                        }
+
+                        let elements = document.getElementsByClassName(key);
+
+                        for (i = 0; i < elements.length; i++) {
+
+                            let element = elements[i];
+
+                                if (!hasSubLevels(element, key)) {
+                                    if (!!window.chrome == false) {
+                                        element.classList.remove("accordion")
+                                    }
+                                    continue;
+                                }
+
+                            element.addEventListener("click", function () {
+                                if (this.classList.toggle("active")) {
+                                    expandSubLevels(this, key);
+                                }
+                                else {
+                                    collapseSubLevels(this, key);
+                                }
+                            });
+                        }
+                    }
+                }
+
+                function hasSubLevels(element, levelName) {
+                    let nextSibling = element.nextElementSibling;
+                    let levelCriticality = LogLevelsEnum[levelName];
+
+                    if (nextSibling == null) {
+                        return false;
+                    }
+
+                    let classList = nextSibling.classList;
+
+                    if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
+                        let subLevelName = classList[0];
+                        let subLevelCriticality = LogLevelsEnum[subLevelName];
+
+                        if (subLevelCriticality >= levelCriticality && canBeFolded(subLevelName)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
+                function collapseSubLevels(element, levelName) {
+                    let nextSibling = element.nextElementSibling;
+                    let levelCriticality = LogLevelsEnum[levelName];
+
+                    while (nextSibling != null) {
+                        let classList = nextSibling.classList;
+
+                        if (classList.contains(levelName)) {
+                            break;
+                        }
+
+                        if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
+                            let subLevelName = classList[0];
+                            let subLevelCriticality = LogLevelsEnum[subLevelName];
+
+                            if (subLevelCriticality > levelCriticality && canBeFolded(subLevelName)) {
+                                break;
+                            }
+
+                            if (subLevelCriticality < levelCriticality) {
+                                nextSibling.classList.remove("active");
+                                nextSibling.style.display = "none";
+                            }
+                        }
+
+                        nextSibling = nextSibling.nextElementSibling;
+                    }
+                }
+
+                function expandSubLevels(element, levelName) {
+                    let nextSibling = element.nextElementSibling;
+                    let levelCriticality = LogLevelsEnum[levelName];
+
+                    let levelIndex = Object.keys(LogLevelsEnum).indexOf(levelName);
+                    let previousLevel = Object.keys(LogLevelsEnum)[levelIndex - 1];
+
+                    if (previousLevel === undefined) {
+                        return;
+                    }
+
+                    while (nextSibling != null) {
+                        let classList = nextSibling.classList;
+
+                        if (classList.contains(levelName)) {
+                            break;
+                        }
+
+                        if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
+                            let subLevelName = classList[0];
+                            let subLevelCriticality = LogLevelsEnum[classList[0]];
+
+                            if (subLevelCriticality > levelCriticality && canBeFolded(subLevelName)) {
+                                break;
+                            }
+
+                            if (classList[0] == previousLevel) {
+                                nextSibling.style.display = "block";
+                            }
+                        }
+
+                        nextSibling = nextSibling.nextElementSibling;
+                    }
+                }
+
+                function expandParentLevels(element) {
+                    let classList = element.classList;
+
+                    if (classList[0] === undefined || !(classList[0] in LogLevelsEnum)) {
+                        return;
+                    }
+
+                    let levelName = classList[0];
+                    let levelCriticality = LogLevelsEnum[levelName];
+
+                    let previousSibling = element.previousElementSibling;
+
+                    while (previousSibling != null) {
+                        let classList = previousSibling.classList;
+
+                        if (levelCriticality >= LogLevelsEnum["notice"]) {
+                            return;
+                        }
+
+                        if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
+                            let previousSiblingLevelName = classList[0];
+                            let previousSiblingCriticality = LogLevelsEnum[classList[0]];
+
+                            if (previousSiblingCriticality > levelCriticality && previousSiblingCriticality <= LogLevelsEnum["notice"])
+                            {
+                                expandSubLevels(previousSibling, previousSiblingLevelName);
+
+                                if (previousSibling.classList.toggle("active")) {
+                                    expandSubLevels(previousSibling, previousSiblingLevelName);
+                                }
+
+                                levelCriticality = previousSiblingCriticality;
+                            }
+                        }
+
+                        previousSibling = previousSibling.previousElementSibling;
+                    }
+                }
+
+                function checkResult() {
+                    let errors = document.getElementsByClassName("error");
+
+                    if (errors.length > 0) {
+                        return;
+                    }
+
+                    let elements = document.querySelectorAll('.title');
+
+                    for (i = 0; i < elements.length; i++) {
+                        elements[i].style.backgroundColor = "#1de9b6";
+                    }
+                }
+
+                var logVideo = document.getElementById("video-insert");
+
+                addAccordions();
+                updateScreenshotsList();
+                checkResult();
+
+                logVideo.ontimeupdate = function () { onTimeUpdateCallback() };
+
+                var previousTime = -1;
+
+                function removePreviousSeekMark() {
+                    previousDiv = screenshotNumberToElement[previousTime];
+
+                    if (previousDiv != null) {
+                        previousDiv.classList.remove("current-frame");
+                    }
+                }
+
+                function onTimeUpdateCallback() {
+                    let currentTime = Math.floor(logVideo.currentTime);
+
+                    if (currentTime === previousTime) {
+                        return;
+                    }
+
+                    removePreviousSeekMark();
+
+                    previousTime = currentTime;
+
+                    let screenshotDiv = screenshotNumberToElement[currentTime];
+
+                    if (screenshotDiv == null) {
+                        return;
+                    }
+
+                    expandParentLevels(screenshotDiv);
+
+                    screenshotDiv.scrollIntoView(true);
+
+                    screenshotDiv.classList.add("current-frame");
+                }
+
+                function onHoverSeekVideoCallback(event) {
+                    element = event.currentTarget;
+
+                    let currentTime = getScreenshotNumber(element);
+
+                    if (currentTime === null) {
+                        return;
+                    }
+
+                    removePreviousSeekMark();
+
+                    previousTime = currentTime;
+
+                    logVideo.currentTime = currentTime;
+
+                    let screenshotDiv = screenshotNumberToElement[currentTime];
+                    screenshotDiv.classList.add("current-frame");
+                }
+            </script>
+
+        </body>
+
+</html>

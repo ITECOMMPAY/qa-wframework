@@ -1,0 +1,7 @@
+# `chrome` environment config
+modules:
+    config:
+        Common\Module\WFramework\Modules\WebTestingModule:
+            browser: Safari
+            capabilities:
+                browser_version: '11.1'

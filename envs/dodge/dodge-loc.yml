@@ -1,0 +1,5 @@
+# `nl3 Dashboard` environment config
+modules:
+    config:
+        Common\Module\WFramework\Modules\WebTestingModule:
+            url: 'https://www.dodge.com/'

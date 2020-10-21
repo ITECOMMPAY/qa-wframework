@@ -1,0 +1,13 @@
+namespace: dodge
+paths:
+    tests: .
+    output: ../../output/dodge/
+    data: _data
+    support: _support
+    envs: ../../envs
+actor_suffix: Tester
+settings:
+    memory_limit: 4096M
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style>
+        .title {
+            background-color: #ef9a9a;
+            color: #212121;
+            padding: 32px 18px 32px;
+            overflow: hidden;
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            font-size: 2.6rem;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .notice,
+        .info,
+        .debug,
+        .warning,
+        .error,
+        .alert,
+        .critical {
+            margin-left: 18px;
+            padding: 12px 18px 12px;
+            overflow: hidden;
+            display: block;
+            background-color: #efebe9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            font-weight: normal;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .alert {
+            border-left: 18px solid #ffa726;
+            background-color: #fff3e0;
+        }
+
+        .critical {
+            border-left: 18px solid #42a5f5;
+            background-color: #e3f2fd;
+        }
+
+        .error {
+            border-left: 18px solid #f44336;
+            background-color: #ffcdd2;
+            font-size: 0.8rem;
+            font-weight: bold;
+            font-family: Consolas, "courier new";
+        }
+
+        .warning {
+            border-left: 18px solid #ef9a9a;
+            background-color: #ffebee;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .notice {
+            border-left: 18px solid #efebe9;
+            background-color: #fafafa;
+        }
+
+        .info {
+            margin-left: 54px;
+            border-left: 18px solid #bcaaa4;
+            background-color: #f5f5f5;
+            display: none;
+        }
+
+        .debug {
+            margin-left: 90px;
+            border-left: 18px solid #8d6e63;
+            background-color: #eeeeee;
+            display: none;
+            font-family: Consolas, "courier new";
+        }
+
+        .left-panel {
+            width: 50%;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .right-panel {
+            width: 50%;
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            height: 60vh;
+        }
+
+        #video-insert {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .right-panel img {
+            max-width: 100%;
+            max-height: 100%;
+            margin: auto;
+            display: inline-block;
+            vertical-align: middle;
+            padding: 20% 0px 0px 0px;
+        }
+
+        .accordion {
+            cursor: pointer;
+            border-bottom: 12px solid transparent;
+            padding: 12px 12px 0px;
+        }
+
+        .accordion.active {
+            border-top: 12px solid transparent;
+            border-bottom: none;
+            padding: 0px 12px 12px;
+        }
+
+        .current-frame {
+            border-right: 18px solid #474747;
+        }
+    </style>
+</head>
+
+<body>
+  <div class="title">
+    $title
+  </div>
+
+  <div class="wrapper">
+
+    <div class="left-panel">

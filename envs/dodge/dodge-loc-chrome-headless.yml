@@ -1,0 +1,9 @@
+# `local` environment config
+modules:
+  config:
+    Common\Module\WFramework\Modules\WebTestingModule:
+      browser: 'chrome'
+      capabilities:
+        chromeOptions:
+          args: ["headless"]
+          w3c: false
