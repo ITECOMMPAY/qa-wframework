@@ -68,7 +68,7 @@ class selfCheckCest
     {
         $I->wantToTest('Указанный PageObject имеет валидные локаторы');
 
-        $pageObject = '\dodge\Helper\Blocks\SelectModelPage\SelectModelBlock'; // Полное имя класса PO, который нужно валидировать
+        $pageObject = '\dodge\Helper\Blocks\BuildModelPage\StripesAndDecalsBlock'; // Полное имя класса PO, который нужно валидировать
                                                                       // (правой кнопкой по имени класса -> Copy/Paste Special -> Copy Reference)
 
 

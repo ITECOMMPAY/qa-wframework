@@ -76,6 +76,9 @@ class exampleCest
                         ->startBuildingModel()
                         ->selectBuyOption()
                         ->selectModel('Alias: SRT HELLCAT REDEYE WIDEBODY')
+                        ->checkModelName()
+                        ->setModelColor('Alias: White Knuckle')
+                        ->selectDecal('Alias: Dual Silver Stripes')
                         ;
     }
 }

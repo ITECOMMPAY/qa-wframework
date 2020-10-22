@@ -5,6 +5,7 @@ namespace dodge\Helper\TestSteps;
 
 
 use Common\Module\WFramework\Exceptions\Common\UsageException;
+use Common\Module\WFramework\Properties\TestProperties;
 use Common\Module\WFramework\StepsGroup\StepsGroup;
 use dodge\DodgeTester;
 use dodge\Helper\AliasMaps\ChallengerModelsMap;
@@ -77,6 +78,8 @@ class SelectModelSteps extends StepsGroup
         /** @var DodgeModelCard $vehicle */
         $model = $models[$name];
         $model->click();
+
+        TestProperties::setValue('currentModel', $name);
 
         return DodgeSteps::$buildModelSteps->shouldBeDisplayed();
     }
