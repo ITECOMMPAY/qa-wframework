@@ -50,10 +50,10 @@ class SelfieShooter
     {
         WLogger::logDebug($this->pageObject . ' -> снимаем скриншот');
 
+        WLogger::logDebug('Получаем список элементов, которые нужно скрыть/сбросить на скриншоте');
+
         $getVolatile = function (IPageObject $pageObject, array &$result) use (&$getVolatile)
         {
-            WLogger::logDebug('Получаем список элементов, которые нужно скрыть/сбросить на скриншоте');
-
             foreach ($pageObject->getChildren() as $child)
             {
                 if ($child instanceof IHiddenOnShot)

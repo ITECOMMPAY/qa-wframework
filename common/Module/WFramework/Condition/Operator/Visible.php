@@ -11,18 +11,28 @@ namespace Common\Module\WFramework\Condition\Operator;
 
 use Common\Module\WFramework\Condition\Cond;
 use Common\Module\WFramework\FacadeWebElement\FacadeWebElement;
+use Common\Module\WFramework\Properties\TestProperties;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
 
 class Visible extends Cond
 {
+    static $isSafari;
+
     protected function apply(FacadeWebElement $facadeWebElement)
     {
         try
         {
             if (!$facadeWebElement->returnProxyWebElement()->isExist())
             {
-                $this->result = False;
+                $this->result = false;
+                return;
+            }
+
+            if ($this->isSafari())
+            {
+                // Safari пока не поддерживает /session/{}/element/{}/displayed
+                $this->result = (bool) $facadeWebElement->exec()->scriptOnThis(static::SCRIPT_VISIBLE);
                 return;
             }
 
@@ -38,6 +48,16 @@ class Visible extends Cond
         }
     }
 
+    protected function isSafari() : bool
+    {
+        if (!isset(static::$isSafari))
+        {
+            static::$isSafari = strtolower(TestProperties::getValue('browser', '')) === 'safari';
+        }
+
+        return static::$isSafari;
+    }
+
     public function printExpectedValue() : string
     {
         return "должен быть виден";
@@ -47,4 +67,10 @@ class Visible extends Cond
     {
         return $this->result ? 'виден' : 'не виден';
     }
+
+    //https://github.com/jquery/jquery/blob/master/src/css/hiddenVisibleSelectors.js
+    protected const SCRIPT_VISIBLE  = <<<EOF
+return !!( arguments[0].offsetWidth || arguments[0].offsetHeight || Array.from(arguments[0].getClientRects()).filter(function(el){return el.width > 0 && el.height > 0;}).length );
+EOF;
+
 }

@@ -313,7 +313,7 @@ function getScrollParent(element, includeHidden) {
     
     if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return element;
 
-    if (style.position === "fixed") return document.body;
+    if (style.position === "fixed") return document.documentElement;
     for (var parent = element; (parent = parent.parentElement);) {
         style = getComputedStyle(parent);
         if (excludeStaticParent && style.position === "static") {
@@ -322,10 +322,10 @@ function getScrollParent(element, includeHidden) {
         if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
     }
 
-    return document.body;
+    return document.documentElement;
 }
 
-getScrollParent(arguments[0], true).scrollBy(arguments[1], arguments[2]);
+getScrollParent(arguments[0], false).scrollBy(arguments[1], arguments[2]);
 EOF;
 
     const CLICK_AT_COORDINATES = <<<EOF

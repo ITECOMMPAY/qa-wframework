@@ -1,8 +1,5 @@
 # `local` environment config
 modules:
-  config:
-    Common\Module\WFramework\Modules\WebTestingModule:
-      browser: 'chrome'
-      capabilities:
-        chromeOptions:
-          w3c: false
+    config:
+        Common\Module\WFramework\Modules\WebTestingModule:
+            browser: chrome

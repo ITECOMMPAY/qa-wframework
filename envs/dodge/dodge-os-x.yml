@@ -4,4 +4,4 @@ modules:
         Common\Module\WFramework\Modules\WebTestingModule:
             capabilities:
                 os: 'OS X'
-                os_version: 'High Sierra'
+                os_version: 'Catalina'

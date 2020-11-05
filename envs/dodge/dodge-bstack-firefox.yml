@@ -4,5 +4,4 @@ modules:
         Common\Module\WFramework\Modules\WebTestingModule:
             browser: firefox
             capabilities:
-                browser: 'Firefox'
-                browser_version: '62.0'
+                browserVersion: 'latest'

@@ -43,9 +43,6 @@ class WebTestingModule extends WebDriver implements DependsOnModule
     /** @var ProxyWebDriver */
     protected $proxyWebDriver;
 
-    /** @var Local */
-    protected $bs_local;
-
     /** @var bool */
     protected $firstInit = true;
 
@@ -130,10 +127,10 @@ EOF;
 
     public function _initialize()
     {
-        WLogger::logInfo('Initializing framework');
-
         if ($this->firstInit)
         {
+            WLogger::logInfo('Initializing framework');
+
             if ($this->config['useBrowserStack'])
             {
                 $this->configureBrowserStack();
@@ -157,53 +154,26 @@ EOF;
 
     protected function configureBrowserStack()
     {
-        WLogger::logDebug('Configuring Browser Stack');
+        WLogger::logDebug('Настраиваем Browser Stack');
 
         getenv('BROWSERSTACK_USERNAME')   ? ($this->config['capabilities']['browserstack.user'] = getenv('BROWSERSTACK_USERNAME')) : 0;
         getenv('BROWSERSTACK_ACCESS_KEY') ? ($this->config['capabilities']['browserstack.key'] = getenv('BROWSERSTACK_ACCESS_KEY')) : 0;
         getenv('BROWSERSTACK_BUILD') ? ($this->config['capabilities']['build'] = getenv('BROWSERSTACK_BUILD')) : 0;
         getenv('BROWSERSTACK_PROJECT') ? ($this->config['capabilities']['project'] = getenv('BROWSERSTACK_PROJECT')) : 0;
 
-        $this->config['capabilities']['browserstack.localIdentifier'] = md5(posix_getlogin() . php_uname() . phpversion() . random_bytes(64));
+        $this->config['capabilities']['browserstack.localIdentifier'] = $this->getBSLocalId();
 
-        $browserStackLocal = $this->config['capabilities']['browserstack.local'] ?? false;
-
-        if ($browserStackLocal)
-        {
-            $this->startLocalBrowserStack();
-        }
+        /*
+         * Локальный BrowserStack нужно запустить руками, через их Jenkins плагин или через /common/Module/WFramework/Helpers/BSStarter.php
+         *
+         * BSStarter.php гарантирует, что даже если несколько тестов одновременно попробуют запустить локального агента BS
+         * - только один экземпляр скрипта сделает это, в то время как остальные будут ждать успешного запуска агента.
+         */
     }
 
-    protected function startLocalBrowserStack()
+    protected function getBSLocalId() : string
     {
-        WLogger::logDebug('Running local Browser Stack');
-
-        if (!isset($this->bs_local))
-        {
-            $bs_local_args = [
-                'key' => $this->config['capabilities']['browserstack.key'],
-                'localIdentifier' => $this->config['capabilities']['browserstack.localIdentifier'],
-                'forcelocal' => true
-                ];
-
-            $this->bs_local = new Local();
-
-            $attempt = 0;
-
-            while(!$this->bs_local->isRunning() && $attempt < 3)
-            {
-                try
-                {
-                    $this->bs_local->start($bs_local_args);
-                    break;
-                }
-                catch (\BrowserStack\LocalException $e)
-                {
-                    $attempt++;
-                    sleep(random_int(3, 5));
-                }
-            }
-        }
+        return preg_replace("/[^A-Za-z0-9]/", '', php_uname());
     }
 
     protected function setRunUniqueId()
@@ -317,13 +287,5 @@ EOF;
         parent::_failed($test, $fail);
 
         WLogger::logError($fail->getMessage());
-    }
-
-    public function __destruct()
-    {
-        if (isset($this->bs_local) && $this->bs_local->isRunning())
-        {
-            $this->bs_local->stop();
-        }
     }
 }

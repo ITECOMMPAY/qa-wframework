@@ -39,6 +39,18 @@ class Rect
         return new Rect($domRect['x'], $domRect['y'], $domRect['width'], $domRect['height'], $domRect['top'], $domRect['bottom'], $domRect['left'], $domRect['right']);
     }
 
+    public static function fromOtherRect(Rect $otherRect, array $modifiers = []) : Rect
+    {
+        $result = new Rect($otherRect->x, $otherRect->y, $otherRect->width, $otherRect->height, $otherRect->top, $otherRect->bottom, $otherRect->left, $otherRect->right);
+
+        foreach ($modifiers as $field => $value)
+        {
+            $result->$field = $value;
+        }
+
+        return $result;
+    }
+
     public function __toString() : string
     {
         return "X: $this->x Y: $this->y    Size: {$this->width}x{$this->height}    T:$this->top B: $this->bottom L: $this->left R: $this->right";

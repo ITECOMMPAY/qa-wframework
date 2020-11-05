@@ -79,7 +79,7 @@ class Color
 
         if (!isset($matches[1], $matches[2], $matches[3]))
         {
-            throw new NotImplementedException('Браузер вернул цвет элемента в неподдерживаемом формате');
+            throw new NotImplementedException('Браузер вернул цвет элемента в неподдерживаемом формате: ' . $string);
         }
 
         $alpha = (float) ($matches[5] ?? 1.0);

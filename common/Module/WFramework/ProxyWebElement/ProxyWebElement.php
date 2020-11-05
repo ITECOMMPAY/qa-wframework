@@ -390,4 +390,9 @@ class ProxyWebElement extends RemoteWebElement
     {
         return $this->returnRemoteWebElement()->upload($local_file);
     }
+
+    public function takeElementScreenshot($save_as = null)
+    {
+        return $this->returnRemoteWebElement()->takeElementScreenshot($save_as);
+    }
 }

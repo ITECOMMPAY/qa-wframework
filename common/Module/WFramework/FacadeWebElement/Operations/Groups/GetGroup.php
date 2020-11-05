@@ -295,7 +295,7 @@ class GetGroup extends OperationsGroup
     {
         WLogger::logDebug('Получаем цвет обводки элемента');
 
-        $borderColor = $this->getProxyWebElement()->getCSSValue('border-color');
+        $borderColor = $this->getProxyWebElement()->getCSSValue('border-top-color');
 
         $result = Color::fromString($borderColor);
 
@@ -468,6 +468,17 @@ class GetGroup extends OperationsGroup
         return $rect;
     }
 
+    public function elementClearViewportRect() : Rect
+    {
+        WLogger::logDebug('Получаем размер viewport\'а для элемента с учётом плавающих панелек');
+
+        $rect = Rect::fromDOMRect($this->getProxyWebElement()->executeScriptOnThis(static::SCRIPT_GET_ELEMENT_CLEAR_VIEWPORT_SIZE));
+
+        WLogger::logDebug('Viewport для элемента имеет размер: ' . $rect);
+
+        return $rect;
+    }
+
     public function boundingClientRect() : Rect
     {
         WLogger::logDebug('Получаем boundingClientRect элемента');
@@ -483,82 +494,90 @@ class GetGroup extends OperationsGroup
     {
         WLogger::logDebug('Получаем скриншот элемента');
 
-        $this->facadeWebElement->mouse()->scrollTo(0);
-
         if (!is_callable($waitClosure))
         {
             $waitClosure = function(){};
         }
 
-        $waitClosure();
-
-        $elementRect = $this->boundingClientRect();
-        $viewportRect = $this->elementViewportRect();
-
-        $getColumnShot = function (Rect $elementRect, Rect $viewportRect) use ($waitClosure)
+        $shotToCanvas = function (Imagick $imagick, Rect $viewportRect)
         {
+            $imagick->readImageBlob($this->getProxyWebElement()->getWebDriver()->takeScreenshot());
+            $imagick->cropImage($viewportRect->getWidth(), $viewportRect->getHeight(), $viewportRect->getX(), $viewportRect->getY());
+            $imagick->setImagePage($imagick->getImageWidth(), $imagick->getImageHeight(), 0, 0);
+            $imagick->setImageUnits(imagick::PATHUNITS_OBJECTBOUNDINGBOX);
+        };
+
+        $getColumnShot = function (Rect $elementRect, Rect $viewportRect) use ($shotToCanvas, $waitClosure)
+        {
+            WLogger::logDebug('Делаем скриншот колонки');
+
             $column = new Imagick();
 
-            $startingY = $this->facadeWebElement->get()->boundingClientRect()->getY();
+            $startingY = $elementRect->getY();
+
+            /**
+             * Скриншот элемента (допустим 30x100), выходящего за рамки viewport (30x30) по вертикали делается в три этапа:
+             *
+             * 1. Делаем скриншот видимой части viewport (кусочек 30x30)
+             * 2. Прокручиваем viewport на его высоту и делаем скриншот, пока viewport можно прокрутить целое количество раз (кусочек 30x60)
+             * 3. Делаем скриншот последней части элемента. Для этого нужно вычислить её высоту и прокрутить viewport на неё (кусочек 30x10).
+             *
+             * В конце метода мы сшиваем скриншоты полученные на этих этапах (30x30 + 30x60 + 30x10 = 30x100)
+             */
+
+            WLogger::logDebug('Делаем скриншот видимой части колонки');
+
+            $shotToCanvas($column, $viewportRect);
+
+
 
             $timesY = (int) floor($elementRect->getHeight() / $viewportRect->getHeight());
 
-            $timesY = ($timesY < 1) ? 1 : $timesY;
+            WLogger::logDebug("Для создания полного скриншота колонки, viewport будет прокручен по вертикали " . max($timesY - 1, 0) . " раз");
 
-            WLogger::logDebug("Для создания полного скриншота, viewport будет прокручен $timesY раз");
-
-            for ($i = 0; $i < $timesY; $i++)
+            for ($i = 1; $i < $timesY; $i++) //С 1 т.к. первый кусок элемента мы уже сфоткали
             {
-                WLogger::logDebug('Делаем скриншот viewport и прокручиваем его на его высоту');
-
-                $screenshot = $this->getProxyWebElement()->getWebDriver()->takeScreenshot();
-
-                $column->readImageBlob($screenshot);
-                $column->cropImage($viewportRect->getWidth(), $viewportRect->getHeight(), $viewportRect->getX(), $viewportRect->getY());
-                $column->setImagePage($column->getImageWidth(), $column->getImageHeight(), 0, 0);
-                $column->setImageUnits(imagick::PATHUNITS_OBJECTBOUNDINGBOX);
+                WLogger::logDebug('Прокручиваем viewport на его высоту и делаем скриншот');
 
                 $this->facadeWebElement->mouse()->scrollBy(0, $viewportRect->getHeight());
+
                 $waitClosure();
+
+                $shotToCanvas($column, $viewportRect);
             }
 
-            $danglingHeight = $elementRect->getHeight() - ($viewportRect->getHeight() * $timesY);
 
-            $currentY = $this->facadeWebElement->get()->boundingClientRect()->getY();
+
+            $danglingHeight = $elementRect->getHeight() - ($viewportRect->getHeight() * max($timesY, 1));
 
             if ($danglingHeight > 0)
             {
-                WLogger::logDebug('Делаем скриншот последнего кусочка viewport');
+                WLogger::logDebug('Делаем скриншот последнего вертикального кусочка колонки');
 
-                $danglingFromTop = ($currentY - $startingY) % $viewportRect->getHeight() == 0;
+                $this->facadeWebElement->mouse()->scrollBy(0, $danglingHeight);
 
-                $screenshot = $this->getProxyWebElement()->getWebDriver()->takeScreenshot();
-                $column->readImageBlob($screenshot);
+                $waitClosure();
 
-                if ($danglingFromTop)
-                {
-                    $column->cropImage(
-                        $viewportRect->getWidth(), $danglingHeight, $viewportRect->getX(), $viewportRect->getY());
-                }
-                else
-                {
-                    $column->cropImage(
-                        $viewportRect->getWidth(), $danglingHeight, $viewportRect->getX(), $viewportRect->getY() +
-                                                                                           ($viewportRect->getHeight() -
-                                                                                            $danglingHeight)
-                    );
-                }
+                $danglingRect = Rect::fromOtherRect($viewportRect,
+                                                    [
+                                                        'height' => $danglingHeight,
+                                                        'y' => $viewportRect->getY() + $viewportRect->getHeight() - $danglingHeight
+                                                    ]);
+
+                $shotToCanvas($column, $danglingRect);
             }
+
+
 
             $column->resetIterator();
 
-            WLogger::logDebug('Сшиваем скриншоты по вертикали');
+            WLogger::logDebug('Сшиваем скриншоты колонки по вертикали');
 
             $wholeColumn = $column->appendImages(true);
             $wholeColumn->setImagePage($wholeColumn->getImageWidth(), $wholeColumn->getImageHeight(), 0, 0);
             $wholeColumn->setImageUnits(imagick::PATHUNITS_OBJECTBOUNDINGBOX);
 
-            WLogger::logDebug('Обрезаем финальный скриншот до размеров элемента');
+            WLogger::logDebug('Обрезаем финальный скриншот колонки до размеров элемента');
 
             $wholeColumn->cropImage(
                 min($viewportRect->getWidth(), $elementRect->getWidth()), $elementRect->getHeight(), $elementRect->getX() -
@@ -566,67 +585,93 @@ class GetGroup extends OperationsGroup
                                                                                             $viewportRect->getY()
             );
 
-            $this->facadeWebElement->mouse()->scrollBy(0, $currentY - $startingY);
+
+
+            $currentY = $this->facadeWebElement->get()->boundingClientRect()->getY();
+            $this->facadeWebElement->mouse()->scrollBy(0, $currentY - $startingY); // Прокручиваем наверх
+
             $waitClosure();
 
             return $wholeColumn;
         };
 
-        $startingX = $this->facadeWebElement->get()->boundingClientRect()->getX();
-
-        $timesX = (int) floor($elementRect->getWidth() / $viewportRect->getWidth());
-
-        WLogger::logDebug("Для создания полного скриншота, viewport будет прокручен по горизонтали $timesX раз");
-
-        $timesX = ($timesX < 1) ? 1 : $timesX;
-
-        $columns = new Imagick();
-
-        for ($j = 0; $j < $timesX; $j++)
+        $getColumnsShot = function (Rect $elementRect, Rect $viewportRect) use ($getColumnShot, $waitClosure)
         {
-            WLogger::logDebug('Делаем скриншот вертикальной колонки элемента и прокручиваем его viewport на его ширину');
+            WLogger::logDebug('Делаем скриншоты колонок');
+
+            $columns = new Imagick();
+
+            $startingX = $elementRect->getX();
+
+            WLogger::logDebug('Делаем скриншот видимой колонки');
 
             $columns->addImage($getColumnShot($elementRect, $viewportRect));
 
-            $this->facadeWebElement->mouse()->scrollBy($viewportRect->getWidth(), 0);
-            $waitClosure();
-        }
 
-        $danglingWidth = $elementRect->getWidth() - ($viewportRect->getWidth() * $timesX);
 
-        $currentX = $this->facadeWebElement->get()->boundingClientRect()->getX();
+            $timesX = (int) floor($elementRect->getWidth() / $viewportRect->getWidth());
 
-        if ($danglingWidth > 0)
-        {
-            WLogger::logDebug('Делаем скриншот последнего горизонтального кусочка viewport');
+            WLogger::logDebug("Для создания полного скриншота элемента, viewport будет прокручен по горизонтали " . max($timesX - 1, 0) . " раз");
 
-            $column = $getColumnShot($elementRect, $viewportRect);
-
-            $danglingFromLeft = ($currentX - $startingX) % $viewportRect->getWidth() == 0;
-
-            if ($danglingFromLeft)
+            for ($j = 1; $j < $timesX; $j++)
             {
-                $column->cropImage(
-                    $danglingWidth, $column->getImageHeight(), 0, 0
-                );
+                WLogger::logDebug('Прокручиваем viewport на его ширину и делаем скриншот вертикальной колонки элемента');
+
+                $this->facadeWebElement->mouse()->scrollBy($viewportRect->getWidth(), 0);
+
+                $waitClosure();
+
+                $columns->addImage($getColumnShot($elementRect, $viewportRect));
             }
-            else
+
+
+
+            $danglingWidth = $elementRect->getWidth() - ($viewportRect->getWidth() * max($timesX, 1));
+
+            if ($danglingWidth > 0)
             {
+                WLogger::logDebug('Делаем скриншот последнего горизонтального кусочка элемента');
+
+                $this->facadeWebElement->mouse()->scrollBy($danglingWidth, 0);
+
+                $waitClosure();
+
+                $column = $getColumnShot($elementRect, $viewportRect);
                 $column->cropImage(
                     $danglingWidth, $column->getImageHeight(), $column->getImageWidth() - $danglingWidth, 0
                 );
+
+                $columns->addImage($column);
             }
 
-            $columns->addImage($column);
-        }
 
-        $columns->resetIterator();
+            $columns->resetIterator();
 
-        WLogger::logDebug('Сшиваем скриншоты по горизонтали');
+            WLogger::logDebug('Сшиваем скриншоты колонок по горизонтали');
 
-        $wholeElement = $columns->appendImages(false);
-        $wholeElement->setImagePage($wholeElement->getImageWidth(), $wholeElement->getImageHeight(), 0, 0);
-        $wholeElement->setImageUnits(imagick::PATHUNITS_OBJECTBOUNDINGBOX);
+            $wholeElement = $columns->appendImages(false);
+            $wholeElement->setImagePage($wholeElement->getImageWidth(), $wholeElement->getImageHeight(), 0, 0);
+            $wholeElement->setImageUnits(imagick::PATHUNITS_OBJECTBOUNDINGBOX);
+
+
+            $currentX = $this->facadeWebElement->get()->boundingClientRect()->getX();
+            $this->facadeWebElement->mouse()->scrollBy(0, $currentX - $startingX); // Прокручиваем налево
+
+            $waitClosure();
+
+            return $wholeElement;
+        };
+
+
+
+        $this->facadeWebElement->mouse()->scrollTo(0);
+
+        $waitClosure();
+
+        $elementRect = $this->boundingClientRect();
+        $viewportRect = $this->elementClearViewportRect();
+
+        $wholeElement = $getColumnsShot($elementRect, $viewportRect);
 
         $elementScreenshot = $wholeElement->getImageBlob();
 
@@ -692,4 +737,242 @@ function getElementViewportSize(element) {
 return getElementViewportSize(arguments[0]);
 EOF;
 
+    const SCRIPT_GET_ELEMENT_CLEAR_VIEWPORT_SIZE = <<<EOF
+return getElementViewportSize(arguments[0]);
+
+function getElementViewportSize(element) {
+    let scrollParent = getScrollParent(element, false);
+
+    let clearViewport = getClearViewport(scrollParent);
+    
+    if (scrollParent === document.body && clearViewport.y < 0) {
+        // Хром со своей дурацкой панелькой "controlled by automated software"
+        return new DOMRect(clearViewport.x, 0, clearViewport.width, clearViewport.height);
+    }
+    
+    return clearViewport;
+}
+
+function getScrollParent(element, includeHidden) {
+    var style = getComputedStyle(element);
+    var excludeStaticParent = style.position === "absolute";
+    var overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;
+
+    if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return element;
+
+    if (style.position === "fixed") return document.body;
+    for (var parent = element; (parent = parent.parentElement);) {
+        style = getComputedStyle(parent);
+        if (excludeStaticParent && style.position === "static") {
+            continue;
+        }
+        if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
+    }
+
+    return document.body;
+}
+
+function getViewportStickies(viewport) {
+    let result = [];
+
+    let elements = viewport.getElementsByTagName("*");
+
+    for (const element of elements) {
+        let cs = getComputedStyle(element);
+        let position = cs['position'];
+
+        if (position !== 'sticky') {
+            continue;
+        }
+
+        result.push(getStickyPosition(element, cs));
+    }
+
+    return result;
+}
+
+function getStickyPosition(sticky, computedStyle) {
+    let positions = ['top', 'bottom', 'left', 'right'];
+
+    for (const pos of positions) {
+        let value = computedStyle[pos] ?? 'auto';
+
+        if (isNaN(parseInt(value, 10))) {
+            continue;
+        }
+
+        let pixels = toPixels(sticky, value, pos);
+
+        return { element: sticky, position: pos, value: pixels };
+    }
+
+    return { element: sticky, position: "top", value: 0 };
+}
+
+function getCutValues(stickies) {
+    var cutValues = { top: [0], bottom: [0], left: [0], right: [0] };
+
+    for (sticky of stickies) {
+        let { element, position, value } = sticky;
+
+        let rect = element.getBoundingClientRect();
+
+        var cutValue = 0;
+
+        if (["top", "bottom"].indexOf(position) > -1) {
+            cutValue = rect.height + value;
+        } else {
+            cutValue = rect.width + value;
+        }
+
+        cutValues[position].push(cutValue);
+    }
+
+    return {
+        top: Math.max(...cutValues.top),
+        bottom: Math.max(...cutValues.bottom),
+        left: Math.max(...cutValues.left),
+        right: Math.max(...cutValues.right)
+    };
+}
+
+function getClearViewport(viewport) {
+    let stickies = getViewportStickies(viewport);
+
+    var viewportRect = viewport.getBoundingClientRect();
+
+    if (!Array.isArray(stickies) || !stickies.length) {
+        return viewportRect;
+    }
+
+    let cutValues = getCutValues(stickies);
+
+    viewportRect = new DOMRect(viewportRect.x, viewportRect.y + cutValues.top, viewportRect.width, viewportRect.height - cutValues.top - cutValues.bottom);
+    viewportRect = new DOMRect(viewportRect.x + cutValues.left, viewportRect.y, viewportRect.width - cutValues.left - cutValues.right, viewportRect.height);
+
+    return viewportRect;
+}
+
+
+//https://github.com/heygrady/Units
+
+function toPixels(elem, value, prop) {
+    // create a test element
+    var testElem = document.createElement('test'),
+        docElement = document.documentElement,
+        defaultView = document.defaultView,
+        getComputedStyle = defaultView && defaultView.getComputedStyle,
+        runit = /^(-?[\d+\.\-]+)([a-z]+|%)$/i,
+        convert = {},
+        conversions = [1 / 25.4, 1 / 2.54, 1 / 72, 1 / 6],
+        units = ['mm', 'cm', 'pt', 'pc', 'in', 'mozmm'],
+        i = 6; // units.length
+
+    // add the test element to the dom
+    docElement.appendChild(testElem);
+
+    // pre-calculate absolute unit conversions
+    while (i--) {
+        convert[units[i] + "toPx"] = conversions[i] ? conversions[i] * convert.inToPx : toPx(testElem, '1' + units[i]);
+    }
+
+    // remove the test element from the DOM and delete it
+    docElement.removeChild(testElem);
+    testElem = undefined;
+
+    // convert a value to pixels
+    function toPx(elem, value, prop, force) {
+        // use width as the default property, or specify your own
+        prop = prop || 'width';
+
+        var style,
+            inlineValue,
+            ret,
+            unit = (value.match(runit) || [])[2],
+            conversion = unit === 'px' ? 1 : convert[unit + 'toPx'],
+            rem = /r?em/i;
+
+        if (conversion || rem.test(unit) && !force) {
+            // calculate known conversions immediately
+            // find the correct element for absolute units or rem or fontSize + em or em
+            elem = conversion ? elem : unit === 'rem' ? docElement : prop === 'fontSize' ? elem.parentNode || elem : elem;
+
+            // use the pre-calculated conversion or fontSize of the element for rem and em
+            conversion = conversion || parseFloat(curCSS(elem, 'fontSize'));
+
+            // multiply the value by the conversion
+            ret = parseFloat(value) * conversion;
+        } else {
+            // begin "the awesome hack by Dean Edwards"
+            // @see http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
+
+            // remember the current style
+            style = elem.style;
+            inlineValue = style[prop];
+
+            // set the style on the target element
+            try {
+                style[prop] = value;
+            } catch (e) {
+                // IE 8 and below throw an exception when setting unsupported units
+                return 0;
+            }
+
+            // read the computed value
+            // if style is nothing we probably set an unsupported unit
+            ret = !style[prop] ? 0 : parseFloat(curCSS(elem, prop));
+
+            // reset the style back to what it was or blank it out
+            style[prop] = inlineValue !== undefined ? inlineValue : null;
+        }
+
+        // return a number
+        return ret;
+    }
+
+    // return the computed value of a CSS property
+    function curCSS(elem, prop) {
+        var value,
+            pixel,
+            unit,
+            rvpos = /^top|bottom/,
+            outerProp = ["paddingTop", "paddingBottom", "borderTop", "borderBottom"],
+            innerHeight,
+            parent,
+            i = 4; // outerProp.length
+
+        if (getComputedStyle) {
+            // FireFox, Chrome/Safari, Opera and IE9+
+            value = getComputedStyle(elem)[prop];
+        } else if (pixel = elem.style['pixel' + prop.charAt(0).toUpperCase() + prop.slice(1)]) {
+            // IE and Opera support pixel shortcuts for top, bottom, left, right, height, width
+            // WebKit supports pixel shortcuts only when an absolute unit is used
+            value = pixel + 'px';
+        } else if (prop === 'fontSize') {
+            // correct IE issues with font-size
+            // @see http://bugs.jquery.com/ticket/760
+            value = toPx(elem, '1em', 'left', 1) + 'px';
+        } else {
+            // IE 8 and below return the specified style
+            value = elem.currentStyle[prop];
+        }
+
+        // check the unit
+        unit = (value.match(runit) || [])[2];
+        if ((value === 'auto' || (unit && unit !== 'px')) && getComputedStyle) {
+            // WebKit and Opera will return auto in some cases
+            // Firefox will pass back an unaltered value when it can't be set, like top on a static element
+            value = 0;
+        } else if (unit && unit !== 'px' && !getComputedStyle) {
+            // IE 8 and below won't convert units for us
+            // try to convert using a prop that will return pixels
+            // this will be accurate for everything (except font-size and some percentages)
+            value = toPx(elem, value) + 'px';
+        }
+        return value;
+    }
+
+    return toPx(elem, value, prop);
+}
+EOF;
 }

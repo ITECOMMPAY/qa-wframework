@@ -6,6 +6,4 @@ modules:
             capabilities:
                 chromeOptions:
                     args: ['start-maximized']
-                    w3c: false
-                browser: 'Chrome'
-                browser_version: '80.0'
+                browserVersion: 'latest'
