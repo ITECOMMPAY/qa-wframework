@@ -3,26 +3,26 @@
 
 namespace Common\Module\WFramework\Debug;
 
-use Common\Module\WFramework\WebObjects\Base\WPageObject;
+use Common\Module\WFramework\WebObjects\Base\Interfaces\IPageObject;
 
 class DebugInfo
 {
-    /** @var WPageObject */
+    /** @var IPageObject */
     protected $pageObject;
 
     /**
-     * @return WPageObject
+     * @return IPageObject
      */
-    public function getPageObject() : WPageObject
+    public function getPageObject() : IPageObject
     {
         return $this->pageObject;
     }
 
     /**
-     * @param WPageObject $pageObject
+     * @param IPageObject $pageObject
      * @return DebugInfo
      */
-    public function setPageObject(WPageObject $pageObject) : DebugInfo
+    public function setPageObject(IPageObject $pageObject) : DebugInfo
     {
         $this->pageObject = $pageObject;
         return $this;

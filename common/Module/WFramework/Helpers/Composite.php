@@ -6,12 +6,14 @@
  * Time: 16:05
  */
 
-namespace Common\Module\WFramework\WebObjects\Base;
+namespace Common\Module\WFramework\Helpers;
 
 
 use Common\Module\WFramework\Helpers\ModernObject;
 use Common\Module\WFramework\Exceptions\Common\UsageException;
-use Common\Module\WFramework\WebObjects\Base\EmptyObjects\EmptyWObject;
+use Common\Module\WFramework\ProxyWebElement\ProxyWebElement;
+use Common\Module\WFramework\Helpers\EmptyComposite;
+use Common\Module\WFramework\WebObjects\Base\WPageObject;
 use function array_keys;
 use function implode;
 
@@ -34,13 +36,13 @@ use function implode;
  *
  * @package Common\Module\WFramework\WebObjects\Base
  */
-abstract class WObject extends ModernObject
+abstract class Composite extends ModernObject
 {
-    /** @var WObject */
-    private $parentWObject = null;
+    /** @var Composite */
+    private $parent = null;
 
-    /** @var WObject[] */
-    private $childrenWObjects = [];
+    /** @var Composite[] */
+    private $children = [];
 
     /** @var string  */
     protected $name = '';
@@ -58,33 +60,33 @@ abstract class WObject extends ModernObject
     /**
      * Задаёт элемент, как своего родителя
      *
-     * @param WObject $parentWObject
+     * @param Composite $parent
      */
-    protected function setParent(WObject $parentWObject)
+    protected function setParent(Composite $parent)
     {
-        $this->parentWObject = $parentWObject;
+        $this->parent = $parent;
     }
 
     /**
      * Возвращает своего родителя
      *
-     * Если родителя нет, то возвращает EmptyWObject
+     * Если родителя нет, то возвращает EmptyComposite
      *
-     * @return WObject|WPageObject
+     * @return Composite
      */
     public function getParent()
     {
-        return $this->parentWObject;
+        return $this->parent;
     }
 
     /**
-     * Добавляет все прописанные в данном классе WObject себе в дети
+     * Добавляет все прописанные в данном классе наследники Composite себе в дети
      */
     private function registerChildren()
     {
         foreach ($this as $fieldName => $fieldValue)
         {
-            if ($fieldName !== 'parentWObject' && ($fieldValue instanceof WObject))
+            if ($fieldName !== 'parent' && ($fieldValue instanceof Composite))
             {
                 if ($fieldName[0] === '_')
                 {
@@ -102,11 +104,11 @@ abstract class WObject extends ModernObject
      *
      * Ребёнок должен иметь уникальное имя.
      *
-     * @param WObject $child
+     * @param Composite $child
      */
-    protected function addChild(WObject $child)
+    protected function addChild(Composite $child)
     {
-        $this->childrenWObjects[$child->getName()] = $child;
+        $this->children[$child->getName()] = $child;
         $child->setParent($this);
     }
 
@@ -115,46 +117,88 @@ abstract class WObject extends ModernObject
      */
     protected function clearChildren()
     {
-        $this->childrenWObjects = [];
+        $this->children = [];
     }
 
     /**
      * Возвращает ассоциативный массив детей
      *
-     * Массив имеет вид: имя WObject => WObject
+     * Массив имеет вид: имя Composite => Composite
      *
-     * @return WObject[]|WPageObject[]
+     * @return Composite[]
      */
     public function getChildren() : array
     {
-        return $this->childrenWObjects;
+        return $this->children;
+    }
+
+    public function hasChild(string $name) : bool
+    {
+        return isset($this->children[$name]);
     }
 
     /**
      * Возвращает своего ребёнка по его имени
      *
      * @param string $name - имя
-     * @return WObject|WPageObject
+     * @return Composite|WPageObject
      * @throws UsageException
      */
     public function getChildByName(string $name)
     {
-        if (!isset($this->childrenWObjects[$name]))
+        if (!$this->hasChild($name))
         {
-            throw new UsageException("В WObject'е нет элемента с именем: $name, есть только: " . implode(', ', array_keys($this->childrenWObjects)));
+            throw new UsageException("У узла нет ребёнка с именем: $name, есть только: " . implode(', ', array_keys($this->children)));
         }
 
-        return $this->childrenWObjects[$name];
+        return $this->children[$name];
     }
 
     public function __construct()
     {
         $this->registerChildren();
-        $this->parentWObject = EmptyWObject::get();
+        $this->parent = EmptyComposite::get();
     }
 
     public function __toString() : string
     {
-        return 'WObject ' . $this->getName();
+        return 'Composite ' . $this->getName();
+    }
+
+    /**
+     * @return Composite
+     */
+    protected function getParentOfSubclass(string $classFull)
+    {
+        $parent = $this->getParent();
+
+        while (!$parent instanceof $classFull)
+        {
+            if ($parent instanceof EmptyComposite)
+            {
+                throw new UsageException($this . ' -> не имеет среди родителей экземпляра подкласса: ' . $classFull);
+            }
+
+            $parent = $parent->getParent();
+        }
+
+        return $parent;
+    }
+
+    public function accept($visitor)
+    {
+        $methodToCall = 'accept' . $this->getClassShort();
+
+        return $visitor->$methodToCall($this);
+    }
+
+    public function callDepthFirst(callable $func) : void
+    {
+        $func($this);
+
+        foreach ($this->getChildren() as $name => $child)
+        {
+            $child->callDepthFirst($func);
+        }
     }
 }

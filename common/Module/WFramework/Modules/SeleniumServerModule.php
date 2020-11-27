@@ -84,7 +84,7 @@ class SeleniumServerModule extends CodeceptionModule
         $geckodriverPath = $paths['geckodriver'];
         $seleniumServerPath = realpath(__DIR__ . static::SELENIUM_SERVER_PATH);
 
-        $cmd = "java -Dwebdriver.chrome.driver=$chromedriverPath -Dwebdriver.gecko.driver=$geckodriverPath -jar $seleniumServerPath -sessionTimeout 7200 -enablePassThrough false";
+        $cmd = "java -Dwebdriver.chrome.driver=$chromedriverPath -Dwebdriver.gecko.driver=$geckodriverPath -jar $seleniumServerPath -sessionTimeout 7200";
 
         WLogger::logDebug('Команда для запуска: ' . $cmd);
 

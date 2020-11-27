@@ -12,9 +12,11 @@ use Common\Module\WFramework\Debug\DebugInfo;
 use Common\Module\WFramework\Exceptions\Common\UsageException;
 use Common\Module\WFramework\Exceptions\FacadeWebElementOperations\WaitUntilElement;
 use Common\Module\WFramework\FacadeWebElement\FacadeWebElement;
+use Common\Module\WFramework\Helpers\Composite;
 use Common\Module\WFramework\Logger\WLogger;
 use Common\Module\WFramework\Properties\TestProperties;
-use Common\Module\WFramework\WebObjects\Base\EmptyObjects\EmptyWObject;
+use Common\Module\WFramework\ProxyWebElement\ProxyWebElement;
+use Common\Module\WFramework\Helpers\EmptyComposite;
 use Common\Module\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Common\Module\WFramework\WebObjects\Base\WElement\WElement;
 use Common\Module\WFramework\WebObjects\Base\WBlock\WBlock;
@@ -23,6 +25,7 @@ use Common\Module\WFramework\WebObjects\SelfieShooter\ComparisonResult\Same;
 use Common\Module\WFramework\WebObjects\SelfieShooter\SelfieShooter;
 use Common\Module\WFramework\WLocator\EmptyLocator;
 use Common\Module\WFramework\WLocator\WLocator;
+use Common\Module\WFramework\WOperations\AbstractPageObjectVisitor;
 use Facebook\WebDriver\Interactions\WebDriverActions;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use function microtime;
@@ -35,7 +38,7 @@ use function usleep;
  *
  * @package Common\Module\WFramework\WebObjects\Base
  */
-abstract class WPageObject extends WObject implements IPageObject
+abstract class WPageObject extends Composite implements IPageObject
 {
     /**
      * Все PageObject'ы привязаны к DOM-дереву через локатор.
@@ -155,7 +158,7 @@ abstract class WPageObject extends WObject implements IPageObject
     {
         if ($this->actor === null)
         {
-            if ($this->getParent() instanceof EmptyWObject)
+            if ($this->getParent() instanceof EmptyComposite)
             {
                 if ($this instanceof WBlock)
                 {
@@ -186,7 +189,7 @@ abstract class WPageObject extends WObject implements IPageObject
     {
         if ($this->webDriver === null)
         {
-            if ($this->getParent() instanceof EmptyWObject)
+            if ($this->getParent() instanceof EmptyComposite)
             {
                 if ($this instanceof WBlock)
                 {
@@ -788,5 +791,19 @@ abstract class WPageObject extends WObject implements IPageObject
         $reference = $this->returnCodeceptionActor()->getShot($name);
 
         return $this->returnSelfieShooter()->compareImages($reference, $screenshot) instanceof Same;
+    }
+
+    /**
+     * @param AbstractPageObjectVisitor $visitor
+     * @return mixed
+     */
+    public function accept($visitor)
+    {
+        return parent::accept($visitor);
+    }
+
+    public function getProxyWebElement() : ProxyWebElement
+    {
+        return $this->returnSeleniumElement()->returnProxyWebElement();
     }
 }

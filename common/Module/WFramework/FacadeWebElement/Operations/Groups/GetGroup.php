@@ -34,116 +34,6 @@ use function reset;
 class GetGroup extends OperationsGroup
 {
     /**
-     * Возвращает видимый текст элемента.
-     *
-     * @return string - видимый текст элемента.
-     * @throws \Facebook\WebDriver\Exception\NoSuchElementException
-     * @throws \Facebook\WebDriver\Exception\UnexpectedTagNameException
-     */
-    public function text() : string
-    {
-        WLogger::logDebug('Получаем текст');
-
-        $element = $this->getProxyWebElement();
-
-        $tag = $element->getTagName();
-
-        $result = '';
-
-        if (strcasecmp('select', $tag) === 0)
-        {
-            $select = new WebDriverSelect($element);
-
-            $result = $select
-                        ->getFirstSelectedOption()
-                        ->getText()
-                        ;
-        }
-        else
-        {
-            $result = $element->getText();
-        }
-
-        WLogger::logDebug('Получили текст: ' . $result);
-
-        return $result;
-    }
-
-    /**
-     * Получает сырой текст элемента (включая невидимый)
-     *
-     * @return string
-     */
-    public function rawText() : string
-    {
-        WLogger::logDebug('Получаем сырой текст элемента (включая невидимый)');
-
-        $element = $this->getProxyWebElement();
-
-        $result = $element->executeScriptOnThis(static::SCRIPT_GET_TEXT);
-
-        WLogger::logDebug('Получили сырой текст: ' . $result);
-
-        return $result;
-    }
-
-    /**
-     * Возвращает значение атрибута данного элемента.
-     *
-     * @param string $attribute - атрибут
-     * @return null|string - значение атрибута, или null - если атрибут не найден
-     */
-    public function attribute(string $attribute)
-    {
-        WLogger::logDebug('Получаем значение атрибута: ' . $attribute);
-
-        $result = $this
-                    ->getProxyWebElement()
-                    ->getAttribute($attribute)
-                    ;
-
-        WLogger::logDebug('Атрибут имеет значение: ' . json_encode($result));
-
-        return $result;
-    }
-
-    /**
-     * Возвращает значение атрибута 'value' данного элемента.
-     *
-     * @return null|string - значение атрибута 'value', или null - если атрибут не найден
-     * @throws \Facebook\WebDriver\Exception\NoSuchElementException
-     * @throws \Facebook\WebDriver\Exception\UnexpectedTagNameException
-     */
-    public function value()
-    {
-        WLogger::logDebug('Получаем значение');
-
-        $element = $this->getProxyWebElement();
-
-        $tag = $element->getTagName();
-
-        $result = '';
-
-        if (strcasecmp('select', $tag) === 0)
-        {
-            $select = new WebDriverSelect($element);
-
-            $result = $select
-                        ->getFirstSelectedOption()
-                        ->getAttribute('value')
-                        ;
-        }
-        else
-        {
-            $result = $element->getAttribute('value');
-        }
-
-        WLogger::logDebug('Получили значение: ' . $result);
-
-        return $result;
-    }
-
-    /**
      * Возвращает значение CSS-свойства данного элемента.
      *
      * @param string $property - CSS-свойство
@@ -490,6 +380,17 @@ class GetGroup extends OperationsGroup
         return $rect;
     }
 
+    public function inSticky() : bool
+    {
+        WLogger::logDebug('Элемент находится внутри плавающего блока?');
+
+        $result = $this->getProxyWebElement()->executeScriptOnThis(static::SCRIPT_ELEMENT_IN_STICKY);
+
+        WLogger::logDebug(json_encode($result));
+
+        return $result;
+    }
+
     public function screenshot(string $filename = '', $waitClosure = null) : string
     {
         WLogger::logDebug('Получаем скриншот элемента');
@@ -669,7 +570,20 @@ class GetGroup extends OperationsGroup
         $waitClosure();
 
         $elementRect = $this->boundingClientRect();
-        $viewportRect = $this->elementClearViewportRect();
+
+        if ($this->inSticky())
+        {
+            $viewportRect = $this->elementViewportRect();
+        }
+        else
+        {
+            $viewportRect = $this->elementClearViewportRect();
+        }
+
+        if ($viewportRect->y < 0)
+        {
+            $viewportRect->y = 0; //Дурацкий Хром со своей панелькой "controlled by automated software"
+        }
 
         $wholeElement = $getColumnsShot($elementRect, $viewportRect);
 
@@ -682,17 +596,6 @@ class GetGroup extends OperationsGroup
 
         return $elementScreenshot;
     }
-
-    const SCRIPT_GET_TEXT = <<<EOF
-let content = arguments[0].textContent;
-
-if (content === "")
-{
-    content = arguments[0].getAttribute('value') ?? '';
-}
-
-return content;
-EOF;
 
     const SCRIPT_GET_COMPUTED_STYLE = <<<EOF
 
@@ -716,7 +619,7 @@ function getScrollParent(element, includeHidden) {
     
     if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return element;
 
-    if (style.position === "fixed") return document.body;
+    if (style.position === "fixed") return document.documentElement;
     for (var parent = element; (parent = parent.parentElement);) {
         style = getComputedStyle(parent);
         if (excludeStaticParent && style.position === "static") {
@@ -725,12 +628,12 @@ function getScrollParent(element, includeHidden) {
         if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
     }
 
-    return document.body;
+    return document.documentElement;
 }
 
 function getElementViewportSize(element) {
-    let scrollParent = getScrollParent(element, true);
-    
+    let scrollParent = getScrollParent(element, false);
+
     return scrollParent.getBoundingClientRect();
 }
 
@@ -742,15 +645,8 @@ return getElementViewportSize(arguments[0]);
 
 function getElementViewportSize(element) {
     let scrollParent = getScrollParent(element, false);
-
-    let clearViewport = getClearViewport(scrollParent);
     
-    if (scrollParent === document.body && clearViewport.y < 0) {
-        // Хром со своей дурацкой панелькой "controlled by automated software"
-        return new DOMRect(clearViewport.x, 0, clearViewport.width, clearViewport.height);
-    }
-    
-    return clearViewport;
+    return getClearViewport(scrollParent);
 }
 
 function getScrollParent(element, includeHidden) {
@@ -760,7 +656,7 @@ function getScrollParent(element, includeHidden) {
 
     if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return element;
 
-    if (style.position === "fixed") return document.body;
+    if (style.position === "fixed") return document.documentElement;
     for (var parent = element; (parent = parent.parentElement);) {
         style = getComputedStyle(parent);
         if (excludeStaticParent && style.position === "static") {
@@ -769,7 +665,7 @@ function getScrollParent(element, includeHidden) {
         if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
     }
 
-    return document.body;
+    return document.documentElement;
 }
 
 function getViewportStickies(viewport) {
@@ -974,5 +870,38 @@ function toPixels(elem, value, prop) {
 
     return toPx(elem, value, prop);
 }
+EOF;
+
+    const SCRIPT_ELEMENT_IN_STICKY = <<<EOF
+function inSticky(element) {
+    let elements = getParents(element);
+
+    for (const element of elements) {
+        if (isSticky(element)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function getParents(element) {
+    let result = [];
+
+    while (element && element !== document) {
+        result.unshift(element);
+        element = element.parentNode;
+    }
+
+    return result;
+}
+
+function isSticky(element) {
+    let cs = getComputedStyle(element);
+
+    return cs['position'] === 'sticky';
+}
+
+return inSticky(arguments[0]);
 EOF;
 }

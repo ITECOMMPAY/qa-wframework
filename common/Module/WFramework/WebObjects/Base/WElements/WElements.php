@@ -9,11 +9,12 @@
 namespace Common\Module\WFramework\WebObjects\Base\WElements;
 
 
+use Common\Module\WFramework\ProxyWebElement\ProxyWebElement;
 use function array_values;
 use Common\Module\WFramework\CollectionCondition\CCond;
 use Common\Module\WFramework\Condition\Cond;
 use Common\Module\WFramework\WebObjects\Base\Interfaces\IPageObject;
-use Common\Module\WFramework\WebObjects\Base\WObject;
+use Common\Module\WFramework\Helpers\Composite;
 use function array_keys;
 use Common\Module\WFramework\Debug\DebugHelper;
 use Common\Module\WFramework\Debug\DebugInfo;
@@ -22,7 +23,7 @@ use Common\Module\WFramework\Exceptions\FacadeWebElementOperations\WaitUntilElem
 use Common\Module\WFramework\FacadeWebElements\FacadeWebElements;
 use Common\Module\WFramework\FacadeWebElements\FacadeWebElementsListener;
 use Common\Module\WFramework\Logger\WLogger;
-use Common\Module\WFramework\WebObjects\Base\EmptyObjects\EmptyWObject;
+use Common\Module\WFramework\Helpers\EmptyComposite;
 use Common\Module\WFramework\WebObjects\Base\WElement\WElement;
 use Common\Module\WFramework\WebObjects\Base\WElements\Import\WsFrom;
 use Common\Module\WFramework\WLocator\WLocator;
@@ -80,7 +81,7 @@ use function reset;
  *
  * @package Common\Module\WFramework\WebObjects\Base\WElements
  */
-abstract class WElements extends WObject implements IPageObject, FacadeWebElementsListener
+abstract class WElements extends Composite implements IPageObject, FacadeWebElementsListener
 {
     /** @var FacadeWebElements|null  */
     protected $facadeWebElements = null;
@@ -139,7 +140,7 @@ abstract class WElements extends WObject implements IPageObject, FacadeWebElemen
 
     public function __toString() : string
     {
-        if ($this->relative && !$this->getParent() instanceof EmptyWObject)
+        if ($this->relative && !$this->getParent() instanceof EmptyComposite)
         {
             return $this->getParent() . ' / ' . $this->getClassShort() . ' (' . $this->getName() . ')';
         }
@@ -307,6 +308,11 @@ abstract class WElements extends WObject implements IPageObject, FacadeWebElemen
             $this->addChild($webElement);
             $webElement->setParent($this->getParent());
         }
+    }
+
+    public function getLocator() : WLocator
+    {
+        return $this->locator;
     }
 
     /**
@@ -491,7 +497,7 @@ abstract class WElements extends WObject implements IPageObject, FacadeWebElemen
 
             if ($debugHandler !== null)
             {
-                $debugInfo = (new DebugInfo())->setPageObject($this->getParent());
+                $debugInfo = (new DebugInfo())->setPageObject($this);
                 $message .= PHP_EOL . $debugHandler($debugInfo);
             }
 
@@ -862,5 +868,12 @@ abstract class WElements extends WObject implements IPageObject, FacadeWebElemen
         WLogger::logInfo($this . " -> имеет все тексты: '$texts'");
 
         return $result;
+    }
+
+    public function getProxyWebElement() : ProxyWebElement
+    {
+        //TODO;
+
+        return $this->returnSeleniumElements()->returnProxyWebElements()->getElementsArray()[0];
     }
 }

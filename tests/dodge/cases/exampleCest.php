@@ -4,7 +4,18 @@
 namespace dodge\cases;
 
 
+use Common\Module\WFramework\Generator\GenOperation;
+use Common\Module\WFramework\Generator\GenOperationGroup;
+use Common\Module\WFramework\Generator\GenOperationsFacade;
+use Common\Module\WFramework\Generator\WProjectStructure;
+use Common\Module\WFramework\WebObjects\Base\WBlock\WBlock;
+use Common\Module\WFramework\WOperations\Field\FieldSet;
+use Common\Module\WFramework\WOperations\Get\GetAttribute;
+use Common\Module\WFramework\WOperations\Get\GetRawText;
+use Common\Module\WFramework\WOperations\Get\GetText;
+use Common\Module\WFramework\WOperations\Get\GetValue;
 use dodge\DodgeTester;
+use dodge\Helper\Blocks\DodgeBlock;
 use dodge\Helper\TestSteps\DodgeSteps;
 
 /**
@@ -63,22 +74,43 @@ class exampleCest
 
     public function exampleTest(DodgeTester $I, DodgeSteps $steps)
     {
-        $I->wantToTest('Проверить чё-то там');
+        echo PHP_EOL;
+        $operations = [
+            FieldSet::class,
+            GetAttribute::class,
+            GetRawText::class,
+            GetText::class,
+            GetValue::class
+        ];
 
-        $steps::$frontPageSteps
-                        ->openSite()
-                        ->closePopup()
-                        ->openVehiclesMenu()
-                        ->checkPrices()
-                        ->selectVehicle('Alias: Challenger')
-                        ->setZip()
-                        ->checkZip()
-                        ->startBuildingModel()
-                        ->selectBuyOption()
-                        ->selectModel('Alias: SRT HELLCAT REDEYE WIDEBODY')
-                        ->checkModelName()
-                        ->setModelColor('Alias: White Knuckle')
-                        ->selectDecal('Alias: Dual Silver Stripes')
-                        ;
+        (new WProjectStructure('Dodge', DodgeTester::class, '/home/nabu/Projects/PhpstormProjects/qa-wframework/output/_support/', 'dodge', $operations))->produce();
+
+
+
+
+
+
+
+        echo PHP_EOL;
+
+
+
+//        $I->wantToTest('Проверить чё-то там');
+//
+//        $steps::$frontPageSteps
+//                        ->openSite()
+//                        ->closePopup()
+//                        ->openVehiclesMenu()
+//                        ->checkPrices()
+//                        ->selectVehicle('Alias: Challenger')
+//                        ->setZip()
+//                        ->checkZip()
+//                        ->startBuildingModel()
+//                        ->selectBuyOption()
+//                        ->selectModel('Alias: SRT HELLCAT REDEYE WIDEBODY')
+//                        ->checkModelName()
+//                        ->setModelColor('Alias: White Knuckle')
+//                        ->selectDecal('Alias: Dual Silver Stripes')
+//                        ;
     }
 }

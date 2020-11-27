@@ -11,7 +11,7 @@ namespace Common\Module\WFramework\WebObjects\Base\WElements\Import;
 
 use Common\Module\WFramework\Exceptions\Common\UsageException;
 use Common\Module\WFramework\FacadeWebElements\FacadeWebElements;
-use Common\Module\WFramework\WebObjects\Base\EmptyObjects\EmptyWObject;
+use Common\Module\WFramework\Helpers\EmptyComposite;
 use Common\Module\WFramework\WebObjects\Base\WElement\WElement;
 use Common\Module\WFramework\WebObjects\Base\WPageObject;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
@@ -64,7 +64,7 @@ abstract class WsFrom
     {
         if ($this->parentElement === null)
         {
-            $this->parentElement = EmptyWObject::get();
+            $this->parentElement = EmptyComposite::get();
         }
 
         return $this->parentElement;

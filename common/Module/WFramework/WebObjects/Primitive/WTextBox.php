@@ -33,10 +33,12 @@ class WTextBox extends WElement implements IHaveWritableText, IMemorizeValue, IH
             ->mouse()
             ->scrollTo()
             ->clickWithLeftButton()
-            ->then()
-            ->wait()
-            ->forSixteenthTimeout()
-            ->then()
+            ;
+
+        $this->waitPlaceholderDisappear();
+
+        $this
+            ->returnSeleniumElement()
             ->field()
             ->clear()
             ->set($text)
@@ -54,10 +56,12 @@ class WTextBox extends WElement implements IHaveWritableText, IMemorizeValue, IH
             ->mouse()
             ->scrollTo()
             ->clickWithLeftButton()
-            ->then()
-            ->wait()
-            ->forSixteenthTimeout()
-            ->then()
+            ;
+
+        $this->waitPlaceholderDisappear();
+
+        $this
+            ->returnSeleniumElement()
             ->field()
             ->append($text)
             ;
@@ -71,11 +75,25 @@ class WTextBox extends WElement implements IHaveWritableText, IMemorizeValue, IH
 
         $this
             ->returnSeleniumElement()
+            ->mouse()
+            ->scrollTo()
+            ->clickWithLeftButton()
+            ;
+
+        $this->waitPlaceholderDisappear();
+
+        $this
+            ->returnSeleniumElement()
             ->field()
             ->clear()
             ;
 
         return $this;
+    }
+
+    protected function waitPlaceholderDisappear()
+    {
+        usleep(250000);
     }
 
     /**

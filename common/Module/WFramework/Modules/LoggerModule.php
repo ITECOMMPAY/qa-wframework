@@ -16,7 +16,7 @@ use Codeception\TestInterface;
 use Common\Module\WFramework\FFmpegBin\FFmpeg;
 use Common\Module\WFramework\Logger\Log;
 use Common\Module\WFramework\ProxyWebDriver\ProxyWebDriver;
-use function Codeception\Extension\codecept_log;
+use function Common\Module\WFramework\Extension\codecept_log;
 use function is_dir;
 use function mkdir;
 use function realpath;

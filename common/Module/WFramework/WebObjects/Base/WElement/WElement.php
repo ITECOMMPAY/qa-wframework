@@ -12,7 +12,7 @@ use Common\Module\WFramework\Condition\Cond;
 use Common\Module\WFramework\Exceptions\Common\UsageException;
 use Common\Module\WFramework\FacadeWebElement\FacadeWebElement;
 use Common\Module\WFramework\Logger\WLogger;
-use Common\Module\WFramework\WebObjects\Base\EmptyObjects\EmptyWObject;
+use Common\Module\WFramework\Helpers\EmptyComposite;
 use Common\Module\WFramework\WebObjects\Base\WElement\Import\WFrom;
 use Common\Module\WFramework\WebObjects\Base\WBlock\WBlock;
 use Common\Module\WFramework\WebObjects\Base\WPageObject;
@@ -177,7 +177,7 @@ abstract class WElement extends WPageObject
 
     public function __toString() : string
     {
-        if ($this->relative && !$this->getParent() instanceof EmptyWObject)
+        if ($this->relative && !$this->getParent() instanceof EmptyComposite)
         {
             return $this->getParent() . ' / ' . $this->getClassShort() . ' (' . $this->getName() . ')';
         }
@@ -197,7 +197,7 @@ abstract class WElement extends WPageObject
 
         while (!$parent instanceof WBlock)
         {
-            if ($parent instanceof EmptyWObject)
+            if ($parent instanceof EmptyComposite)
             {
                 throw new UsageException($this . ' -> должен располагаться на WBlock.');
             }

@@ -11,7 +11,7 @@ namespace Common\Module\WFramework\WebObjects\Base\WElement\Import;
 
 use Common\Module\WFramework\Exceptions\Common\UsageException;
 use Common\Module\WFramework\FacadeWebElement\FacadeWebElement;
-use Common\Module\WFramework\WebObjects\Base\EmptyObjects\EmptyWObject;
+use Common\Module\WFramework\Helpers\EmptyComposite;
 use Common\Module\WFramework\WebObjects\Base\WElement\WElement;
 use Common\Module\WFramework\WebObjects\Base\WPageObject;
 use Common\Module\WFramework\WLocator\WLocator;
@@ -57,7 +57,7 @@ class WFrom
     {
         if ($this->parentElement === null)
         {
-            $this->parentElement = EmptyWObject::get();
+            $this->parentElement = EmptyComposite::get();
         }
 
         return $this->parentElement;

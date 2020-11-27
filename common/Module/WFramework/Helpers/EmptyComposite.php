@@ -6,12 +6,12 @@
  * Time: 15:32
  */
 
-namespace Common\Module\WFramework\WebObjects\Base\EmptyObjects;
+namespace Common\Module\WFramework\Helpers;
 
-use Common\Module\WFramework\WebObjects\Base\WObject;
+use Common\Module\WFramework\Helpers\Composite;
 
 /**
- * Это - пустой WObject.
+ * Это - пустой узел Composite.
  *
  * Он не имеет детей. Его родителем является он сам.
  *
@@ -21,24 +21,19 @@ use Common\Module\WFramework\WebObjects\Base\WObject;
  *
  * @package Common\Module\WFramework\WebObjects\Base\EmptyObjects
  */
-class EmptyWObject extends WObject
+class EmptyComposite extends Composite
 {
     protected function initName() : string
     {
-        return 'Пустой WObject';
+        return 'Пустой узел Composite';
     }
 
-    public function setParent(WObject $parentWObject)
+    public function setParent(Composite $parent)
     {
 
     }
 
-    protected function addChild(WObject $child)
-    {
-
-    }
-
-    protected function registerChildrenWObjects()
+    protected function addChild(Composite $child)
     {
 
     }
@@ -54,7 +49,7 @@ class EmptyWObject extends WObject
         throw new \Exception('Cannot unserialize singleton!');
     }
 
-    public static function get() : EmptyWObject
+    public static function get() : EmptyComposite
     {
         $class = get_called_class();
 

@@ -10,9 +10,11 @@ namespace Common\Module\WFramework\Modules;
 
 
 use BrowserStack\Local;
+use Codeception\Configuration;
 use Codeception\Lib\Interfaces\DependsOnModule;
 use Codeception\Module\WebDriver;
 use Codeception\TestInterface;
+use Common\Module\WFramework\Generator\WProjectStructure;
 use Common\Module\WFramework\Logger\WLogger;
 use Common\Module\WFramework\Properties\GlobalProperties;
 use Common\Module\WFramework\Properties\SuiteProperties;
@@ -161,7 +163,12 @@ EOF;
         getenv('BROWSERSTACK_BUILD') ? ($this->config['capabilities']['build'] = getenv('BROWSERSTACK_BUILD')) : 0;
         getenv('BROWSERSTACK_PROJECT') ? ($this->config['capabilities']['project'] = getenv('BROWSERSTACK_PROJECT')) : 0;
 
-        $this->config['capabilities']['browserstack.localIdentifier'] = $this->getBSLocalId();
+        $local = $this->config['capabilities']['browserstack.local'] ?? false;
+
+        if ($local)
+        {
+            $this->config['capabilities']['browserstack.localIdentifier'] = $this->getBSLocalId();
+        }
 
         /*
          * Локальный BrowserStack нужно запустить руками, через их Jenkins плагин или через /common/Module/WFramework/Helpers/BSStarter.php
@@ -287,5 +294,19 @@ EOF;
         parent::_failed($test, $fail);
 
         WLogger::logError($fail->getMessage());
+
+        if ($this->config['useBrowserStack'] && isset($this->webDriver))
+        {
+            try
+            {
+                $script = 'browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"failed","reason":"fail"}}';
+
+                $this->webDriver->executeScript($script);
+            }
+            catch (\Throwable $e)
+            {
+
+            }
+        }
     }
 }

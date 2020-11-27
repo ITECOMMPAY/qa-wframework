@@ -6,11 +6,11 @@ namespace Common\Module\WFramework\Debug;
 
 use Common\Module\WFramework\Helpers\Dindent\Exception\DindentException;
 use Common\Module\WFramework\Helpers\Dindent\Indenter;
+use Common\Module\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use function array_slice;
 use function array_unshift;
 use Common\Module\WFramework\Logger\WLogger;
-use Common\Module\WFramework\WebObjects\Base\EmptyObjects\EmptyWObject;
-use Common\Module\WFramework\WebObjects\Base\WPageObject;
+use Common\Module\WFramework\Helpers\EmptyComposite;
 use function explode;
 use function implode;
 use function in_array;
@@ -26,11 +26,11 @@ class DebugHelper
     const IN_VIEWPORT     = 6;
     const OUT_OF_VIEWPORT = 7;
 
-    protected function getObjectChain(WPageObject $pageObject) : array
+    protected function getObjectChain(IPageObject $pageObject) : array
     {
         $objectChain = [$pageObject];
 
-        while (!$pageObject->getParent() instanceof EmptyWObject)
+        while (!$pageObject->getParent() instanceof EmptyComposite)
         {
             $pageObject = $pageObject->getParent();
             array_unshift($objectChain, $pageObject);
@@ -39,7 +39,7 @@ class DebugHelper
         return $objectChain;
     }
 
-    protected function diagnoseProperties(WPageObject $pageObject, array $properties = []) : array
+    protected function diagnoseProperties(IPageObject $pageObject, array $properties = []) : array
     {
         $description = '';
         $stopAfter = false;
@@ -117,7 +117,7 @@ class DebugHelper
 
         $possibleMissingTimeout = true;
 
-        /** @var WPageObject $object */
+        /** @var IPageObject $object */
         foreach ($objectChain as $object)
         {
             $result .= $object . PHP_EOL;
@@ -147,7 +147,7 @@ class DebugHelper
         {
             $result .= '=======================================================================================' . PHP_EOL;
             $result .= 'ДЛЯ СПРАВКИ: ' . PHP_EOL;
-            $result .= $previousObject. PHP_EOL . 'содержит HTML:' . PHP_EOL . PHP_EOL;
+            $result .= $previousObject . PHP_EOL . 'содержит HTML:' . PHP_EOL . PHP_EOL;
             $innerHtml = $previousObject->returnSeleniumElement()->get()->attribute('innerHTML');
 
             try

@@ -11,3 +11,6 @@ settings:
 extensions:
     enabled:
         - Codeception\Extension\RunFailed
+        - Common\Module\WFramework\Extension\WAutoRebuild
+    commands:
+        - Common\Module\WFramework\Command\WBuild

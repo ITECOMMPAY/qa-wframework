@@ -3,6 +3,9 @@
 
 namespace Common\Module\WFramework\WebObjects\Base\Interfaces;
 
+use Common\Module\WFramework\ProxyWebElement\ProxyWebElement;
+use Common\Module\WFramework\WLocator\WLocator;
+
 /**
  * Interface IPageObject
  *
@@ -21,7 +24,7 @@ interface IPageObject
     /**
      * Возвращает своего родителя
      *
-     * Если родителя нет, то возвращает EmptyWObject
+     * Если родителя нет, то возвращает EmptyComposite
      *
      * @return IPageObject
      */
@@ -30,11 +33,19 @@ interface IPageObject
     /**
      * Возвращает ассоциативный массив детей
      *
-     * Массив имеет вид: имя WObject => WObject
+     * Массив имеет вид: имя Composite => Composite
      *
      * @return IPageObject[]
      */
     public function getChildren() : array;
+
+    public function __toString();
+
+    public function getClass();
+
+    public function getClassShort();
+
+    public function getLocator() : WLocator;
 
     /**
      * PageObject должен существовать.
@@ -305,4 +316,6 @@ interface IPageObject
      * @return static
      */
     public function isOutOfViewport(bool $deep = true) : bool;
+
+    public function getProxyWebElement() : ProxyWebElement;
 }

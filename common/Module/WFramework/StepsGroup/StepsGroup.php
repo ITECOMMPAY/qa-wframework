@@ -8,15 +8,12 @@
 
 namespace Common\Module\WFramework\StepsGroup;
 
-
-use Codeception\Actor;
-
 /**
  * Класс, от которого должны наследовать все группы тест-степов.
  *
  * @package Common\Module\WFramework\StepsGroup
  */
-abstract class StepsGroup extends Actor
+abstract class StepsGroup
 {
 
 }
