@@ -1,0 +1,7 @@
+# `Windows 10` environment config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            capabilities:
+                os: 'Windows'
+                os_version: '10'

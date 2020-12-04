@@ -4,8 +4,8 @@
 namespace dodge\Helper\TestSteps;
 
 
-use Common\Module\WFramework\Exceptions\Common\UsageException;
-use Common\Module\WFramework\StepsGroup\StepsGroup;
+use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\StepsGroup\StepsGroup;
 use dodge\DodgeTester;
 use dodge\Helper\AliasMaps\VehiclesNamesMap;
 use dodge\Helper\Blocks\Common\VehiclesMenuBlock;

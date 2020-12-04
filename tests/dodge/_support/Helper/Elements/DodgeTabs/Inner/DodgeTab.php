@@ -4,7 +4,7 @@
 namespace dodge\Helper\Elements\DodgeTabs\Inner;
 
 
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
+use Codeception\Lib\WFramework\WebObjects\Primitive\WButton;
 
 class DodgeTab extends WButton
 {

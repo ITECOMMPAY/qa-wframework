@@ -4,7 +4,7 @@
 namespace dodge\Helper\AliasMaps\TabsHeaders;
 
 
-use Common\Module\WFramework\AliasMap\AliasMap;
+use Codeception\Lib\WFramework\AliasMap\AliasMap;
 
 class HeaderTabsMap extends AliasMap
 {

@@ -1,46 +1,59 @@
 {
-  "require": {
-    "php": ">=7.2.0",
-    "ext-curl": "*",
-    "ext-dom": "*",
-    "ext-imagick": "*",
-    "ext-json": "*",
-    "ext-libxml": "*",
-    "ext-mbstring": "*",
-    "ext-pcre": "*",
-    "ext-phar": "*",
-    "ext-posix": "*",
-    "ext-simplexml": "*",
-    "ext-tokenizer": "*",
-    "ext-xml": "*",
-    "ext-xmlwriter": "*",
-    "ext-zip": "*",
-    "aws/aws-sdk-php": "3.147.2",
-    "browserstack/browserstack-local": "1.1.0",
-    "codeception/codeception": "4.1.7",
-    "codeception/module-asserts": "1.3.0",
-    "codeception/module-webdriver": "1.1.1",
-    "codeception/robo-paracept": "0.4.2",
-    "consolidation/robo": "1.4.11",
-    "dms/phpunit-arraysubset-asserts": "0.1.1",
-    "monolog/monolog": "2.0.2",
-    "php-ds/php-ds": "1.2.0",
-    "phpunit/phpunit": "8.5.8",
-    "ramsey/uuid": "3.9.2",
-    "symfony/process": "4.4.10"
-  },
-  "repositories": [
-  ],
-  "autoload": {
-    "psr-4": {
-      "Common\\": "common/",
-      "dodge\\Helper\\": "tests/dodge/_support/Helper"
-    }
-  },
-  "config": {
-    "platform": {
-      "php": "7.2.0"
+    "name": "itecommpay/module-wframework",
+    "description": "Codeception module for advanced WebUI testing",
+    "keywords": [
+        "codeception",
+        "browser-testing",
+        "acceptance-testing"
+    ],
+    "homepage": "https://github.com/ITECOMMPAY/qa-wframework/",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Egor Nelyubov"
+        }
+    ],
+    "require": {
+        "php": "^7.2.0",
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "ext-imagick": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-pcre": "*",
+        "ext-phar": "*",
+        "ext-posix": "*",
+        "ext-simplexml": "*",
+        "ext-tokenizer": "*",
+        "ext-xml": "*",
+        "ext-xmlwriter": "*",
+        "ext-zip": "*",
+        "aws/aws-sdk-php": "^3.147.2",
+        "browserstack/browserstack-local": "^1.1.0",
+        "codeception/codeception": "^4.1.7",
+        "codeception/module-asserts": "^1.3.0",
+        "codeception/module-webdriver": "^1.1.1",
+        "codeception/robo-paracept": "^0.4.2",
+        "consolidation/robo": "^1.4.11",
+        "dms/phpunit-arraysubset-asserts": "^0.1.1",
+        "monolog/monolog": "^2.0.2",
+        "php-ds/php-ds": "^1.2.0",
+        "phpunit/phpunit": "^8.5.8",
+        "ramsey/uuid": "^3.9.2",
+        "symfony/process": "^4.4.10"
     },
-    "sort-packages": true
-  }
+    "autoload": {
+        "psr-4": {
+            "": "src/",
+            "dodge\\Helper\\": "tests/dodge/_support/Helper"
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "7.2.0"
+        },
+        "sort-packages": true
+    }
 }

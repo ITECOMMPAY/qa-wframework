@@ -1,5 +1,0 @@
-# `1920` environment config
-modules:
-    config:
-        Common\Module\WFramework\Modules\WebTestingModule:
-            window_size: "2048x1536"

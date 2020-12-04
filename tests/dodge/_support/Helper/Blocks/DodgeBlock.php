@@ -4,7 +4,7 @@
 namespace dodge\Helper\Blocks;
 
 
-use Common\Module\WFramework\WebObjects\Base\WBlock\WBlock;
+use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use dodge\DodgeTester;
 use dodge\_generated\Block\Operations;
 

@@ -3,14 +3,14 @@
 
 namespace dodge\Helper\Elements\DodgeTabs;
 
-use Common\Module\WFramework\AliasMap\AliasMap;
-use Common\Module\WFramework\AliasMap\EmptyAliasMap;
-use Common\Module\WFramework\Exceptions\Common\UsageException;
-use Common\Module\WFramework\Logger\WLogger;
-use Common\Module\WFramework\Properties\TestProperties;
-use Common\Module\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Common\Module\WFramework\WebObjects\Base\WElement\WElement;
-use Common\Module\WFramework\WebObjects\Primitive\WArray;
+use Codeception\Lib\WFramework\AliasMap\AliasMap;
+use Codeception\Lib\WFramework\AliasMap\EmptyAliasMap;
+use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Properties\TestProperties;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
+use Codeception\Lib\WFramework\WebObjects\Primitive\WArray;
 use dodge\Helper\Elements\DodgeTabs\Inner\DodgeTab;
 
 /**

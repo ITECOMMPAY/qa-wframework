@@ -4,9 +4,9 @@
 namespace dodge\Helper\TestSteps;
 
 
-use Common\Module\WFramework\Exceptions\Common\UsageException;
-use Common\Module\WFramework\Properties\TestProperties;
-use Common\Module\WFramework\StepsGroup\StepsGroup;
+use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Properties\TestProperties;
+use Codeception\Lib\WFramework\StepsGroup\StepsGroup;
 use dodge\DodgeTester;
 use dodge\Helper\AliasMaps\ChallengerDecalsMap;
 use dodge\Helper\Blocks\BuildModelPage\ExteriorColorBlock;

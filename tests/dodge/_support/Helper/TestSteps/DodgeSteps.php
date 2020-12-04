@@ -4,7 +4,7 @@
 namespace dodge\Helper\TestSteps;
 
 
-use Common\Module\WFramework\StepsGroup\StepsGroup;
+use Codeception\Lib\WFramework\StepsGroup\StepsGroup;
 
 class DodgeSteps extends StepsGroup
 {

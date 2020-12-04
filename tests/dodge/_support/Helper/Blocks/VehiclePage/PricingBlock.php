@@ -3,8 +3,8 @@
 
 namespace dodge\Helper\Blocks\VehiclePage;
 
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
-use Common\Module\WFramework\WebObjects\Primitive\WLabel;
+use Codeception\Lib\WFramework\WebObjects\Primitive\WButton;
+use Codeception\Lib\WFramework\WebObjects\Primitive\WLabel;
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\DodgeBlock;
 use dodge\Helper\TestSteps\DodgeSteps;

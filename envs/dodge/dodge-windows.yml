@@ -1,7 +1,0 @@
-# `Windows 10` environment config
-modules:
-    config:
-        Common\Module\WFramework\Modules\WebTestingModule:
-            capabilities:
-                os: 'Windows'
-                os_version: '10'

@@ -4,8 +4,8 @@
 namespace dodge\Helper\Elements\DodgeTabs\Inner;
 
 
-use Common\Module\WFramework\Condition\Cond;
-use Common\Module\WFramework\FacadeWebElement\FacadeWebElement;
+use Codeception\Lib\WFramework\Condition\Cond;
+use Codeception\Lib\WFramework\FacadeWebElement\FacadeWebElement;
 
 class TabSelected extends Cond
 {

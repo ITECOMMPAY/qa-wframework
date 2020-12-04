@@ -4,7 +4,7 @@
 namespace dodge\Helper\Blocks\Common;
 
 
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
+use Codeception\Lib\WFramework\WebObjects\Primitive\WButton;
 use dodge\DodgeTester;
 use dodge\Helper\AliasMaps\TabsHeaders\HeaderTabsMap;
 use dodge\Helper\Blocks\DodgeBlock;

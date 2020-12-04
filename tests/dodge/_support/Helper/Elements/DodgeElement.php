@@ -4,7 +4,7 @@
 namespace dodge\Helper\Elements;
 
 
-use Common\Module\WFramework\WebObjects\Base\WElement\WElement;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use dodge\DodgeTester;
 use dodge\_generated\Element\Operations;
 

@@ -4,9 +4,9 @@
 namespace dodge\Helper\TestSteps;
 
 
-use Common\Module\WFramework\StepsGroup\StepsGroup;
-use Common\Module\WFramework\WOperations\Field\FieldSet;
-use Common\Module\WFramework\WOperations\GetText;
+use Codeception\Lib\WFramework\StepsGroup\StepsGroup;
+use Codeception\Lib\WFramework\WOperations\Field\FieldSet;
+use Codeception\Lib\WFramework\WOperations\GetText;
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\FrontPage\ChooseYourSiteBlock;
 use dodge\Helper\Blocks\Common\HeaderBlock;
@@ -69,13 +69,6 @@ class FrontPageSteps extends StepsGroup
     public function closePopup() : FrontPageSteps
     {
         $this->I->logNotice('Ожидаем всплывающее окно Choose Your Site и закрываем его');
-
-        echo $this
-                ->chooseYourSiteBlock
-                ->getCloseButton()
-                ->accept(new FieldSet());
-
-        $this->I->fail();
 
         $this
             ->chooseYourSiteBlock

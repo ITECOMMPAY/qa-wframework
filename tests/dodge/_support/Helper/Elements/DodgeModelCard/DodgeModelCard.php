@@ -4,10 +4,10 @@
 namespace dodge\Helper\Elements\DodgeModelCard;
 
 
-use Common\Module\WFramework\Logger\WLogger;
-use Common\Module\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
-use Common\Module\WFramework\WebObjects\Primitive\WLabel;
+use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
+use Codeception\Lib\WFramework\WebObjects\Primitive\WButton;
+use Codeception\Lib\WFramework\WebObjects\Primitive\WLabel;
 
 class DodgeModelCard extends WButton
 {

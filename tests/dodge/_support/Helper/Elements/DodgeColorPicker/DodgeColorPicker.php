@@ -4,13 +4,13 @@
 namespace dodge\Helper\Elements\DodgeColorPicker;
 
 
-use Common\Module\WFramework\AliasMap\AliasMap;
-use Common\Module\WFramework\Exceptions\Common\UsageException;
-use Common\Module\WFramework\Logger\WLogger;
-use Common\Module\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Common\Module\WFramework\WebObjects\Base\WElement\WElement;
-use Common\Module\WFramework\WebObjects\Primitive\WArray;
-use Common\Module\WFramework\WebObjects\Primitive\WLabel;
+use Codeception\Lib\WFramework\AliasMap\AliasMap;
+use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
+use Codeception\Lib\WFramework\WebObjects\Primitive\WArray;
+use Codeception\Lib\WFramework\WebObjects\Primitive\WLabel;
 use dodge\Helper\Elements\DodgeColorPicker\Inner\DodgeColorButton;
 
 class DodgeColorPicker extends WElement

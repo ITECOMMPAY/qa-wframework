@@ -1,6 +1,0 @@
-# `1920` environment config
-modules:
-    config:
-        Common\Module\WFramework\Modules\WebTestingModule:
-            capabilities:
-                resolution: '1366x768'
