@@ -4,8 +4,8 @@
 namespace Codeception\Lib\WFramework\Helpers;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\NotImplementedException;
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\NotImplementedException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use function abs;
 use function preg_match;
 

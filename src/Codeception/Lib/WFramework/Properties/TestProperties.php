@@ -9,7 +9,7 @@
 namespace Codeception\Lib\WFramework\Properties;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use function is_array;
 use function is_object;
 

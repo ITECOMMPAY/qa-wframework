@@ -9,7 +9,7 @@
 namespace Codeception\Lib\WFramework\WebDriverProxies;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WLocator\WLocator;
 use Countable;

@@ -5,8 +5,8 @@ namespace Codeception\Lib\WFramework\Operations\Wait;
 
 
 use Codeception\Lib\WFramework\Conditions\AbstractCondition;
-use Codeception\Lib\WFramework\Exceptions\FacadeWebElementOperations\WaitUntilElement;
-use Codeception\Lib\WFramework\Exceptions\FacadeWebElementOperations\WaitWhileElement;
+use Codeception\Lib\WFramework\Exceptions\WaitUntilElement;
+use Codeception\Lib\WFramework\Exceptions\WaitWhileElement;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;

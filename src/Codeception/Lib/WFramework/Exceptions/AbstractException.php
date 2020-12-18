@@ -2,11 +2,11 @@
 /**
  * Created by PhpStorm.
  * User: egor
- * Date: 16.04.19
- * Time: 12:13
+ * Date: 12.04.19
+ * Time: 14:16
  */
 
-namespace Codeception\Lib\WFramework\Exceptions\AliasMap;
+namespace Codeception\Lib\WFramework\Exceptions;
 
 
 use Exception;

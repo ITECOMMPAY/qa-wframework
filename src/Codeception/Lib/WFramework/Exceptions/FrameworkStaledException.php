@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Codeception\Lib\WFramework\Exceptions\Common;
+namespace Codeception\Lib\WFramework\Exceptions;
 
 
 class FrameworkStaledException extends AbstractException

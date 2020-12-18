@@ -4,8 +4,8 @@
 namespace Codeception\Lib\WFramework\Generator\FileGenerator;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\GeneralException;
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\GeneralException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNodes\AbstractPageObjectNode;
 use Codeception\Lib\WFramework\Helpers\Composite;
 

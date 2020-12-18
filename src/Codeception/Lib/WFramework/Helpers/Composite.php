@@ -9,7 +9,7 @@
 namespace Codeception\Lib\WFramework\Helpers;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Ds\Deque;
 use Ds\Map;

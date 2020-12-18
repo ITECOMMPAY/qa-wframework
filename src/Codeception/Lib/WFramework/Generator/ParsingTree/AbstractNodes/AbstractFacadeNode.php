@@ -4,7 +4,7 @@
 namespace Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNodes;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\FrameworkStaledException;
+use Codeception\Lib\WFramework\Exceptions\FrameworkStaledException;
 use Codeception\Lib\WFramework\Helpers\ClassHelper;
 use Codeception\Lib\WFramework\Helpers\Composite;
 
@@ -30,7 +30,7 @@ abstract class AbstractFacadeNode extends Composite
     /**
      * @param AbstractOperationNode $operationNode
      * @throws FrameworkStaledException
-     * @throws \Codeception\Lib\WFramework\Exceptions\Common\UsageException
+     * @throws \Codeception\Lib\WFramework\Exceptions\UsageException
      */
     public function addOperation($operationNode)
     {

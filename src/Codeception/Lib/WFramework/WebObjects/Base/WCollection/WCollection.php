@@ -24,7 +24,7 @@ use Ds\Sequence;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\Helpers\Composite;
 use function array_keys;
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;

@@ -46,7 +46,7 @@ class WButton extends WElement implements IClickable, IHaveReadableText
      *      autoClickViaJS = false;
      *
      * @return $this
-     * @throws \Codeception\Lib\WFramework\Exceptions\Common\UsageException
+     * @throws \Codeception\Lib\WFramework\Exceptions\UsageException
      * @throws \Facebook\WebDriver\Exception\UnknownServerException
      * @throws \Facebook\WebDriver\Exception\WebDriverException
      */
@@ -139,7 +139,7 @@ class WButton extends WElement implements IClickable, IHaveReadableText
      * нет способа получить список - на какие ивенты повешены обработчики у элемента.
      *
      * @return WButton
-     * @throws \Codeception\Lib\WFramework\Exceptions\Common\UsageException
+     * @throws \Codeception\Lib\WFramework\Exceptions\UsageException
      */
     public function clickMouseDown() : WButton
     {

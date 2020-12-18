@@ -4,7 +4,7 @@
 namespace Codeception\Lib\WFramework\WebObjects\SelfieShooter;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\Rect;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Properties\TestProperties;

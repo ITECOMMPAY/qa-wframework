@@ -6,7 +6,7 @@
  * Time: 14:16
  */
 
-namespace Codeception\Lib\WFramework\Exceptions\Common;
+namespace Codeception\Lib\WFramework\Exceptions;
 
 
 class UsageException extends AbstractException

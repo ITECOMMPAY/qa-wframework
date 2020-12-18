@@ -9,8 +9,7 @@
 namespace Codeception\Lib\WFramework\WebObjects\Primitive;
 
 
-use Codeception\Lib\WFramework\Exceptions\WArray\EmptyException;
-use Codeception\Lib\WFramework\Exceptions\WArray\NoSuchIndexException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -26,12 +25,12 @@ class WArray extends WCollection implements IIndexedCollection
 
         if (empty($elementsArray))
         {
-            throw new EmptyException($this . ' - не содержит элементов.');
+            throw new UsageException($this . ' - не содержит элементов.');
         }
 
         if (!isset($elementsArray[$index]))
         {
-            throw new NoSuchIndexException($this . ' - не содержит элементов.');
+            throw new UsageException($this . ' - не содержит элементов.');
         }
 
         return $elementsArray[$index];

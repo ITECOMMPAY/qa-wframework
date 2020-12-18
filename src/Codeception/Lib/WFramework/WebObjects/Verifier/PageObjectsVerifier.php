@@ -118,7 +118,7 @@ class PageObjectsVerifier
      *
      * @param int $totalThreads
      * @param int $currentThreadNumber
-     * @throws \Codeception\Lib\WFramework\Exceptions\Common\UsageException
+     * @throws \Codeception\Lib\WFramework\Exceptions\UsageException
      * @throws \ImagickException
      * @throws \ReflectionException
      */
@@ -149,7 +149,7 @@ class PageObjectsVerifier
      * статического метода printResult().
      *
      * @param string $className - полное имя класса PageObject'а
-     * @throws \Codeception\Lib\WFramework\Exceptions\Common\UsageException
+     * @throws \Codeception\Lib\WFramework\Exceptions\UsageException
      * @throws \ImagickException
      * @throws \ReflectionException
      */

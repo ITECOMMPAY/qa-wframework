@@ -9,7 +9,7 @@
 namespace Codeception\Lib\WFramework\WebObjects\Base\WElement\Import;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebDriver;
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElement;

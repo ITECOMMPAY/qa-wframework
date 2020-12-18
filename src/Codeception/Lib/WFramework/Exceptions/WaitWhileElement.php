@@ -6,7 +6,7 @@
  * Time: 17:44
  */
 
-namespace Codeception\Lib\WFramework\Exceptions\FacadeWebElementOperations;
+namespace Codeception\Lib\WFramework\Exceptions;
 
 
 class WaitWhileElement extends AbstractException

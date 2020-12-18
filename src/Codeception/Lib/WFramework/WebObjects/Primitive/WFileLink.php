@@ -4,8 +4,8 @@
 namespace Codeception\Lib\WFramework\WebObjects\Primitive;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
-use Codeception\Lib\WFramework\Exceptions\WFileLink\FileDownloadException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
+use Codeception\Lib\WFramework\Exceptions\FileDownloadException;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WLocator\WLocator;

@@ -3,7 +3,7 @@
 
 namespace Codeception\Lib\WFramework\Helpers;
 
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 
 class EmptyDateTime extends \DateTimeImmutable
 {

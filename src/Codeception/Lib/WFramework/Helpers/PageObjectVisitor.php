@@ -4,7 +4,7 @@
 namespace Codeception\Lib\WFramework\Helpers;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Exceptions\VisitorNotImplementedException;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;

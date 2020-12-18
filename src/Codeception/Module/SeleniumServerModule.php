@@ -9,8 +9,8 @@
 namespace Codeception\Module;
 
 use Codeception\Module as CodeceptionModule;
-use Codeception\Lib\WFramework\Exceptions\SeleniumServerModule\PortAlreadyInUseException;
-use Codeception\Lib\WFramework\Exceptions\SeleniumServerModule\UsageException;
+use Codeception\Lib\WFramework\Exceptions\PortAlreadyInUseException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\CurrentOS;
 use Codeception\Lib\WFramework\Helpers\UnixProcess;
 use Codeception\Lib\WFramework\Logger\WLogger;

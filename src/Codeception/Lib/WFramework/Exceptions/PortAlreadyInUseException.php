@@ -6,7 +6,7 @@
  * Time: 11:29
  */
 
-namespace Codeception\Lib\WFramework\Exceptions\SeleniumServerModule;
+namespace Codeception\Lib\WFramework\Exceptions;
 
 
 class PortAlreadyInUseException extends AbstractException

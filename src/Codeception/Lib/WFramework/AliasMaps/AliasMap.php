@@ -8,7 +8,7 @@
 
 namespace Codeception\Lib\WFramework\AliasMaps;
 
-use Codeception\Lib\WFramework\Exceptions\AliasMap\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use function array_flip;
 use function get_called_class;
 

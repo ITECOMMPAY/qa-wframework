@@ -3,7 +3,7 @@
 
 namespace Codeception\Lib\WFramework\FFmpegBin;
 
-use Codeception\Lib\WFramework\Exceptions\SeleniumServerModule\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\CurrentOS;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Symfony\Component\Process\Process;

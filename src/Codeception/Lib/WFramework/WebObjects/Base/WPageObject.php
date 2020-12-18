@@ -7,7 +7,7 @@ namespace Codeception\Lib\WFramework\WebObjects\Base;
 use Codeception\Actor;
 use Codeception\Lib\WFramework\Actor\ImaginaryActor;
 use Codeception\Lib\WFramework\Conditions\PageLoaded;
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 use Codeception\Lib\WFramework\Logger\WLogger;
