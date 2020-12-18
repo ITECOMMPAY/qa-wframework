@@ -6,11 +6,11 @@ namespace Codeception\Lib\WFramework\Debug;
 
 use Codeception\Lib\WFramework\Helpers\Dindent\Exception\DindentException;
 use Codeception\Lib\WFramework\Helpers\Dindent\Indenter;
+use Codeception\Lib\WFramework\Helpers\EmptyComposite;
+use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use function array_slice;
 use function array_unshift;
-use Codeception\Lib\WFramework\Logger\WLogger;
-use Codeception\Lib\WFramework\Helpers\EmptyComposite;
 use function explode;
 use function implode;
 use function in_array;

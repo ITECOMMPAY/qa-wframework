@@ -4,8 +4,8 @@
 namespace Codeception\Lib\WFramework\Generator\SourceGenerator;
 
 
-use Codeception\Util\Template;
 use Codeception\Lib\WFramework\Generator\IGenerator;
+use Codeception\Util\Template;
 
 class OperationSource implements IGenerator
 {

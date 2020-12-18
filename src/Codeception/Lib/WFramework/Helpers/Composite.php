@@ -10,15 +10,11 @@ namespace Codeception\Lib\WFramework\Helpers;
 
 
 use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
-use Codeception\Lib\WFramework\Helpers\EmptyComposite;
-use Codeception\Lib\WFramework\Helpers\ModernObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Ds\Deque;
 use Ds\Map;
-use Ds\Queue;
 use Ds\Sequence;
 use Ds\Vector;
-use function array_keys;
 use function implode;
 
 /**

@@ -5,10 +5,10 @@ namespace Codeception\Lib\WFramework\Generator\SourceGenerator;
 
 
 use Codeception\Lib\Generator\Shared\Classname;
-use Codeception\Util\Shared\Namespaces;
-use Codeception\Util\Template;
 use Codeception\Lib\WFramework\Generator\IGenerator;
 use Codeception\Lib\WFramework\Helpers\ClassHelper;
+use Codeception\Util\Shared\Namespaces;
+use Codeception\Util\Template;
 
 class FacadeSource implements IGenerator
 {

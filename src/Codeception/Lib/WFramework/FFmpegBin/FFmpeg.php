@@ -3,11 +3,11 @@
 
 namespace Codeception\Lib\WFramework\FFmpegBin;
 
-use Codeception\Lib\WFramework\Helpers\CurrentOS;
 use Codeception\Lib\WFramework\Exceptions\SeleniumServerModule\UsageException;
+use Codeception\Lib\WFramework\Helpers\CurrentOS;
 use Codeception\Lib\WFramework\Logger\WLogger;
-use function realpath;
 use Symfony\Component\Process\Process;
+use function realpath;
 
 class FFmpeg
 {

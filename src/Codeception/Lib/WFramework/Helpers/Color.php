@@ -4,9 +4,9 @@
 namespace Codeception\Lib\WFramework\Helpers;
 
 
+use Codeception\Lib\WFramework\Exceptions\Common\NotImplementedException;
 use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
 use function abs;
-use Codeception\Lib\WFramework\Exceptions\Common\NotImplementedException;
 use function preg_match;
 
 class Color

@@ -3,12 +3,12 @@
 
 namespace Codeception\Lib\WFramework\Logger\HtmlLogger;
 
-use function file_get_contents;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use function chmod;
 use function dirname;
 use function fclose;
+use function file_get_contents;
 use function flock;
 use function fopen;
 use function fwrite;

@@ -8,7 +8,6 @@
 
 namespace Codeception\Lib\WFramework\Helpers;
 
-use Codeception\Lib\WFramework\Helpers\Composite;
 use Ds\Hashable;
 use stdClass;
 

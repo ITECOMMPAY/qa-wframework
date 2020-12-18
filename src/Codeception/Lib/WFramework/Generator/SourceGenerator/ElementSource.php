@@ -4,10 +4,10 @@
 namespace Codeception\Lib\WFramework\Generator\SourceGenerator;
 
 
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
-use Codeception\Util\Template;
 use Codeception\Lib\WFramework\Generator\IGenerator;
 use Codeception\Lib\WFramework\Helpers\ClassHelper;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
+use Codeception\Util\Template;
 
 class ElementSource implements IGenerator
 {

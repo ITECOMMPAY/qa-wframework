@@ -8,8 +8,6 @@
 
 namespace Codeception\Lib\WFramework\Helpers;
 
-use Codeception\Lib\WFramework\Helpers\Composite;
-
 /**
  * Это - пустой узел Composite.
  *
