@@ -9,29 +9,30 @@
 namespace Codeception\Lib\WFramework\WebObjects\Base\WCollection;
 
 
-use Codeception\Lib\WFramework\ProxyWebElement\ProxyWebElement;
-use function array_values;
-use Codeception\Lib\WFramework\CollectionCondition\CCond;
-use Codeception\Lib\WFramework\Condition\Cond;
+use Codeception\Lib\WFramework\Conditions\AbstractCondition;
+use Codeception\Lib\WFramework\Conditions\CountEmpty;
+use Codeception\Lib\WFramework\Conditions\CountEquals;
+use Codeception\Lib\WFramework\Conditions\CountGreaterThanOrEqual;
+use Codeception\Lib\WFramework\Conditions\CountLessThanOrEqual;
+use Codeception\Lib\WFramework\Operations\Get\GetRawText;
+use Codeception\Lib\WFramework\Operations\Get\GetText;
+use Codeception\Lib\WFramework\Properties\TestProperties;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElements;
+use Codeception\Lib\WFramework\WebObjects\Base\Traits\PageObjectBaseMethods;
+use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
+use Ds\Sequence;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\Helpers\Composite;
 use function array_keys;
-use Codeception\Lib\WFramework\Debug\DebugHelper;
-use Codeception\Lib\WFramework\Debug\DebugInfo;
 use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
-use Codeception\Lib\WFramework\Exceptions\FacadeWebElementOperations\WaitUntilElement;
-use Codeception\Lib\WFramework\FacadeWebElements\FacadeWebElements;
-use Codeception\Lib\WFramework\FacadeWebElements\FacadeWebElementsListener;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\Import\WsFrom;
 use Codeception\Lib\WFramework\WLocator\WLocator;
-use function end;
-use PHPUnit\Framework\AssertionFailedError;
+use Ds\Map;
 use function implode;
 use function is_callable;
-use function reset;
 
 /**
  * Данный класс реализует механизм работы с коллекцией веб-элементов.
@@ -83,8 +84,10 @@ use function reset;
  */
 abstract class WCollection extends Composite implements IPageObject, FacadeWebElementsListener
 {
-    /** @var FacadeWebElements|null  */
-    protected $facadeWebElements = null;
+    use PageObjectBaseMethods;
+
+    /** @var ProxyWebElements|null  */
+    protected $proxyWebElements = null;
 
     /** @var string */
     protected $instanceName = '';
@@ -98,7 +101,10 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
     /** @var WElement|string */
     protected $elementClass = '';
 
-    protected $filtered = False;
+    protected $proxyWebElementsStateId = 0;
+
+    /** @var AbstractCondition|null */
+    protected $elementFilter;
 
     /**
      * Создаёт коллекцию веб-элементов из объявления одиночного элемента.
@@ -115,24 +121,24 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
         return new static(WsFrom::firstElement($webElement));
     }
 
-    public static function fromFacadeWebElements(string $instanceName, FacadeWebElements $facadeWebElements, string $elementClass)
+    public static function fromProxyWebElements(string $instanceName, ProxyWebElements $proxyWebElements, string $elementClass, WPageObject $parent)
     {
-        return new static(WsFrom::facadeWebElements($instanceName, $facadeWebElements, $elementClass));
+        return new static(WsFrom::proxyWebElements($instanceName, $proxyWebElements, $elementClass, $parent));
     }
 
     public function __construct(WsFrom $importer)
     {
         parent::__construct();
 
-        $this->facadeWebElements = $importer->getFacadeWebElements();
+        $this->proxyWebElements = $importer->getProxyWebElements();
         $this->instanceName = $importer->getInstanceName();
         $this->locator = $importer->getLocator();
         $this->relative = $importer->getRelative();
         $this->elementClass = $importer->getElementClass();
 
-        if ($this->facadeWebElements !== null)
+        if (!$importer->getParent() instanceof EmptyComposite)
         {
-            $this->facadeWebElements->listenerAdd($this);
+            $this->setParent($importer->getParent());
         }
 
         $this->name = 'Коллекция элементов: ' . $this->instanceName;
@@ -149,13 +155,13 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
     }
 
 
-    public function returnSeleniumElements() : FacadeWebElements
+    public function returnSeleniumElements() : ProxyWebElements
     {
         WLogger::logInfo($this . ' -> обращаемся к низлежащему API');
 
-        if ($this->facadeWebElements === null)
+        if ($this->proxyWebElements === null)
         {
-            if ($this->relative === True)
+            if ($this->relative === true)
             {
                 /**
                  * WCollection является специальным механизмом для создания коллекции элементов.
@@ -163,25 +169,16 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
                  * PageObject'ов. Вместо этого он назначает их родителем PageObject в котором он
                  * объявлен.
                  */
-                $parent = $this->getParent()->returnSeleniumElement();
 
-                $this->facadeWebElements = FacadeWebElements::fromLocator($this->locator, $this->getParent()->returnSeleniumServer(), $parent);
+                $this->proxyWebElements = new ProxyWebElements($this->locator, $this->getParent()->returnSeleniumServer(), $this->getTimeout(), $this->getParent()->returnSeleniumElement());
             }
             else
             {
-                $this->facadeWebElements = FacadeWebElements::fromLocator($this->locator, $this->getParent()->returnSeleniumServer());
+                $this->proxyWebElements = new ProxyWebElements($this->locator, $this->getParent()->returnSeleniumServer(), $this->getTimeout());
             }
-
-            $this->facadeWebElements->listenerAdd($this);
         }
 
-        if (!$this->facadeWebElements->returnProxyWebElements()->hasDebugInfo())
-        {
-            $debugInfo = (new DebugInfo())->setPageObject($this->getParent());
-            $this->facadeWebElements->returnProxyWebElements()->setDebugInfo($debugInfo);
-        }
-
-        return $this->facadeWebElements;
+        return $this->proxyWebElements;
     }
 
     /**
@@ -198,57 +195,22 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
         WLogger::logInfo($this . " -> обновляем содержимое");
 
         $this->returnSeleniumElements()->refresh();
+        $this->updateFromProxyWebElements();
 
         return $this;
     }
 
     /**
-     * Фильтрует коллекцию элементов по условию
+     * Задаёт фильтрацию коллекции элементов по условию
      *
-     * @param Cond $elementFilter
+     * @param AbstractCondition $condition
      * @return $this
      */
-    public function filtersSet(Cond $elementFilter)
+    public function filterSet(AbstractCondition $condition)
     {
-        WLogger::logInfo($this . " -> задаём фильтрацию по условию: " . $elementFilter->getName());
+        WLogger::logInfo($this . " -> задаём фильтрацию по условию: " . $condition->getName());
 
-        $this->filtered = True;
-
-        $this->returnSeleniumElements()->filtersSet($elementFilter);
-
-        return $this;
-    }
-
-    /**
-     * Добавляет условие к списку фильтров данной коллекции
-     *
-     * @param Cond $elementFilter
-     * @return $this
-     */
-    public function filterAdd(Cond $elementFilter)
-    {
-        WLogger::logInfo($this . " -> добавляем фильтрацию по условию: " . $elementFilter->getName());
-
-        $this->filtered = True;
-
-        $this->returnSeleniumElements()->filterAdd($elementFilter);
-
-        return $this;
-    }
-
-    /**
-     * Удаляет последний применённый фильтр
-     *
-     * @return $this
-     */
-    public function filterPop()
-    {
-        WLogger::logInfo($this . " -> удаляем последний добавленный фильтр");
-
-        if ($this->returnSeleniumElements()->filterPop()->filtersGet() === null)
-        {
-            $this->filtered = False;
-        }
+        $this->elementFilter = $condition;
 
         return $this;
     }
@@ -258,56 +220,66 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
      *
      * @return $this
      */
-    public function filtersRemove()
+    public function filterRemove()
     {
         WLogger::logInfo($this . " -> удаляем все фильтры");
 
-        $this->filtered = False;
-
-        $this->returnSeleniumElements()->filtersRemove();
+        $this->elementFilter = null;
 
         return $this;
     }
 
-    /**
-     * Это внутренний метод, который служит для уведомления коллекции, что лежащий под её капотом FacadeWebElements
-     * обновился.
-     *
-     * В тестах его использовать не нужно.
-     *
-     * По сути, во время вызова WCollection->refresh() происходит вызов FacadeWebElements->refresh(), который
-     * вызывает ProxyWebElements->refresh(), который вызывает низкоуровневый код Селениума, который подгружает
-     * элементы со страницы. Эти элементы оборачиваются в ProxyWebElement, которые затем передаются в метод
-     * FacadeWebElements->fillFrom(), который оборачивает каждый ProxyWebElement в FacadeWebElement и затем
-     * передаёт их в метод WCollection->fillFrom(), который оборачивает каждый FacadeWebElement в заданный
-     * WElement класс и добавляет в список своих детей.
-     */
-    public function onFacadeWebElementsRefresh()
+    private function mustBeFilteredOut(WElement $element) : bool
     {
-        $this->fillFrom($this->facadeWebElements);
+        if ($this->elementFilter === null)
+        {
+            return false;
+        }
+
+        if (!$this->elementFilter->applicable($element))
+        {
+            return false;
+        }
+
+        return $element->accept($this->elementFilter);
     }
 
     /**
-     * Заполняет коллекцию элементами из низлежащего объекта FacadeWebElements
+     * Заполняет коллекцию элементами из низлежащего объекта ProxyWebElements
      *
-     * @param FacadeWebElements $facadeWebElements
+     * @param ProxyWebElements $proxyWebElements
      */
-    private function fillFrom(FacadeWebElements $facadeWebElements)
+    private function updateFromProxyWebElements()
     {
+        if ($this->returnSeleniumElements()->getInnerStateId() === $this->proxyWebElementsStateId)
+        {
+            return;
+        }
+
+        $this->proxyWebElementsStateId = $this->returnSeleniumElements()->getInnerStateId();
+
         $this->clearChildren();
 
-        $facadeWebElementsArray = $facadeWebElements->getElementsArray();
-        $count = count($facadeWebElementsArray);
-
-        for ($i = 0; $i < $count; $i++)
+        foreach ($this->returnSeleniumElements()->getElementsArray() as $index => $proxyWebElement)
         {
-            $facadeWebElement = $facadeWebElementsArray[$i];
-
             /** @var WElement $webElement */
-            $webElement = $this->elementClass::fromFacadeWebElement($this->instanceName . " [$i]", $facadeWebElement);
+            $webElement = $this->elementClass::fromProxyWebElement($this->instanceName . " [$index]", $proxyWebElement, $this->getParent());
+
+            if ($this->mustBeFilteredOut($webElement))
+            {
+                continue;
+            }
+
             $this->addChild($webElement);
             $webElement->setParent($this->getParent());
         }
+    }
+
+    public function getChildren() : Map
+    {
+        $this->updateFromProxyWebElements();
+
+        return parent::getChildren();
     }
 
     public function getLocator() : WLocator
@@ -320,13 +292,13 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
      *
      * Элементы коллекции будут иметь тот же класс, что и веб-элемент из которого она была создана
      *
-     * @return WElement[]
+     * @return WElement[]|Sequence
      */
-    public function getElementsArray() : array
+    public function getElementsArray() : Sequence
     {
         WLogger::logInfo($this . " -> получаем массив элементов");
 
-        return array_values($this->getChildren());
+        return $this->getChildren()->values();
     }
 
     /**
@@ -415,6 +387,16 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
         return $result;
     }
 
+    public function count() : int
+    {
+        return $this->getChildren()->count();
+    }
+
+    public function isEmpty() : bool
+    {
+        return $this->is(new CountEmpty(), false);
+    }
+
     /**
      * Возвращает первый элемент коллекции
      */
@@ -424,12 +406,12 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
 
         $elements = $this->getElementsArray();
 
-        if (empty($elements))
+        if ($elements->isEmpty())
         {
             throw new UsageException('Перед вызовом getFirstElement() нужно быть уверенным, что коллекция содержит хотя бы один элемент');
         }
 
-        return reset($elements);
+        return $elements->first();
     }
 
     /**
@@ -441,181 +423,12 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
 
         $elements = $this->getElementsArray();
 
-        if (empty($elements))
+        if (empty($elements->isEmpty()))
         {
             throw new UsageException('Перед вызовом getLastElement() нужно быть уверенным, что коллекция содержит хотя бы один элемент');
         }
 
-        return end($elements);
-    }
-
-    public function count() : int
-    {
-        return count($this->getChildren());
-    }
-
-    /**
-     * @param string $description
-     * @throws UsageException|AssertionFailedError
-     */
-    protected function fail(string $description = '')
-    {
-        $this
-            ->getParent()
-            ->returnCodeceptionActor()
-            ->fail($this . PHP_EOL . ' -> ' . $description)
-            ;
-    }
-
-    /**
-     * Ждёт выполнение заданного условия для данной коллекции элементов.
-     *
-     * Если условие не было выполнено в течении заданного таймаута (collectionTimeout) - валит тест.
-     *
-     * @param CCond $condition - условие
-     * @param string $description - описание причины, по которой заданное условие должно выполняться для данной коллекции элементов
-     * @param callable|null $debugHandler - опциональная функция, которая продиагностирует почему условие не выполнилось
-     *                                      и сообщит тестировщику в удобном для понимания виде
-     * @return $this
-     * @throws UsageException|AssertionFailedError
-     */
-    protected function should(CCond $condition, string $description = '', callable $debugHandler = null)
-    {
-        WLogger::logInfo($this . ' -> ' . $description);
-
-        try
-        {
-            $this
-                ->returnSeleniumElements()
-                ->wait()
-                ->until($condition)
-                ;
-        }
-        catch (WaitUntilElement $e)
-        {
-            $message = $condition->toString();
-
-            if ($debugHandler !== null)
-            {
-                $debugInfo = (new DebugInfo())->setPageObject($this);
-                $message .= PHP_EOL . $debugHandler($debugInfo);
-            }
-
-            $this->fail($message);
-        }
-
-        return $this;
-    }
-
-    protected function eachElementShould(string $shouldMethod)
-    {
-        foreach ($this->getElementsArray() as $element)
-        {
-            $element->$shouldMethod();
-        }
-
-        return $this;
-    }
-
-    protected function firstElementShould(string $shouldMethod)
-    {
-        $this->getFirstElement()->$shouldMethod();
-
-        return $this;
-    }
-
-    public function shouldExist(bool $deep = false)
-    {
-        return $this->should(CCond::sizeGreaterThan(0), 'должен существовать хотя бы один элемент', function (DebugInfo $debugInfo){return (new DebugHelper())->diagnoseLocator($debugInfo, DebugHelper::EXIST);});
-    }
-
-    public function shouldNotExist(bool $deep = false)
-    {
-        return $this->should(CCond::size(0), 'должен быть пустой', function (DebugInfo $debugInfo){return (new DebugHelper())->diagnoseLocator($debugInfo, DebugHelper::NOT_EXIST);});
-    }
-
-    public function shouldBeDisplayed(bool $deep = false)
-    {
-        $this->shouldExist();
-
-        if ($deep)
-        {
-            return $this->eachElementShould('shouldBeDisplayed');
-        }
-
-        return $this->firstElementShould('shouldBeDisplayed');
-    }
-
-    public function shouldBeHidden(bool $deep = false)
-    {
-        try
-        {
-            $this->shouldNotExist();
-        }
-        catch (AssertionFailedError $e)
-        {
-            if ($deep)
-            {
-                return $this->eachElementShould('shouldBeHidden');
-            }
-
-            return $this->firstElementShould('shouldBeHidden');
-        }
-
-        return $this;
-    }
-
-    public function shouldBeEnabled(bool $deep = false)
-    {
-        $this->shouldExist();
-
-        if ($deep)
-        {
-            return $this->eachElementShould('shouldBeEnabled');
-        }
-
-        return $this->firstElementShould('shouldBeEnabled');
-    }
-
-    public function shouldBeDisabled(bool $deep = false)
-    {
-        $this->shouldExist();
-
-        if ($deep)
-        {
-            return $this->eachElementShould('shouldBeDisabled');
-        }
-
-        return $this->firstElementShould('shouldBeDisabled');
-    }
-
-    public function shouldBeInViewport(bool $deep = true)
-    {
-        $this->shouldExist();
-
-        if ($deep)
-        {
-            return $this->eachElementShould('shouldBeInViewport');
-        }
-
-        return $this->firstElementShould('shouldBeInViewport');
-    }
-
-    public function shouldBeOutOfViewport(bool $deep = true)
-    {
-        $this->shouldExist();
-
-        if ($deep)
-        {
-            return $this->eachElementShould('shouldBeOutOfViewport');
-        }
-
-        return $this->firstElementShould('shouldBeOutOfViewport');
-    }
-
-    public function shouldContainText(string $text)
-    {
-        return $this->should(CCond::textsInAnyOrder(), "должен содержать текст: $text");
+        return $elements->last();
     }
 
     /**
@@ -623,11 +436,11 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
      *
      * Если условие не будет выполнено в течении заданного таймаута (collectionTimeout) - валит тест.
      *
-     * @return static
+     * @return $this
      */
     public function shouldBeGreaterThanOrEqual(int $size)
     {
-        return $this->should(CCond::sizeGreaterThanOrEqual($size), "должна иметь больше или равно $size элементов");
+        return $this->should(new CountGreaterThanOrEqual($size), false);
     }
 
     /**
@@ -635,11 +448,11 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
      *
      * Если условие не будет выполнено в течении заданного таймаута (collectionTimeout) - валит тест.
      *
-     * @return static
+     * @return $this
      */
     public function shouldBeEqual(int $size)
     {
-        return $this->should(CCond::size($size), "должна иметь ровно $size элементов");
+        return $this->should(new CountEquals($size), false);
     }
 
     /**
@@ -647,116 +460,47 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
      *
      * Если условие не будет выполнено в течении заданного таймаута (collectionTimeout) - валит тест.
      *
-     * @return static
+     * @return $this
      */
     public function shouldBeLesserThanOrEqual(int $size)
     {
-        return $this->should(CCond::sizeLessThanOrEqual($size), "должна иметь меньше или равно $size элементов");
+        return $this->should(new CountLessThanOrEqual($size), false);
     }
 
-    protected function is(CCond $condition, string $description) : bool
+    /**
+     * Коллеция должна содержать >= заданного числа элементов.
+     *
+     * Если условие не будет выполнено в течении заданного таймаута (collectionTimeout) - валит тест.
+     *
+     * @return bool
+     */
+    public function finallyGreaterThanOrEqual(int $size) : bool
     {
-        WLogger::logInfo($this . ' -> ' . $description);
-
-        return $this
-                    ->refresh()
-                    ->returnSeleniumElements()
-                    ->checkIt()
-                    ->is($condition)
-                    ;
+        return $this->finally_(new CountGreaterThanOrEqual($size), false);
     }
 
-    protected function eachElementIs(string $isMethod) : bool
+    /**
+     * Коллеция должна содержать == заданного числа элементов.
+     *
+     * Если условие не будет выполнено в течении заданного таймаута (collectionTimeout) - валит тест.
+     *
+     * @return bool
+     */
+    public function finallyEqual(int $size) : bool
     {
-        foreach ($this->getElementsArray() as $element)
-        {
-            if (!$element->$isMethod())
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->finally_(new CountEquals($size), false);
     }
 
-    protected function firstElementIs(string $isMethod) : bool
+    /**
+     * Коллеция должна содержать <= заданного числа элементов.
+     *
+     * Если условие не будет выполнено в течении заданного таймаута (collectionTimeout) - валит тест.
+     *
+     * @return bool
+     */
+    public function finallyLesserThanOrEqual(int $size) : bool
     {
-        return $this->getFirstElement()->$isMethod();
-    }
-
-    public function isExist(bool $deep = false) : bool
-    {
-        return $this->is(CCond::sizeGreaterThan(0), 'существует хотя бы один элемент?');
-    }
-
-    public function isNotExist(bool $deep = false) : bool
-    {
-        return $this->is(CCond::size(0), 'пустая?');
-    }
-
-    public function isDisplayed(bool $deep = false) : bool
-    {
-        if ($this->isNotExist())
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachElementIs('isDisplayed');
-        }
-
-        return $this->firstElementIs('isDisplayed');
-    }
-
-    public function isHidden(bool $deep = false) : bool
-    {
-        if ($this->isNotExist())
-        {
-            return true;
-        }
-
-        if ($deep)
-        {
-            return $this->eachElementIs('isHidden');
-        }
-
-        return $this->firstElementIs('isHidden');
-    }
-
-    public function isEnabled(bool $deep = false) : bool
-    {
-        if ($this->isNotExist())
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachElementIs('isEnabled');
-        }
-
-        return $this->firstElementIs('isEnabled');
-    }
-
-    public function isDisabled(bool $deep = false) : bool
-    {
-        if ($this->isNotExist())
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachElementIs('isDisabled');
-        }
-
-        return $this->firstElementIs('isDisabled');
-    }
-
-    public function isContainingText(string $text) : bool
-    {
-        return $this->is(CCond::textsInAnyOrder($text), "содержит текст: '$text'?");
+        return $this->finally_(new CountLessThanOrEqual($size), false);
     }
 
     /**
@@ -768,7 +512,7 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
      */
     public function isGreaterThanOrEqual(int $size) : bool
     {
-        return $this->is(CCond::sizeGreaterThanOrEqual($size), "имеет больше или равно $size элементов?");
+        return $this->is(new CountGreaterThanOrEqual($size), false);
     }
 
     /**
@@ -780,7 +524,7 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
      */
     public function isEqual(int $size) : bool
     {
-        return $this->is(CCond::sizeGreaterThanOrEqual($size), "имеет ровно $size элементов?");
+        return $this->is(new CountEquals($size), false);
     }
 
     /**
@@ -792,56 +536,21 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
      */
     public function isLesserThanOrEqual(int $size) : bool
     {
-        return $this->is(CCond::sizeLessThanOrEqual($size), "имеет меньше или равно $size элементов?");
+        return $this->is(new CountLessThanOrEqual($size), false);
     }
-
-    public function isInViewport(bool $deep = true) : bool
-    {
-        if ($this->isNotExist())
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachElementIs('isInViewport');
-        }
-
-        return $this->firstElementIs('isInViewport');
-    }
-
-    public function isOutOfViewport(bool $deep = true) : bool
-    {
-        if ($this->isNotExist())
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachElementIs('isOutOfViewport');
-        }
-
-        return $this->firstElementIs('isOutOfViewport');
-    }
-
-
 
     /**
      * Возвращает массив видимых текстов всех элементов коллекции
-     * @return array
+     * @return Sequence
      */
-    public function getVisibleTexts() : array
+    public function getVisibleTexts() : Sequence
     {
         WLogger::logInfo($this . " -> получаем видимые тексты всех элементов коллекции");
 
-        $result = $this
-                        ->returnSeleniumElements()
-                        ->get()
-                        ->texts()
-                        ;
+        /** @var Sequence $result */
+        $result = $this->accept(new GetText());
 
-        $texts = implode(', ', $result);
+        $texts = implode(', ', $result->toArray());
 
         WLogger::logInfo($this . " -> имеет видимые тексты: '$texts'");
 
@@ -851,22 +560,40 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
     /**
      * Возвращает массив сырых текстов (включая невидимые тексты) всех элементов коллекции
      *
-     * @return array
+     * @return Sequence
      */
-    public function getAllTexts() : array
+    public function getAllTexts() : Sequence
     {
         WLogger::logInfo($this . " -> получаем все тексты (включая невидимые) всех элементов коллекции");
 
-        $result = $this
-                        ->returnSeleniumElements()
-                        ->get()
-                        ->rawTexts()
-                        ;
+        /** @var Sequence $result */
+        $result = $this->accept(new GetRawText());
 
-        $texts = implode(', ', $result);
+        $texts = implode(', ', $result->toArray());
 
         WLogger::logInfo($this . " -> имеет все тексты: '$texts'");
 
         return $result;
+    }
+
+    /**
+     * @return EmptyComposite|WPageObject
+     * @throws UsageException
+     */
+    public function getParent()
+    {
+        $parent = parent::getParent();
+
+        if (!$parent instanceof EmptyComposite && !$parent instanceof WPageObject)
+        {
+            throw new UsageException($this . ' -> родителем WCollection должен быть наследник WPageObject или EmptyComposite');
+        }
+
+        return $parent;
+    }
+
+    public function getTimeout() : int
+    {
+        return (int) TestProperties::getValue('collectionTimeout');
     }
 }

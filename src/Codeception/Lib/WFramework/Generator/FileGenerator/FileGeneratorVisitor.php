@@ -46,6 +46,11 @@ class FileGeneratorVisitor
             return;
         }
 
+        if (file_exists($filename))
+        {
+            unlink($filename);
+        }
+
         file_put_contents($filename, $node->source);
     }
 

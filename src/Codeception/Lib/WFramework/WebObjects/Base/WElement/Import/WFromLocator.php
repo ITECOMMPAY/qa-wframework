@@ -21,7 +21,7 @@ class WFromLocator extends WFrom
         $this->name = $name;
         $this->locator = $locator;
         $this->relative = $relative;
-        $this->facadeWebElement = null;
+        $this->proxyWebElement = null;
 
         if ($relative === true && $locator->getMechanism() === 'xpath' && $locator->getValue()[0] !== '.')
         {

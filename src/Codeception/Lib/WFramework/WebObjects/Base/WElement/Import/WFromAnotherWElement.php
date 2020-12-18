@@ -21,7 +21,7 @@ class WFromAnotherWElement extends WFrom
         $this->name = $element->getName();
         $this->locator = $element->getLocator();
         $this->relative = $element->isRelative();
-        $this->facadeWebElement = $element->returnSeleniumElement();
+        $this->proxyWebElement = $element->returnSeleniumElement();
         $this->parentElement = $element->getParent();
     }
 }

@@ -90,16 +90,7 @@ EOF;
 
             if ($param->isDefaultValueAvailable())
             {
-                if (is_array($param->getDefaultValue()))
-                {
-                    echo PHP_EOL;
-                    echo $this->operationClassFull;
-
-                    echo PHP_EOL;
-                    echo var_dump($param->getDefaultValue());
-                }
-
-                $defaultValue = ' = ' . $param->getDefaultValue();
+                $defaultValue = ' = ' . json_encode($param->getDefaultValue(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             }
 
             $result[] = (new Template(static::PARAM_TEMPLATE))

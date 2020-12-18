@@ -151,7 +151,7 @@ abstract class WBlock extends WPageObject
         }
 
         $this->actor = $actor;
-        $this->webDriver = $actor->getWebDriver();
+        $this->proxyWebDriver = $actor->getWebDriver();
 
         if ($this->initPageLocator() instanceof WLocator)
         {
@@ -159,7 +159,7 @@ abstract class WBlock extends WPageObject
         }
         else
         {
-            $this->locator = WLocator::xpath($this->initPageLocator());
+            $this->locator = WLocator::xpath($this->initPageLocator()); //Локаторы заданные строкой считаются за Xpath-локаторы
         }
     }
 

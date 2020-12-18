@@ -6,7 +6,7 @@ namespace Codeception\Lib\WFramework\Generator\SourceGenerator;
 
 use Codeception\Lib\WFramework\Generator\IGenerator;
 use Codeception\Lib\WFramework\Helpers\ClassHelper;
-use Codeception\Lib\WFramework\WOperations\AbstractOperation;
+use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use Codeception\Util\Template;
 
 class OperationsParentSource implements IGenerator
@@ -18,7 +18,7 @@ class OperationsParentSource implements IGenerator
 namespace {{namespace}};
 
 
-use {{abstract_operation_reference}}
+use {{abstract_operation_reference}};
 use {{block_class_full}};
 use {{element_class_full}};
 use {{collection_class_full}};

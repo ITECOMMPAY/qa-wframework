@@ -10,12 +10,12 @@ namespace Codeception\Lib\WFramework\WebObjects\Base\WElement\Import;
 
 
 use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
-use Codeception\Lib\WFramework\FacadeWebElement\FacadeWebElement;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebDriver;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\WLocator\WLocator;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 class WFrom
 {
@@ -25,9 +25,12 @@ class WFrom
 
     protected $relative = false;
 
-    protected $facadeWebElement = null;
+    /**
+     * @var ProxyWebElement|null
+     */
+    protected $proxyWebElement = null;
 
-    /** @var RemoteWebDriver|null  */
+    /** @var ProxyWebDriver|null  */
     protected $webDriver = null;
 
     /** @var WPageObject|null  */
@@ -48,9 +51,9 @@ class WFrom
         return $this->relative;
     }
 
-    public function getFacadeWebElement()
+    public function getProxyWebElement()
     {
-        return $this->facadeWebElement;
+        return $this->proxyWebElement;
     }
 
     public function getParent()
@@ -78,9 +81,9 @@ class WFrom
         return new WFromLocator($instanceName, $locator, $relative);
     }
 
-    public static function facadeWebElement(string $instanceName, FacadeWebElement $facadeWebElement) : WFrom
+    public static function proxyWebElement(string $instanceName, ProxyWebElement $proxyWebElement, WPageObject $parent) : WFrom
     {
-        return new WFromFacadeWebElement($instanceName, $facadeWebElement);
+        return new WFromProxyWebElement($instanceName, $proxyWebElement, $parent);
     }
 
     public static function anotherWElement(WElement $element) : WFrom

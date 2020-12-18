@@ -6,26 +6,28 @@ namespace Codeception\Lib\WFramework\WebObjects\Base;
 
 use Codeception\Actor;
 use Codeception\Lib\WFramework\Actor\ImaginaryActor;
-use Codeception\Lib\WFramework\Condition\Cond;
-use Codeception\Lib\WFramework\Debug\DebugHelper;
-use Codeception\Lib\WFramework\Debug\DebugInfo;
+use Codeception\Lib\WFramework\Conditions\PageLoaded;
 use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
-use Codeception\Lib\WFramework\Exceptions\FacadeWebElementOperations\WaitUntilElement;
-use Codeception\Lib\WFramework\FacadeWebElement\FacadeWebElement;
 use Codeception\Lib\WFramework\Helpers\Composite;
+use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteActions;
+use Codeception\Lib\WFramework\Operations\Get\GetRawText;
+use Codeception\Lib\WFramework\Operations\Get\GetText;
+use Codeception\Lib\WFramework\Operations\Get\GetLayoutViewportSize;
+use Codeception\Lib\WFramework\Operations\Mouse\MouseScrollTo;
 use Codeception\Lib\WFramework\Properties\TestProperties;
-use Codeception\Lib\WFramework\ProxyWebElement\ProxyWebElement;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebDriver;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElement;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElementActions;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
-use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
+use Codeception\Lib\WFramework\WebObjects\Base\Traits\PageObjectBaseMethods;
 use Codeception\Lib\WFramework\WebObjects\SelfieShooter\ComparisonResult\Diff;
 use Codeception\Lib\WFramework\WebObjects\SelfieShooter\ComparisonResult\Same;
 use Codeception\Lib\WFramework\WebObjects\SelfieShooter\SelfieShooter;
 use Codeception\Lib\WFramework\WLocator\EmptyLocator;
 use Codeception\Lib\WFramework\WLocator\WLocator;
-use Codeception\Lib\WFramework\WOperations\AbstractOperation;
 use Facebook\WebDriver\Interactions\WebDriverActions;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use function microtime;
@@ -40,6 +42,8 @@ use function usleep;
  */
 abstract class WPageObject extends Composite implements IPageObject
 {
+    use PageObjectBaseMethods;
+
     /**
      * Все PageObject'ы привязаны к DOM-дереву через локатор.
      *
@@ -57,18 +61,18 @@ abstract class WPageObject extends Composite implements IPageObject
     /**
      * Все PageObject'ы имеют ссылку на Сервер Селениума, чтобы дёргать его методы
      *
-     * @var RemoteWebDriver
+     * Сервер Селениума обёрнут в прокси-объект, чтобы
+     *
+     * @var ProxyWebDriver
      */
-    protected $webDriver = null;
+    protected $proxyWebDriver = null;
 
     /**
      * Все PageObject'ы имеют ссылку на свой элемент Селениума, чтобы дёргать его методы
      *
-     * Элемент Селениума обёрнут в красивый фасад
-     *
-     * @var  FacadeWebElement
+     * @var  ProxyWebElement
      */
-    protected $facadeWebElement = null;
+    protected $proxyWebElement = null;
 
     /**
      * Все PageObject'ы могут являться частью других PageObject'ов.
@@ -122,30 +126,58 @@ abstract class WPageObject extends Composite implements IPageObject
      *
      * Обычно все наружные методы PageObject'а реализованы через вызовы FacadeWebElement.
      *
-     * @return FacadeWebElement
+     * @return ProxyWebElement
      * @throws UsageException
      */
-    public function returnSeleniumElement() : FacadeWebElement
+    public function returnSeleniumElement() : ProxyWebElement
     {
-        if ($this->facadeWebElement === null)
+        if ($this->proxyWebElement === null)
         {
-            if ($this->relative === True)
+            if ($this->relative === true)
             {
-                $this->facadeWebElement = FacadeWebElement::fromLocator($this->locator, $this->returnSeleniumServer(), $this->getParent()->returnSeleniumElement());
+                $this->proxyWebElement = new ProxyWebElement($this->locator, $this->returnSeleniumServer(), $this->getTimeout(), $this->getParent()->returnSeleniumElement());
             }
             else
             {
-                $this->facadeWebElement = FacadeWebElement::fromLocator($this->locator, $this->returnSeleniumServer());
+                $this->proxyWebElement = new ProxyWebElement($this->locator, $this->returnSeleniumServer(), $this->getTimeout());
             }
         }
 
-        if (!$this->facadeWebElement->returnProxyWebElement()->hasDebugInfo())
+        return $this->proxyWebElement;
+    }
+
+    /**
+     * С помощью этого метода можно обратиться к методам Сервера Селениума
+     *
+     * @return RemoteWebDriver
+     * @throws UsageException
+     */
+    public function returnSeleniumServer() : RemoteWebDriver
+    {
+        if ($this->proxyWebDriver === null)
         {
-            $debugInfo = (new DebugInfo())->setPageObject($this);
-            $this->facadeWebElement->returnProxyWebElement()->setDebugInfo($debugInfo);
+            if ($this->getParent() instanceof EmptyComposite)
+            {
+                throw new UsageException($this . ' -> не содержит ссылку на webDriver. Это странно.');
+            }
+
+            $this->proxyWebDriver = $this->getParent()->returnSeleniumServer();
         }
 
-        return $this->facadeWebElement;
+        return $this->proxyWebDriver;
+    }
+
+    /**
+     * С помощью этого метода можно обратиться к методам Selenium Actions
+     *
+     * https://selenium.dev/selenium/docs/api/java/org/openqa/selenium/interactions/Actions.html
+     *
+     * @return WebDriverActions
+     * @throws UsageException
+     */
+    public function returnSeleniumActions() : ProxyWebElementActions
+    {
+        return $this->accept(new ExecuteActions());
     }
 
     /**
@@ -160,67 +192,13 @@ abstract class WPageObject extends Composite implements IPageObject
         {
             if ($this->getParent() instanceof EmptyComposite)
             {
-                if ($this instanceof WBlock)
-                {
-                    throw new UsageException($this . ' -> не содержит ссылку на актора. Это странно, учитвая, чтоа ктор должен передаваться в её конструкторе');
-                }
-
-                if ($this instanceof WElement)
-                {
-                    throw new UsageException($this . ' -> должен располагаться на WBlock.');
-                }
-
-                throw new UsageException($this . ' -> не содержит актора и не является WBlock и WElement - ');
+                throw new UsageException($this . ' -> не содержит ссылку на актора. Это странно.');
             }
 
             $this->actor = $this->getParent()->returnCodeceptionActor();
         }
 
         return $this->actor;
-    }
-
-    /**
-     * С помощью этого метода можно обратиться к методам Сервера Селениума
-     *
-     * @return RemoteWebDriver
-     * @throws UsageException
-     */
-    public function returnSeleniumServer() : RemoteWebDriver
-    {
-        if ($this->webDriver === null)
-        {
-            if ($this->getParent() instanceof EmptyComposite)
-            {
-                if ($this instanceof WBlock)
-                {
-                    throw new UsageException($this . ' -> не содержит ссылку на webDriver. Это странно, учитывая, что актор должен передаваться в конструкторе WBlock');
-                }
-
-                if ($this instanceof WElement)
-                {
-                    throw new UsageException($this . ' -> должен располагаться на WBlock.');
-                }
-
-                throw new UsageException($this . ' -> не содержит webDriver и не является WBlock и WElement');
-            }
-
-            $this->webDriver = $this->getParent()->returnSeleniumServer();
-        }
-
-        return $this->webDriver;
-    }
-
-    /**
-     * С помощью этого метода можно обратиться к методам Selenium Actions
-     *
-     * https://selenium.dev/selenium/docs/api/java/org/openqa/selenium/interactions/Actions.html
-     *
-     * @return WebDriverActions
-     * @throws UsageException
-     */
-    public function returnSeleniumActions() : WebDriverActions
-    {
-        return new WebDriverActions($this->returnSeleniumServer());
     }
 
     public function returnSelfieShooter() : SelfieShooter
@@ -231,351 +209,6 @@ abstract class WPageObject extends Composite implements IPageObject
         }
 
         return $this->selfieShooter;
-    }
-
-    /**
-     * Метод валит тест
-     *
-     * @param string $description - причина
-     * @throws UsageException
-     */
-    protected function fail(string $description = '')
-    {
-        $this
-            ->returnCodeceptionActor()
-            ->fail($this . PHP_EOL . ' -> ' . $description)
-        ;
-    }
-
-    /**
-     * Ждёт выполнение заданного условия для данного PageObject'а.
-     *
-     * Если условие не было выполнено в течении заданного таймаута (elementTimeout для наследников WElement,
-     * collectionTimeout для наследников WCollection) - валит тест.
-     *
-     * @param Cond $condition - условие
-     * @param string $description - описание причины, по которой заданное условие должно выполняться для данного PageObject'а
-     * @param callable|null $debugHandler - опциональная функция, которая продиагностирует почему условие не выполнилось
-     *                                      и сообщит тестировщику в удобном для понимания виде
-     * @return $this
-     * @throws UsageException
-     */
-    protected function should(Cond $condition, string $description = '', callable $debugHandler = null)
-    {
-        WLogger::logInfo($this . ' -> ' . $description);
-
-        try
-        {
-            $this
-                ->returnSeleniumElement()
-                ->wait()
-                ->until($condition)
-                ;
-        }
-        catch (WaitUntilElement $e)
-        {
-            $message = $condition->toString();
-
-            if ($debugHandler !== null)
-            {
-                $debugInfo = (new DebugInfo())->setPageObject($this);
-                $message .= PHP_EOL . $debugHandler($debugInfo);
-            }
-
-            $this->fail($message);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Вызывает should-метод для всех PageObject'ов, которые объявлены внутри данного PageObject'а
-     *
-     * @param string $shouldMethod
-     * @return $this
-     */
-    protected function eachChildShould(string $shouldMethod)
-    {
-        foreach ($this->getChildren() as $child)
-        {
-            $child->$shouldMethod();
-        }
-
-        return $this;
-    }
-
-    public function shouldExist(bool $deep = true)
-    {
-        if (!$this->getLocator()->isHtmlRoot())
-        {
-            $this->should(Cond::exist(), 'должен существовать', function (DebugInfo $debugInfo){return (new DebugHelper())->diagnoseLocator($debugInfo, DebugHelper::EXIST);});
-        }
-
-        if ($deep)
-        {
-            $this->eachChildShould('shouldExist');
-        }
-
-        return $this;
-    }
-
-    public function shouldNotExist(bool $deep = true)
-    {
-        if (!$this->getLocator()->isHtmlRoot())
-        {
-            $this->should(Cond::not(Cond::exist()), 'НЕ должен существовать', function (DebugInfo $debugInfo){return (new DebugHelper())->diagnoseLocator($debugInfo, DebugHelper::NOT_EXIST);});
-        }
-
-        elseif ($deep)
-        {
-            $this->eachChildShould('shouldNotExist');
-        }
-
-        return $this;
-    }
-
-    public function shouldBeDisplayed(bool $deep = true)
-    {
-        if (!$this->getLocator()->isHtmlRoot())
-        {
-            $this->should(Cond::visible(), 'должен отображаться', function (DebugInfo $debugInfo){return (new DebugHelper())->diagnoseLocator($debugInfo, DebugHelper::EXIST, DebugHelper::VISIBLE);});
-        }
-
-        if ($deep)
-        {
-            $this->eachChildShould('shouldBeDisplayed');
-        }
-
-        return $this;
-    }
-
-    public function shouldBeHidden(bool $deep = true)
-    {
-        if (!$this->getLocator()->isHtmlRoot())
-        {
-            $this->should(Cond::hidden(), 'НЕ должен отображаться', function (DebugInfo $debugInfo){return (new DebugHelper())->diagnoseLocator($debugInfo, DebugHelper::HIDDEN);});
-        }
-
-        elseif ($deep)
-        {
-            $this->eachChildShould('shouldBeHidden');
-        }
-
-        return $this;
-    }
-
-    public function shouldBeEnabled(bool $deep = true)
-    {
-        if (!$this->getLocator()->isHtmlRoot())
-        {
-            $this->should(Cond::enabled(), 'должен быть доступен', function (DebugInfo $debugInfo){return (new DebugHelper())->diagnoseLocator($debugInfo, DebugHelper::EXIST, DebugHelper::ENABLED);});
-        }
-
-        if ($deep)
-        {
-            $this->eachChildShould('shouldBeEnabled');
-        }
-
-        return $this;
-    }
-
-    public function shouldBeDisabled(bool $deep = true)
-    {
-        if (!$this->getLocator()->isHtmlRoot())
-        {
-            $this->should(Cond::disabled(), 'должен быть недоступен', function (DebugInfo $debugInfo){return (new DebugHelper())->diagnoseLocator($debugInfo, DebugHelper::EXIST, DebugHelper::DISABLED);});
-        }
-
-        elseif ($deep)
-        {
-            $this->eachChildShould('shouldBeDisabled');
-        }
-
-        return $this;
-    }
-
-    public function shouldBeInViewport(bool $deep = true)
-    {
-        if (!$this->getLocator()->isHtmlRoot())
-        {
-            $this->should(Cond::inView(), 'должен быть внутри рамок окна', function (DebugInfo $debugInfo){return (new DebugHelper())->diagnoseLocator($debugInfo, DebugHelper::EXIST, DebugHelper::IN_VIEWPORT);});
-        }
-
-        if ($deep)
-        {
-            $this->eachChildShould('shouldBeInViewport');
-        }
-
-        return $this;
-    }
-
-    public function shouldBeOutOfViewport(bool $deep = true)
-    {
-        if (!$this->getLocator()->isHtmlRoot())
-        {
-            $this->should(Cond::not(Cond::inView()), 'должен быть за рамками окна', function (DebugInfo $debugInfo){return (new DebugHelper())->diagnoseLocator($debugInfo, DebugHelper::EXIST, DebugHelper::OUT_OF_VIEWPORT);});
-        }
-
-        if ($deep)
-        {
-            $this->eachChildShould('shouldBeOutOfViewport');
-        }
-
-        return $this;
-    }
-
-    public function shouldContainText(string $text)
-    {
-        return $this->should(Cond::textThatContains($text), "должен содержать текст: $text");
-    }
-
-    protected function is(Cond $condition, string $description) : bool
-    {
-        WLogger::logInfo($this . ' -> ' . $description);
-
-        return $this
-                    ->returnSeleniumElement()
-                    ->checkIt()
-                    ->is($condition)
-                    ;
-    }
-
-    protected function eachChildIs(string $isMethod) : bool
-    {
-        foreach ($this->getChildren() as $child)
-        {
-            if (!$child->$isMethod())
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public function isExist(bool $deep = true) : bool
-    {
-        if (!$this->getLocator()->isHtmlRoot() && !$this->is(Cond::exist(), 'существует?'))
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachChildIs('isExist');
-        }
-
-        return true;
-    }
-
-    public function isNotExist(bool $deep = true) : bool
-    {
-        if (!$this->getLocator()->isHtmlRoot() && !$this->is(Cond::not(Cond::exist()), 'НЕ существует?'))
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachChildIs('isNotExist');
-        }
-
-        return true;
-    }
-
-    public function isDisplayed(bool $deep = true) : bool
-    {
-        if (!$this->getLocator()->isHtmlRoot() && !$this->is(Cond::visible(), 'отображается?'))
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachChildIs('isDisplayed');
-        }
-
-        return true;
-    }
-
-    public function isHidden(bool $deep = true) : bool
-    {
-        if (!$this->getLocator()->isHtmlRoot() && !$this->is(Cond::hidden(), 'НЕ отображается?'))
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachChildIs('isHidden');
-        }
-
-        return true;
-    }
-
-    public function isEnabled(bool $deep = true) : bool
-    {
-        if (!$this->getLocator()->isHtmlRoot() && !$this->is(Cond::enabled(), 'доступен?'))
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachChildIs('isEnabled');
-        }
-
-        return true;
-    }
-
-    public function isDisabled(bool $deep = true) : bool
-    {
-        if (!$this->getLocator()->isHtmlRoot() && !$this->is(Cond::disabled(), 'НЕ доступен?'))
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachChildIs('isEnabled');
-        }
-
-        return true;
-    }
-
-    public function isInViewport(bool $deep = true) : bool
-    {
-        if (!$this->getLocator()->isHtmlRoot() && !$this->is(Cond::inView(), 'внутри рамок окна?'))
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachChildIs('isInViewport');
-        }
-
-        return true;
-    }
-
-    public function isOutOfViewport(bool $deep = true) : bool
-    {
-        if (!$this->getLocator()->isHtmlRoot() && !$this->is(Cond::not(Cond::inView()), 'за рамками окна?'))
-        {
-            return false;
-        }
-
-        if ($deep)
-        {
-            return $this->eachChildIs('isOutOfViewport');
-        }
-
-        return true;
-    }
-
-    public function isContainingText(string $text) : bool
-    {
-        return $this->is(Cond::textThatContains($text), "содержит текст: '$text'?");
     }
 
     /**
@@ -592,11 +225,7 @@ abstract class WPageObject extends Composite implements IPageObject
     {
         WLogger::logInfo($this . " -> получаем видимый текст");
 
-        $result = $this
-                    ->returnSeleniumElement()
-                    ->get()
-                    ->text()
-                    ;
+        $result = $this->accept(new GetText());
 
         WLogger::logInfo($this . " -> имеет видимый текст: '$result'");
 
@@ -617,11 +246,7 @@ abstract class WPageObject extends Composite implements IPageObject
     {
         WLogger::logInfo($this . " -> получаем весь текст (включая невидимый)");
 
-        $result = $this
-                    ->returnSeleniumElement()
-                    ->get()
-                    ->rawText()
-                    ;
+        $result = $this->accept(new GetRawText());
 
         WLogger::logInfo($this . " -> имеет весь текст: '$result'");
 
@@ -638,11 +263,7 @@ abstract class WPageObject extends Composite implements IPageObject
     {
         WLogger::logInfo($this . " -> скроллим к элементу");
 
-        $this
-            ->returnSeleniumElement()
-            ->mouse()
-            ->scrollTo()
-            ;
+        $this->accept(new MouseScrollTo());
 
         return $this;
     }
@@ -678,15 +299,7 @@ abstract class WPageObject extends Composite implements IPageObject
     {
         WLogger::logInfo($this . ' -> должен выглядеть, как сохранённый эталон: ' . $suffix);
 
-        try
-        {
-            $this
-                ->returnSeleniumElement()
-                ->wait()
-                ->until(Cond::pageLoaded())
-                ;
-        }
-        catch (WaitUntilElement $e) {}
+        $this->finally_(new PageLoaded());
 
         $screenshot = $this->returnSelfieShooter()->takeScreenshot('', $waitClosure);
 
@@ -726,7 +339,7 @@ abstract class WPageObject extends Composite implements IPageObject
 
         $this->returnCodeceptionActor()->putTempShot($name, $screenshot);
 
-        $viewportSize = $this->returnSeleniumElement()->get()->viewportSize();
+        $viewportSize = $this->accept(new GetLayoutViewportSize());
 
         $diffImage = $this->returnSelfieShooter()->fitIntoDimensions($comparisonResult->diffImage, $viewportSize);
 
@@ -765,15 +378,7 @@ abstract class WPageObject extends Composite implements IPageObject
     {
         WLogger::logInfo($this . ' -> выглядит, как сохранённый образец: ' . $suffix . '?');
 
-        try
-        {
-            $this
-                ->returnSeleniumElement()
-                ->wait()
-                ->until(Cond::pageLoaded())
-            ;
-        }
-        catch (WaitUntilElement $e) {}
+        $this->finally_(new PageLoaded());
 
         $screenshot = $this->returnSelfieShooter()->takeScreenshot('', $waitClosure);
 
@@ -794,7 +399,7 @@ abstract class WPageObject extends Composite implements IPageObject
     }
 
     /**
-     * @param AbstractOperation $visitor
+     * @param PageObjectVisitor $visitor
      * @return mixed
      */
     public function accept($visitor)
@@ -802,8 +407,24 @@ abstract class WPageObject extends Composite implements IPageObject
         return parent::accept($visitor);
     }
 
-    public function getProxyWebElement() : ProxyWebElement
+    public function getTimeout() : int
     {
-        return $this->returnSeleniumElement()->returnProxyWebElement();
+        return (int) TestProperties::getValue('elementTimeout');
+    }
+
+    /**
+     * @return EmptyComposite|WPageObject
+     * @throws UsageException
+     */
+    public function getParent()
+    {
+        $parent = parent::getParent();
+
+        if (!$parent instanceof EmptyComposite && !$parent instanceof WPageObject)
+        {
+            throw new UsageException($this . ' -> родителем WPageObject должен быть другой WPageObject или EmptyComposite');
+        }
+
+        return $parent;
     }
 }

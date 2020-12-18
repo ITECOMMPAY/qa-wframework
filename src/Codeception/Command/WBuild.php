@@ -74,7 +74,7 @@ class WBuild extends Command implements CustomCommandInterface
                 $moduleName = reset($moduleName);
             }
 
-            if (strpos($moduleName, 'WFramework') !== false)
+            if (strpos($moduleName, 'WebTestingModule') !== false)
             {
                 return true;
             }

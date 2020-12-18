@@ -10,6 +10,6 @@ class ElementOperationNode extends AbstractOperationNode
 {
     protected function getVisitorName() : string
     {
-        return 'acceptWCollection';
+        return 'acceptWElement';
     }
 }

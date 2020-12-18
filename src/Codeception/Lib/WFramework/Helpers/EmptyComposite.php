@@ -63,6 +63,7 @@ class EmptyComposite extends Composite
 
     // Здесь кончается стандартный код синглтона
 
+    /** @noinspection MagicMethodsValidityInspection */
     public function __construct()
     {
         //здесь нельзя вызывать родительский конструктор

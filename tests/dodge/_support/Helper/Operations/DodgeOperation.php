@@ -4,8 +4,10 @@
 namespace dodge\Helper\Operations;
 
 
-use Codeception\Lib\WFramework\WOperations\AbstractOperation;
+use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use dodge\Helper\Blocks\DodgeBlock;
+use dodge\Helper\Elements\DodgeElement;
+use dodge\Helper\Collections\DodgeCollection;
 
 class DodgeOperation extends AbstractOperation
 {

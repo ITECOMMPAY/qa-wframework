@@ -4,9 +4,9 @@
 namespace dodge\Helper\TestSteps;
 
 
-use Codeception\Lib\WFramework\StepsGroup\StepsGroup;
-use Codeception\Lib\WFramework\WOperations\Field\FieldSet;
-use Codeception\Lib\WFramework\WOperations\GetText;
+use Codeception\Lib\WFramework\Steps\StepsGroup;
+use Codeception\Lib\WFramework\Operations\Field\FieldSet;
+use Codeception\Lib\WFramework\Operations\GetText;
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\FrontPage\ChooseYourSiteBlock;
 use dodge\Helper\Blocks\Common\HeaderBlock;

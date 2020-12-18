@@ -6,7 +6,7 @@ namespace dodge\Helper\TestSteps;
 
 use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
 use Codeception\Lib\WFramework\Properties\TestProperties;
-use Codeception\Lib\WFramework\StepsGroup\StepsGroup;
+use Codeception\Lib\WFramework\Steps\StepsGroup;
 use dodge\DodgeTester;
 use dodge\Helper\AliasMaps\ChallengerModelsMap;
 use dodge\Helper\Blocks\SelectModelPage\SelectModelBlock;

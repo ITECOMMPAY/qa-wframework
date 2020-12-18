@@ -12,7 +12,10 @@ class WProject extends InitTemplate
     protected $configTemplate = <<<EOF
 namespace: {{namespace}}
 
-actor: {{actor_name}}
+suites:
+    webui:
+        actor: {{actor_name}}
+        path: .
 
 modules:
     enabled:
@@ -105,7 +108,7 @@ EOF;
         $this->createEmptyDirectory($outputDir = $root . DIRECTORY_SEPARATOR . '_output');
         $this->createEmptyDirectory($root . DIRECTORY_SEPARATOR . '_data');
         $this->createEmptyDirectory($root . DIRECTORY_SEPARATOR . '_envs');
-        $this->createEmptyDirectory($root . DIRECTORY_SEPARATOR . 'tests');
+        $this->createEmptyDirectory($root . DIRECTORY_SEPARATOR . 'Tests');
         $this->createDirectoryFor($supportDir = $root . DIRECTORY_SEPARATOR . '_support');
         $this->createDirectoryFor($generatedDir = $supportDir . DIRECTORY_SEPARATOR . '_generated');
         $this->createDirectoryFor($helperDir = $supportDir . DIRECTORY_SEPARATOR . 'Helper');
@@ -135,7 +138,7 @@ EOF;
         $this->sayInfo("Файл конфигурации проекта: codeception.yml - успешно создан");
 
 
-        $this->createActor($actorName, $supportDir, Yaml::parse($configFile));
+        $this->createActor($actorName, $supportDir, Yaml::parse($configFile)['suites']['webui']);
 
         $this->sayInfo("Актор проекта: $actorName - успешно создан");
 

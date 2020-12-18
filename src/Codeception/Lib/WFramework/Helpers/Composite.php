@@ -9,11 +9,15 @@
 namespace Codeception\Lib\WFramework\Helpers;
 
 
-use Codeception\Lib\WFramework\Helpers\ModernObject;
 use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
-use Codeception\Lib\WFramework\ProxyWebElement\ProxyWebElement;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
+use Codeception\Lib\WFramework\Helpers\ModernObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
+use Ds\Deque;
+use Ds\Map;
+use Ds\Queue;
+use Ds\Sequence;
+use Ds\Vector;
 use function array_keys;
 use function implode;
 
@@ -41,8 +45,8 @@ abstract class Composite extends ModernObject
     /** @var Composite */
     private $parent = null;
 
-    /** @var Composite[] */
-    private $children = [];
+    /** @var Composite[]|Map */
+    private $children;
 
     /** @var string  */
     protected $name = '';
@@ -108,7 +112,7 @@ abstract class Composite extends ModernObject
      */
     protected function addChild(Composite $child)
     {
-        $this->children[$child->getName()] = $child;
+        $this->children->put($child->getName(), $child);
         $child->setParent($this);
     }
 
@@ -117,7 +121,7 @@ abstract class Composite extends ModernObject
      */
     protected function clearChildren()
     {
-        $this->children = [];
+        $this->children->clear();
     }
 
     /**
@@ -125,16 +129,16 @@ abstract class Composite extends ModernObject
      *
      * Массив имеет вид: имя Composite => Composite
      *
-     * @return Composite[]
+     * @return Composite[]|Map
      */
-    public function getChildren() : array
+    public function getChildren() : Map
     {
         return $this->children;
     }
 
     public function hasChild(string $name) : bool
     {
-        return isset($this->children[$name]);
+        return $this->children->hasKey($name);
     }
 
     /**
@@ -148,16 +152,17 @@ abstract class Composite extends ModernObject
     {
         if (!$this->hasChild($name))
         {
-            throw new UsageException("У узла нет ребёнка с именем: $name, есть только: " . implode(', ', array_keys($this->children)));
+            throw new UsageException("У узла нет ребёнка с именем: $name, есть только: " . implode(', ', $this->children->keys()));
         }
 
-        return $this->children[$name];
+        return $this->children->get($name);
     }
 
     public function __construct()
     {
-        $this->registerChildren();
         $this->parent = EmptyComposite::get();
+        $this->children = new Map();
+        $this->registerChildren();
     }
 
     public function __toString() : string
@@ -200,5 +205,120 @@ abstract class Composite extends ModernObject
         {
             $child->callDepthFirst($func);
         }
+    }
+
+    /**
+     * Возвращает детей элемента в следующем порядке, включая этот элемент (1 - этот элемент):
+     * ```
+     *         (1)
+     *         / \
+     *        /   \
+     *       /     \
+     *      /       \
+     *      2       3
+     *     / \     / \
+     *    /   \   /   \
+     *    4   5   6   7
+     * ```
+     * @return \Generator
+     */
+    public function traverseBreadthFirst() : \Generator
+    {
+        $deque = new Deque([$this]);
+
+        while (!$deque->isEmpty())
+        {
+            /** @var Composite $node */
+            $node = $deque->shift();
+            yield $node; // Вначале возвращаем элемент - может быть это WCollection и по ходу теста она подзагрузит себе детей
+            $deque->push(... $node->getChildren()->values());
+        }
+    }
+
+    /**
+     * Возвращает детей элемента в следующем порядке, включая этот элемент (1 - этот элемент):
+     * ```
+     *         (1)
+     *         / \
+     *        /   \
+     *       /     \
+     *      /       \
+     *      2       5
+     *     / \     / \
+     *    /   \   /   \
+     *    3   4   6   7
+     * ```
+     *
+     * Для PageObject'ов, по умолчанию, следует использовать этот способ т.к. он перебирает элементы страницы сверху-вниз.
+     *
+     * @return \Generator
+     */
+    public function traverseDepthFirst() : \Generator
+    {
+        $deque = new Deque([$this]);
+
+        while (!$deque->isEmpty())
+        {
+            /** @var Composite $node */
+            $node = $deque->shift();
+            yield $node; // Вначале возвращаем элемент - может быть это WCollection и по ходу теста она подзагрузит себе детей
+            $deque->unshift(... $node->getChildren()->values());
+        }
+    }
+
+    /**
+     * Возвращает родителей элемента в следующем порядке, включая этот элемент (1 - этот элемент):
+     * ```
+     *      3
+     *      |
+     *      |
+     *      2
+     *     / \
+     *    /   \
+     *   (1)   X
+     * ```
+     * @return Sequence
+     */
+    public function traverseToRoot() : Sequence
+    {
+        $result = new Vector([$this]);
+
+        $parent = $this->getParent();
+
+        while (!$parent instanceof EmptyComposite)
+        {
+            $result->push($parent);
+            $parent = $parent->getParent();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Возвращает родителей элемента в следующем порядке, включая этот элемент (3 - этот элемент):
+     * ```
+     *      1
+     *      |
+     *      |
+     *      2
+     *     / \
+     *    /   \
+     *   (3)   X
+     * ```
+     * @return Sequence
+     */
+    public function traverseFromRoot() : Sequence
+    {
+        $result = new Deque([$this]);
+
+        $parent = $this->getParent();
+
+        while (!$parent instanceof EmptyComposite)
+        {
+            $result->unshift($parent);
+            $parent = $parent->getParent();
+        }
+
+        return $result;
     }
 }

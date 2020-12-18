@@ -4,7 +4,7 @@
 namespace dodge\Helper\Elements\DodgeColorPicker;
 
 
-use Codeception\Lib\WFramework\AliasMap\AliasMap;
+use Codeception\Lib\WFramework\AliasMaps\AliasMap;
 use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;

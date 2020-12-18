@@ -4,7 +4,7 @@
 namespace dodge\Helper\AliasMaps;
 
 
-use Codeception\Lib\WFramework\AliasMap\AliasMap;
+use Codeception\Lib\WFramework\AliasMaps\AliasMap;
 
 class ChallengerExteriorColorsMap extends AliasMap
 {

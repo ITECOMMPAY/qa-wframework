@@ -14,7 +14,7 @@ use Codeception\TestInterface;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Properties\GlobalProperties;
 use Codeception\Lib\WFramework\Properties\SuiteProperties;
-use Codeception\Lib\WFramework\ProxyWebDriver\ProxyWebDriver;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebDriver;
 use Codeception\Lib\WFramework\Properties\TestProperties;
 use function getenv;
 use function getmypid;

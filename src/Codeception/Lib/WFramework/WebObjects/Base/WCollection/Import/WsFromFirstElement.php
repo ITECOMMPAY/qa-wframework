@@ -20,8 +20,8 @@ class WsFromFirstElement extends WsFrom
         $this->instanceName = $webElement->getName();
         $this->locator = $webElement->getLocator();
         $this->relative = $webElement->isRelative();
-        $this->elementClass = get_class($webElement);
+        $this->elementClass = $webElement->getClass();
 
-        $this->facadeWebElements = null;
+        $this->proxyWebElements = null;
     }
 }

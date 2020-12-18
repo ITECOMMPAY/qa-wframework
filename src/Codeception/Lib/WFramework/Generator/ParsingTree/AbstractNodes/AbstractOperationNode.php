@@ -48,7 +48,7 @@ abstract class AbstractOperationNode extends Composite
     protected function getReflectionMethod() : ?\ReflectionMethod
     {
         $inherited = function ($reflectionMethod, $reflectionClass) {
-            return $reflectionMethod->getDeclaringClass()->name !== $reflectionClass->name;
+            return $reflectionMethod->getDeclaringClass()->getName() !== $reflectionClass->getName();
         };
 
         $methodName = $this->getVisitorName();

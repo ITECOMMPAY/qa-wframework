@@ -10,7 +10,7 @@ namespace Codeception\Lib\WFramework\Logger;
 
 use Codeception\Lib\WFramework\Logger\HtmlLogger\CustomHtmlFormatter;
 use Codeception\Lib\WFramework\Logger\HtmlLogger\CustomHtmlStreamHandler;
-use Codeception\Lib\WFramework\ProxyWebDriver\ProxyWebDriver;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebDriver;
 use function file_put_contents;
 use Monolog\Logger;
 use function preg_replace;

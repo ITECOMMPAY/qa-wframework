@@ -1,6 +1,9 @@
 namespace: dodge
 
-actor: DodgeTester
+suites:
+    cases:
+        actor: DodgeTester
+        path: .
 
 modules:
     enabled:

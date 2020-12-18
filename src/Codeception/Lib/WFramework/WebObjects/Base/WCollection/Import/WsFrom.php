@@ -10,23 +10,28 @@ namespace Codeception\Lib\WFramework\WebObjects\Base\WCollection\Import;
 
 
 use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
-use Codeception\Lib\WFramework\FacadeWebElements\FacadeWebElements;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElements;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
+use Codeception\Lib\WFramework\WLocator\WLocator;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 abstract class WsFrom
 {
+    /** @var string */
     protected $instanceName = '';
 
-    protected $locator = null;
+    /** @var WLocator */
+    protected $locator;
 
     protected $relative = false;
 
+    /** @var string */
     protected $elementClass = '';
 
-    protected $facadeWebElements = null;
+    /** @var ProxyWebElements|null  */
+    protected $proxyWebElements = null;
 
     /** @var RemoteWebDriver|null  */
     protected $webDriver = null;
@@ -35,9 +40,9 @@ abstract class WsFrom
     protected $parentElement = null;
 
 
-    public function getFacadeWebElements()
+    public function getProxyWebElements()
     {
-        return $this->facadeWebElements;
+        return $this->proxyWebElements;
     }
 
     public function getInstanceName()
@@ -77,9 +82,9 @@ abstract class WsFrom
                                 - он должен располагаться на каком-нибудь WBlock, и именно WBlock должен быть прописан в степах.');
     }
 
-    public static function facadeWebElements(string $name, FacadeWebElements $facadeWebElements, string $elementClass) : WsFrom
+    public static function proxyWebElements(string $name, ProxyWebElements $proxyWebElements, string $elementClass, WPageObject $parent) : WsFrom
     {
-        return new WsFromFacadeWebElements($name, $facadeWebElements, $elementClass);
+        return new WsFromProxyWebElements($name, $proxyWebElements, $elementClass, $parent);
     }
 
     public static function firstElement(WElement $webElement) : WsFrom

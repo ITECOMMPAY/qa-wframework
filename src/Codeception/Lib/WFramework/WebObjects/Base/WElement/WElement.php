@@ -8,11 +8,16 @@
 
 namespace Codeception\Lib\WFramework\WebObjects\Base\WElement;
 
-use Codeception\Lib\WFramework\Condition\Cond;
+
+use Codeception\Lib\WFramework\Conditions\Text;
+use Codeception\Lib\WFramework\Conditions\Value;
+use Codeception\Lib\WFramework\Conditions\ValueContains;
 use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
 use Codeception\Lib\WFramework\FacadeWebElement\FacadeWebElement;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
+use Codeception\Lib\WFramework\Operations\Get\GetValue;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
@@ -110,15 +115,16 @@ abstract class WElement extends WPageObject
     }
 
     /**
-     * Создаёт данный веб-элемент из FacadeWebElement.
+     * Создаёт данный веб-элемент из ProxyWebElement.
      *
      * @param string $name - понятное для человека описание данного веб-элемента. Имя должно быть уникальным в рамках WBlock.
-     * @param FacadeWebElement $facadeWebElement
+     * @param ProxyWebElement $proxyWebElement
+     * @param WPageObject $parent - элемент должен располагаться внутри другого элемента или внутри блока - здесь его нужно указать
      * @return mixed
      */
-    public static function fromFacadeWebElement(string $name, FacadeWebElement $facadeWebElement)
+    public static function fromProxyWebElement(string $name, ProxyWebElement $proxyWebElement, WPageObject $parent)
     {
-        return new static (WFrom::facadeWebElement($name, $facadeWebElement));
+        return new static (WFrom::proxyWebElement($name, $proxyWebElement, $parent));
     }
 
     /**
@@ -161,7 +167,7 @@ abstract class WElement extends WPageObject
         $this->name = $importer->getName();
         $this->locator = $importer->getLocator();
         $this->relative = $importer->getRelative();
-        $this->facadeWebElement = $importer->getFacadeWebElement();
+        $this->facadeWebElement = $importer->getProxyWebElement();
         $this->setParent($importer->getParent());
     }
 
@@ -193,19 +199,17 @@ abstract class WElement extends WPageObject
      */
     protected function getWBlock() : WBlock
     {
-        $parent = $this->getParent();
-
-        while (!$parent instanceof WBlock)
+        foreach ($this->traverseToRoot() as $parent)
         {
-            if ($parent instanceof EmptyComposite)
+            if (!$parent instanceof WBlock)
             {
-                throw new UsageException($this . ' -> должен располагаться на WBlock.');
+                continue;
             }
 
-            $parent = $parent->getParent();
+            return $parent;
         }
 
-        return $parent;
+        throw new UsageException($this . ' -> должен располагаться на WBlock.');
     }
 
     /**
@@ -225,7 +229,7 @@ abstract class WElement extends WPageObject
      */
     public function shouldHaveText(string $text)
     {
-        return $this->should(Cond::text($text), "должен иметь текст: $text");
+        return $this->should(new Text($text), false);
     }
 
     /**
@@ -244,7 +248,7 @@ abstract class WElement extends WPageObject
      */
     public function isHavingText(string $text) : bool
     {
-        return $this->is(Cond::text($text), "имеет текст: '$text'?");
+        return $this->is(new Text($text), false);
     }
 
     /**
@@ -264,7 +268,7 @@ abstract class WElement extends WPageObject
      */
     public function shouldHaveValue(string $value)
     {
-        return $this->should(Cond::value($value), "должен иметь значение: $value");
+        return $this->should(new Value($value), false);
     }
 
     /**
@@ -283,7 +287,7 @@ abstract class WElement extends WPageObject
      */
     public function isHavingValue(string $value) : bool
     {
-        return $this->is(Cond::value($value), "имеет значение: '$value'?");
+        return $this->is(new Value($value), false);
     }
 
     /**
@@ -302,7 +306,7 @@ abstract class WElement extends WPageObject
      */
     public function shouldContainValue(string $value)
     {
-        return $this->should(Cond::valueThatContains($value), "должен содержать значение: $value");
+        return $this->should(new ValueContains($value), false);
     }
 
     /**
@@ -320,18 +324,14 @@ abstract class WElement extends WPageObject
      */
     public function isContainingValue(string $value) : bool
     {
-        return $this->is(Cond::valueThatContains($value), "содержит значение: '$value'?");
+        return $this->is(new ValueContains($value), false);
     }
 
     public function getValue() : string
     {
         WLogger::logInfo($this . " -> получаем значение");
 
-        $result = $this
-                        ->returnSeleniumElement()
-                        ->get()
-                        ->value()
-                        ;
+        $result = $this->accept(new GetValue());
 
         WLogger::logInfo($this . " -> имеет значение: '$result'");
 

@@ -9,7 +9,7 @@ use Codeception\Lib\WFramework\Generator\ParsingTree\RootNode;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\SourceGeneratorVisitor;
 use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Logger\WLogger;
-use Codeception\Lib\WFramework\WOperations\AbstractOperation;
+use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
@@ -43,7 +43,7 @@ class WProjectStructure
         $this->outputNamespace = $outputNamespace;
         $this->actorNameShort = $actorNameShort;
         $this->actorNameFull = $this->getActorNameFull();
-        $this->operationsPath = [__DIR__ . '/../WOperations', $supportDir . '/Helper'];
+        $this->operationsPath = [__DIR__ . '/../Operations', $supportDir . '/Helper/Operations'];
     }
 
     protected function getActorNameFull() : string
@@ -103,10 +103,18 @@ class WProjectStructure
         foreach ($classes as $class)
         {
             $reflectionClass = new ReflectionClass($class);
-            if ($reflectionClass->isSubclassOf($classOrInterface))
+
+            if (!$reflectionClass->isInstantiable())
             {
-                $result[$class] = $reflectionClass;
+                continue;
             }
+
+            if (!$reflectionClass->isSubclassOf($classOrInterface))
+            {
+                continue;
+            }
+
+            $result[$class] = $reflectionClass;
         }
 
         return $result;
