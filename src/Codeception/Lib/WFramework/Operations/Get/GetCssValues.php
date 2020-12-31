@@ -55,8 +55,6 @@ class GetCssValues extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : array
     {
-        WLogger::logDebug('Получаем значение CSS-свойств: ' . implode(', ', $this->property));
-
         $result = [];
 
         foreach ($this->property as $property)

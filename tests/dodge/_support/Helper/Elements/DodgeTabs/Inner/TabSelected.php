@@ -4,30 +4,19 @@
 namespace dodge\Helper\Elements\DodgeTabs\Inner;
 
 
-use Codeception\Lib\WFramework\Condition\Cond;
-use Codeception\Lib\WFramework\FacadeWebElement\FacadeWebElement;
+use Codeception\Lib\WFramework\Conditions\AbstractCondition;
 
-class TabSelected extends Cond
+class TabSelected extends AbstractCondition
 {
-    public static function new() : TabSelected
+    public function getName() : string
     {
-        return new self('вкладка выбрана');
+        return "выбрана?";
     }
 
-    protected function apply(FacadeWebElement $facadeWebElement)
+    public function acceptDodgeTab(DodgeTab $tab) : bool
     {
-        $class = $facadeWebElement->get()->attribute('class') ?? '';
+        $class = $tab->returnOperations()->get()->attribute('class') ?? '';
 
-        $this->result = stripos($class, 'active') !== false;
-    }
-
-    public function printExpectedValue() : string
-    {
-        return 'должна быть выбрана';
-    }
-
-    public function printActualValue() : string
-    {
-        return $this->result ? 'выбрана' : 'не выбрана' ;
+        return stripos($class, 'active') !== false;
     }
 }

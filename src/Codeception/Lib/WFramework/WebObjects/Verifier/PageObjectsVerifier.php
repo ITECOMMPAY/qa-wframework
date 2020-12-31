@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\WebObjects\Verifier;
 
 
+use Codeception\Lib\WFramework\Operations\Get\GetScreenshotRaw;
 use function array_filter;
 use Codeception\Actor;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
@@ -218,7 +219,7 @@ class PageObjectsVerifier
 
         $screenshotName = mb_substr($filename, 0, -4) . '__.png';
 
-        $pageObject->returnSelfieShooter()->takeScreenshot($screenshotName);
+        $pageObject->accept(new GetScreenshotRaw($screenshotName));
     }
 
     /**

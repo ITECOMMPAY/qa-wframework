@@ -4,10 +4,10 @@
 namespace dodge\Helper\Blocks\FrontPage;
 
 
-use Codeception\Lib\WFramework\WebObjects\Primitive\WButton;
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\DodgeBlock;
-use dodge\Helper\TestSteps\DodgeSteps;
+use dodge\Helper\Elements\Basic\DodgeButton;
+use dodge\Helper\Steps\DodgeSteps;
 
 class ChooseYourSiteBlock extends DodgeBlock
 {
@@ -30,7 +30,7 @@ class ChooseYourSiteBlock extends DodgeBlock
 
     public function __construct(DodgeTester $actor)
     {
-        $this->closeButton = WButton::fromXpath('X', ".//button[string()='Close']");
+        $this->closeButton = DodgeButton::fromXpath('X', ".//button[string()='Close']");
 
         parent::__construct($actor);
     }
@@ -47,7 +47,7 @@ class ChooseYourSiteBlock extends DodgeBlock
 
 
 
-    public function getCloseButton() : WButton
+    public function getCloseButton() : DodgeButton
     {
         return $this->closeButton;
     }

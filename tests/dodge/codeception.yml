@@ -1,7 +1,7 @@
 namespace: dodge
 
 suites:
-    cases:
+    webui:
         actor: DodgeTester
         path: .
 
@@ -44,7 +44,7 @@ extensions:
         - Codeception\Command\WBuild
 
 paths:
-    tests: tests
+    tests: Tests
     output: ../../output/dodge/
     data: _data
     support: _support

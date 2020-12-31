@@ -19,11 +19,11 @@ class WaitUntil extends AbstractOperation
 
     public function getName() : string
     {
-        return "ждём окончания выполнения условия: " . $this->condition;
+        return "ждём выполнения условия: " . $this->condition;
     }
 
     /**
-     * Ожидает, пока для данного PageObject'а перестанут выполняться условия,
+     * Ожидает, пока для данного PageObject'а начнут выполняться условия,
      * или не пройдёт, заданный в настройках модуля, elementTimeout / collectionTimeout.
      *
      * @param AbstractCondition $condition - условие
@@ -60,7 +60,7 @@ class WaitUntil extends AbstractOperation
                 $pageObject->refresh();
             }
 
-            if (!$pageObject->accept($this->condition))
+            if ($pageObject->accept($this->condition))
             {
                 return $this;
             }
@@ -68,6 +68,6 @@ class WaitUntil extends AbstractOperation
             usleep(500000);
         }
 
-        throw new WaitUntilElement('Не удалось дождаться окончания выполнения условия: ' . $this->condition);
+        throw new WaitUntilElement('Не удалось дождаться выполнения условия: ' . $this->condition);
     }
 }

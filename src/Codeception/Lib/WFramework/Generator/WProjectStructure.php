@@ -61,10 +61,18 @@ class WProjectStructure
         $parsingTree = new RootNode($this->projectName, $this->actorNameFull, $this->outputNamespace, $this->getOperationClasses());
 
         $sourceGenerator = new SourceGeneratorVisitor();
-        $parsingTree->callDepthFirst(function (Composite $node) use ($sourceGenerator) {$node->accept($sourceGenerator);});
+
+        foreach ($parsingTree->traverseDepthFirst() as $node)
+        {
+            $node->accept($sourceGenerator);
+        }
 
         $fileGenerator = new FileGeneratorVisitor($this->outputPath);
-        $parsingTree->callDepthFirst(function (Composite $node) use ($fileGenerator) {$node->accept($fileGenerator);});
+
+        foreach ($parsingTree->traverseDepthFirst() as $node)
+        {
+            $node->accept($fileGenerator);
+        }
     }
 
     protected function getOperationClasses() : array
@@ -82,7 +90,11 @@ class WProjectStructure
             $result[] = $this->loadSubclassesFromDir($path, AbstractOperation::class);
         }
 
-        return array_merge(...$result);
+        $result = array_merge(...$result);
+
+        ksort($result);
+
+        return $result;
     }
 
     protected function loadSubclassesFromDir(string $path, string $classOrInterface) : array

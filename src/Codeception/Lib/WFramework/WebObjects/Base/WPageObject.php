@@ -6,13 +6,14 @@ namespace Codeception\Lib\WFramework\WebObjects\Base;
 
 use Codeception\Actor;
 use Codeception\Lib\WFramework\Actor\ImaginaryActor;
-use Codeception\Lib\WFramework\Conditions\PageLoaded;
+use Codeception\Lib\WFramework\Conditions\LikeBefore;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Execute\ExecuteActions;
-use Codeception\Lib\WFramework\Operations\Get\GetRawText;
+use Codeception\Lib\WFramework\Operations\Get\GetScreenshot;
+use Codeception\Lib\WFramework\Operations\Get\GetTextRaw;
 use Codeception\Lib\WFramework\Operations\Get\GetText;
 use Codeception\Lib\WFramework\Operations\Get\GetLayoutViewportSize;
 use Codeception\Lib\WFramework\Operations\Mouse\MouseScrollTo;
@@ -23,14 +24,11 @@ use Codeception\Lib\WFramework\Helpers\EmptyComposite;
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElementActions;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\Traits\PageObjectBaseMethods;
-use Codeception\Lib\WFramework\WebObjects\SelfieShooter\ComparisonResult\Diff;
-use Codeception\Lib\WFramework\WebObjects\SelfieShooter\ComparisonResult\Same;
-use Codeception\Lib\WFramework\WebObjects\SelfieShooter\SelfieShooter;
 use Codeception\Lib\WFramework\WLocator\EmptyLocator;
 use Codeception\Lib\WFramework\WLocator\WLocator;
 use Facebook\WebDriver\Interactions\WebDriverActions;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use function microtime;
+use Facebook\WebDriver\WebDriverDimension;
 use function usleep;
 
 /**
@@ -85,11 +83,6 @@ abstract class WPageObject extends Composite implements IPageObject
      * @var bool
      */
     protected $relative = true;
-
-    /**
-     * @var SelfieShooter|null
-     */
-    protected $selfieShooter = null;
 
     public function __construct()
     {
@@ -201,16 +194,6 @@ abstract class WPageObject extends Composite implements IPageObject
         return $this->actor;
     }
 
-    public function returnSelfieShooter() : SelfieShooter
-    {
-        if ($this->selfieShooter === null)
-        {
-            $this->selfieShooter = new SelfieShooter($this);
-        }
-
-        return $this->selfieShooter;
-    }
-
     /**
      * Возвращает видимый текст PageObject'а
      *
@@ -223,8 +206,6 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function getVisibleText() : string
     {
-        WLogger::logInfo($this . " -> получаем видимый текст");
-
         $result = $this->accept(new GetText());
 
         WLogger::logInfo($this . " -> имеет видимый текст: '$result'");
@@ -244,9 +225,7 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function getAllText() : string
     {
-        WLogger::logInfo($this . " -> получаем весь текст (включая невидимый)");
-
-        $result = $this->accept(new GetRawText());
+        $result = $this->accept(new GetTextRaw());
 
         WLogger::logInfo($this . " -> имеет весь текст: '$result'");
 
@@ -261,8 +240,6 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function scrollTo()
     {
-        WLogger::logInfo($this . " -> скроллим к элементу");
-
         $this->accept(new MouseScrollTo());
 
         return $this;
@@ -299,16 +276,16 @@ abstract class WPageObject extends Composite implements IPageObject
     {
         WLogger::logInfo($this . ' -> должен выглядеть, как сохранённый эталон: ' . $suffix);
 
-        $this->finally_(new PageLoaded());
-
-        $screenshot = $this->returnSelfieShooter()->takeScreenshot('', $waitClosure);
-
         $shotRun = (bool) TestProperties::getValue('shotRun');
 
         $name = $this . '_' . $suffix;
 
         if ($shotRun)
         {
+            WLogger::logInfo($this . ' -> сохраняем эталон: ' . $suffix);
+
+            $screenshot = $this->accept(new GetScreenshot('', $waitClosure));
+
             $this->returnCodeceptionActor()->putTempShot($name, $screenshot);
 
             usleep($defaultDelay);
@@ -316,36 +293,62 @@ abstract class WPageObject extends Composite implements IPageObject
             return $this;
         }
 
-        $reference = $this->returnCodeceptionActor()->getShot($name);
+        $condition = new LikeBefore($suffix, $waitClosure);
 
-        $timeout = (int) TestProperties::getValue('elementTimeout');
-
-        $deadLine = microtime(True) + $timeout;
-
-        while (microtime(True) < $deadLine)
+        if ($this->finally_($condition))
         {
-            /** @var Same|Diff $comparisonResult */
-            $comparisonResult = $this->returnSelfieShooter()->compareImages($reference, $screenshot);
-
-            if ($comparisonResult instanceof Same)
-            {
-                return $this;
-            }
-
-            usleep(500000);
-
-            $screenshot = $this->returnSelfieShooter()->takeScreenshot('', $waitClosure);
+            return $this;
         }
 
-        $this->returnCodeceptionActor()->putTempShot($name, $screenshot);
+        //TODO переделать эту часть на Explanations
+
+        $this->returnCodeceptionActor()->putTempShot($name, $condition->screenshot);
 
         $viewportSize = $this->accept(new GetLayoutViewportSize());
 
-        $diffImage = $this->returnSelfieShooter()->fitIntoDimensions($comparisonResult->diffImage, $viewportSize);
+        $diffImage = $this->fitIntoDimensions($condition->diff, $viewportSize);
 
         $this->returnCodeceptionActor()->failSoft($this . ' -> не совпадает с сохранённым образцом: ' . $suffix, ['screenshot_blob' => $diffImage]);
 
         return $this;
+    }
+
+    /**
+     * Подгоняет картинку под заданное разрешение.
+     *
+     * Будет создан холст заданного разрешения, залитый чёрным цветом. Картинка будет размещена в центре холста.
+     * Если картинка больше чем холст, то она будет отмасштабирована под его размер.
+     *
+     * @param string $imageBlob
+     * @param WebDriverDimension $dimensions
+     * @return string
+     * @throws \ImagickException
+     */
+    private function fitIntoDimensions(string $imageBlob, WebDriverDimension $dimensions) : string
+    {
+        WLogger::logDebug('Подгоняем картинку под разрешение, если она в него не вмещается');
+
+        $imagick = new \Imagick();
+        $imagick->readImageBlob($imageBlob);
+
+        $imageGeometry = $imagick->getImageGeometry();
+
+        if ($imageGeometry['width'] > $dimensions->getWidth() || $imageGeometry['height'] > $dimensions->getHeight())
+        {
+            $imagick->scaleImage($dimensions->getWidth(), $dimensions->getHeight(), true);
+        }
+
+        $canvas = new \Imagick();
+        $canvas->newImage($dimensions->getWidth(), $dimensions->getHeight(), 'black', 'PNG32');
+
+        $imageGeometry = $imagick->getImageGeometry();
+
+        $offsetX = (int)($dimensions->getWidth()  / 2) - (int)($imageGeometry['width']  / 2);
+        $offsetY = (int)($dimensions->getHeight() / 2) - (int)($imageGeometry['height'] / 2);
+
+        $canvas->compositeImage($imagick, \Imagick::COMPOSITE_OVER, $offsetX, $offsetY);
+
+        return $canvas->getImageBlob();
     }
 
     /**
@@ -378,24 +381,20 @@ abstract class WPageObject extends Composite implements IPageObject
     {
         WLogger::logInfo($this . ' -> выглядит, как сохранённый образец: ' . $suffix . '?');
 
-        $this->finally_(new PageLoaded());
-
-        $screenshot = $this->returnSelfieShooter()->takeScreenshot('', $waitClosure);
-
         $shotRun = (bool) TestProperties::getValue('shotRun');
-
-        $name = $this . '_' . $suffix;
 
         if ($shotRun)
         {
+            $screenshot = $this->accept(new GetScreenshot('', $waitClosure));
+
+            $name = $this . '_' . $suffix;
+
             $this->returnCodeceptionActor()->putTempShot($name, $screenshot);
 
             return $defaultValue;
         }
 
-        $reference = $this->returnCodeceptionActor()->getShot($name);
-
-        return $this->returnSelfieShooter()->compareImages($reference, $screenshot) instanceof Same;
+        return $this->is(new LikeBefore($suffix, $waitClosure));
     }
 
     /**
@@ -404,6 +403,39 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function accept($visitor)
     {
+        $logMessage = $this . ' -> ' . $visitor->getName();
+
+        $calledFromVisitor = static function ()
+        {
+            $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 8);
+            array_shift($backtrace);
+            array_shift($backtrace);
+
+            foreach ($backtrace as $trace)
+            {
+                if (!isset($trace['function']))
+                {
+                    continue;
+                }
+
+                if ($trace['function'] === 'accept')
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        if ($calledFromVisitor())
+        {
+            WLogger::logDebug($logMessage);
+        }
+        else
+        {
+            WLogger::logInfo($logMessage);
+        }
+
         return parent::accept($visitor);
     }
 

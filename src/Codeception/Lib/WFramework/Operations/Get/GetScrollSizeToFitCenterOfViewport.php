@@ -53,8 +53,6 @@ class GetScrollSizeToFitCenterOfViewport extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WebDriverDimension
     {
-        WLogger::logDebug('Получаем насколько нужно прокрутить элемент чтобы выровнять его по центру viewport\'а');
-
         $elementScrollSize = $pageObject->accept(new GetScrollSize());
         $viewportScrollSize = $this->viewport->accept(new GetClientSize());
 

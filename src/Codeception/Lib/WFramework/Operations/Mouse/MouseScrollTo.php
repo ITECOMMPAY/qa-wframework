@@ -45,8 +45,6 @@ class MouseScrollTo extends AbstractOperation
 
     public function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Скроллим к элементу');
-
         $forceScrollToOff = (bool) TestProperties::getValue('forceScrollToOff', false);
 
         if ($forceScrollToOff)

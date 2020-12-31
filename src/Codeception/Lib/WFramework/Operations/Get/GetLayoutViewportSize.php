@@ -36,8 +36,6 @@ class GetLayoutViewportSize extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WebDriverDimension
     {
-        WLogger::logDebug('Получаем размер viewport\'а окна браузера');
-
         $size = $pageObject->returnSeleniumElement()->executeScript('return {"width": window.innerWidth, "height": window.innerHeight};');
 
         WLogger::logDebug('Viewport имеет размер: ' . $size['width'] . 'x' . $size['height']);

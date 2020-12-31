@@ -13,7 +13,7 @@ class MouseClickAtCoordinates extends AbstractOperation
 {
     public function getName() : string
     {
-        return "кликаем на координатах ($this->x; $this->y)";
+        return "кликаем на координатах X:$this->x; Y:$this->y";
     }
 
     /**

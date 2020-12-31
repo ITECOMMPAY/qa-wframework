@@ -51,8 +51,6 @@ class MouseScrollBy extends AbstractOperation
 
     public function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug("Скроллим элемент на $this->x по X, и $this->y по Y");
-
         $pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_SCROLL_BY, [$this->x, $this->y]);
     }
 

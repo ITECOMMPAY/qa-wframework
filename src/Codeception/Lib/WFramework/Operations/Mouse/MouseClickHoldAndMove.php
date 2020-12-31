@@ -14,7 +14,7 @@ class MouseClickHoldAndMove extends AbstractOperation
 {
     public function getName() : string
     {
-        return "зажимаем ЛКМ и двигаем курсор на координаты ($this->offsetX; $this->offsetY)";
+        return "зажимаем ЛКМ и двигаем курсор на координаты X:$this->offsetX; Y:$this->offsetY";
     }
 
     /**
@@ -51,11 +51,8 @@ class MouseClickHoldAndMove extends AbstractOperation
 
     public function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug("Зажимаем ЛКМ на элементе и двигаем по оффсетам: X$this->offsetX, Y$this->offsetY");
-
         $pageObject
-            ->returnSeleniumElement()
-            ->executeActions()
+            ->returnSeleniumActions()
             ->dragAndDropBy($this->offsetX, $this->offsetY)
             ->perform();
     }

@@ -14,7 +14,7 @@ class MouseMoveOver extends AbstractOperation
 {
     public function getName() : string
     {
-        return "перемещаем курсор поверх, со смещением от центра ($this->offsetX; $this->offsetY)";
+        return "перемещаем курсор поверх, со смещением от центра X:$this->offsetX; Y:$this->offsetY";
     }
 
     /**
@@ -50,12 +50,9 @@ class MouseMoveOver extends AbstractOperation
 
     public function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug("Двигаем курсор на элемент, смещение от центра: X$this->offsetX, Y$this->offsetY");
-
         $pageObject
-            ->returnSeleniumElement()
-            ->executeActions()
-            ->moveToElement($this->offsetX, $this->offsetY)
+            ->returnSeleniumActions()
+            ->moveOnto($this->offsetX, $this->offsetY)
             ->perform()
         ;
     }

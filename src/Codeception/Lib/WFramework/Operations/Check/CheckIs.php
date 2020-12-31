@@ -23,7 +23,7 @@ class CheckIs extends AbstractOperation
     /**
      * Проверяет, что заданные условия выполняются для данного элемента.
      *
-     * @param AbstractCondition $condition - условие
+     * @param \Codeception\Lib\WFramework\Conditions\AbstractCondition $condition - условие
      */
     public function __construct(AbstractCondition $condition)
     {

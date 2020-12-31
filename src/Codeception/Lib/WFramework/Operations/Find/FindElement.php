@@ -47,8 +47,6 @@ class FindElement extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : ProxyWebElement
     {
-        WLogger::logDebug('Ищем относительный элемент: ' . $this->by);
-
         return $pageObject
                     ->returnSeleniumElement()
                     ->findElement($this->by)

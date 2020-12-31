@@ -15,7 +15,7 @@ class MouseClickWithRightButton extends AbstractOperation
 {
     public function getName() : string
     {
-        return "кликаем ПКМ со смещением от центра ($this->offsetX; $this->offsetY)";
+        return "кликаем ПКМ со смещением от центра X:$this->offsetX; Y:$this->offsetY";
     }
 
     /**
@@ -56,12 +56,9 @@ class MouseClickWithRightButton extends AbstractOperation
 
     public function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug("Кликаем правой кнопкой мыши на элементе, смещение от центра: X$this->offsetX, Y$this->offsetY");
-
         $pageObject
-            ->returnSeleniumElement()
-            ->executeActions()
-            ->moveToElement($this->offsetX, $this->offsetY)
+            ->returnSeleniumActions()
+            ->moveOnto($this->offsetX, $this->offsetY)
             ->contextClick()
             ->perform()
             ;

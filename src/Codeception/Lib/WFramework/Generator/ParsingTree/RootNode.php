@@ -4,6 +4,12 @@
 namespace Codeception\Lib\WFramework\Generator\ParsingTree;
 
 
+use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\ButtonNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\CheckboxNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\ImageNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\LabelNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\LinkNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\TextBoxNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\Block\BlockFacadeNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\Block\BlockNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\Block\BlockOperationNode;
@@ -13,7 +19,7 @@ use Codeception\Lib\WFramework\Generator\ParsingTree\Collection\CollectionOperat
 use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementFacadeNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementOperationNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\OperationsParent\OperationsParentNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\OperationTemplate\OperationTemplateNode;
 use Codeception\Lib\WFramework\Helpers\Composite;
 
 class RootNode extends Composite
@@ -65,21 +71,21 @@ class RootNode extends Composite
 
         foreach ($this->operationClassFullToReflectionClass as $operationClassFull => $reflectionClass)
         {
-            $blockOperationNode = BlockOperationNode::tryFrom($operationClassFull, $reflectionClass);
+            $blockOperationNode = BlockOperationNode::tryCreateFrom($operationClassFull, $reflectionClass, $blockNode->getVisitorNames());
 
             if ($blockOperationNode !== null)
             {
                 $blockFacadeNode->addOperation($blockOperationNode);
             }
 
-            $elementOperationNode = ElementOperationNode::tryFrom($operationClassFull, $reflectionClass);
+            $elementOperationNode = ElementOperationNode::tryCreateFrom($operationClassFull, $reflectionClass, $elementNode->getVisitorNames());
 
             if ($elementOperationNode !== null)
             {
                 $elementFacadeNode->addOperation($elementOperationNode);
             }
 
-            $collectionOperationNode = CollectionOperationNode::tryFrom($operationClassFull, $reflectionClass);
+            $collectionOperationNode = CollectionOperationNode::tryCreateFrom($operationClassFull, $reflectionClass, $collectionNode->getVisitorNames());
 
             if ($collectionOperationNode !== null)
             {
@@ -87,13 +93,40 @@ class RootNode extends Composite
             }
         }
 
-        $operationsAbstractParent = new OperationsParentNode(
-                                        $this->name . 'Operation',
-                                        $helperNamespace . '\Operations',
-                                        $blockNode->classFull,
-                                        $elementNode->classFull,
-                                        $collectionNode->classFull
+        $buttonNode = new ButtonNode(
+            $this->name . 'Button',
+            $helperNamespace . '\Elements\Basic'
         );
-        $this->addChild($operationsAbstractParent);
+        $this->addChild($buttonNode);
+
+        $checkboxNode = new CheckboxNode(
+            $this->name . 'Checkbox',
+            $helperNamespace . '\Elements\Basic'
+        );
+        $this->addChild($checkboxNode);
+
+        $linkNode = new LinkNode(
+            $this->name . 'Link',
+            $helperNamespace . '\Elements\Basic'
+        );
+        $this->addChild($linkNode);
+
+        $imageNode = new ImageNode(
+            $this->name . 'Image',
+            $helperNamespace . '\Elements\Basic'
+        );
+        $this->addChild($imageNode);
+
+        $labelNode = new LabelNode(
+            $this->name . 'Label',
+            $helperNamespace . '\Elements\Basic'
+        );
+        $this->addChild($labelNode);
+
+        $textBoxNode = new TextBoxNode(
+            $this->name . 'TextBox',
+            $helperNamespace . '\Elements\Basic'
+        );
+        $this->addChild($textBoxNode);
     }
 }

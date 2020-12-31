@@ -4,13 +4,13 @@
 namespace dodge\Helper\Elements\DodgeVehicleCard;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\FrameworkStaledException;
+use Codeception\Lib\WFramework\Exceptions\FrameworkStaledException;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WButton;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WLabel;
+use dodge\Helper\Elements\Basic\DodgeButton;
+use dodge\Helper\Elements\Basic\DodgeLabel;
 
-class DodgeVehicleCard extends WButton
+class DodgeVehicleCard extends DodgeButton
 {
     protected function initTypeName() : string
     {
@@ -19,8 +19,8 @@ class DodgeVehicleCard extends WButton
 
     public function __construct(WFrom $importer)
     {
-        $this->nameLabel  = WLabel::fromXpath('Название авто', ".//div/span[@data-cats-id='vehicle-name']");
-        $this->_priceLabel = WLabel::fromXpath('Цена',          ".//div/span[@data-cats-id='price']/ins");
+        $this->nameLabel   = DodgeLabel::fromXpath('Название авто', ".//div/span[@data-cats-id='vehicle-name']");
+        $this->_priceLabel = DodgeLabel::fromXpath('Цена',          ".//div/span[@data-cats-id='price']/ins");
 
         parent::__construct($importer);
     }

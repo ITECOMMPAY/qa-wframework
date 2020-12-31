@@ -41,8 +41,6 @@ class KeyboardPressEsc extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Посылаем элементу Esc');
-
         $pageObject
             ->returnSeleniumElement()
             ->sendKeys(WebDriverKeys::ESCAPE)

@@ -92,7 +92,7 @@ class ProxyWebElements implements Iterator, Countable
 
         foreach ($elements as $index => $element)
         {
-            $locator = WLocator::xpath('(' . $this->getFullXPath() . ')[' . $index - 1 . ']');
+            $locator = WLocator::xpath('(' . $this->getFullXPath() . ')[' . ($index + 1) . ']'); //Индексы в XPath начинаются с 1
             $proxyWebElement = new ProxyWebElement($locator, $this->webDriver, $this->timeout);
             $proxyWebElement->setRemoteWebElement($element);
 

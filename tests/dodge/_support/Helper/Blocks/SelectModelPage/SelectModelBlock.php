@@ -4,12 +4,12 @@
 namespace dodge\Helper\Blocks\SelectModelPage;
 
 
-use Codeception\Lib\WFramework\WebObjects\Primitive\WArray;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WButton;
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\DodgeBlock;
+use dodge\Helper\Collections\DodgeCollection;
+use dodge\Helper\Elements\Basic\DodgeButton;
 use dodge\Helper\Elements\DodgeModelCard\DodgeModelCard;
-use dodge\Helper\TestSteps\DodgeSteps;
+use dodge\Helper\Steps\DodgeSteps;
 
 class SelectModelBlock extends DodgeBlock
 {
@@ -37,10 +37,10 @@ class SelectModelBlock extends DodgeBlock
 
     public function __construct(DodgeTester $actor)
     {
-        $this->buyButton   = WButton::fromXpath('Buy',   ".//a[text()='buy']");
-        $this->leaseButton = WButton::fromXpath('Lease', ".//a[text()='lease']");
+        $this->buyButton   = DodgeButton::fromXpath('Buy',   ".//a[text()='buy']");
+        $this->leaseButton = DodgeButton::fromXpath('Lease', ".//a[text()='lease']");
 
-        $this->modelsArray = WArray::fromFirstElement(DodgeModelCard::fromXpath('Карточка модели авто', ".//div[contains(@class, 'grid')]//div[contains(@class, 'sdp-col')]"));
+        $this->modelsArray = DodgeCollection::fromFirstElement(DodgeModelCard::fromXpath('Карточка модели авто', ".//div[contains(@class, 'grid')]//div[contains(@class, 'sdp-col')]"));
 
         parent::__construct($actor);
     }
@@ -59,17 +59,17 @@ class SelectModelBlock extends DodgeBlock
 
 
 
-    public function getBuyButton() : WButton
+    public function getBuyButton() : DodgeButton
     {
         return $this->buyButton;
     }
 
-    public function getLeaseButton() : WButton
+    public function getLeaseButton() : DodgeButton
     {
         return $this->leaseButton;
     }
 
-    public function getModelsArray() : WArray
+    public function getModelsArray() : DodgeCollection
     {
         return $this->modelsArray;
     }

@@ -46,8 +46,6 @@ class GetText extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : string
     {
-        WLogger::logDebug('Получаем видимый текст');
-
         $element = $pageObject->returnSeleniumElement();
 
         $tag = $element->getTagName();

@@ -31,7 +31,7 @@ class EmptyComposite extends Composite
 
     }
 
-    protected function addChild(Composite $child)
+    public function addChild(Composite $child)
     {
 
     }

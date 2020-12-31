@@ -6,10 +6,10 @@ namespace dodge\Helper\Elements\DodgeColorPicker\Inner;
 
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WButton;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WLabel;
+use dodge\Helper\Elements\Basic\DodgeButton;
+use dodge\Helper\Elements\Basic\DodgeLabel;
 
-class DodgeColorButton extends WButton
+class DodgeColorButton extends DodgeButton
 {
     protected function initTypeName() : string
     {
@@ -18,7 +18,7 @@ class DodgeColorButton extends WButton
 
     public function __construct(WFrom $importer)
     {
-        $this->colorLabel = WLabel::fromXpath('Название цвета', ".//label[contains(@title, 'Paint')]");
+        $this->colorLabel = DodgeLabel::fromXpath('Название цвета', ".//label[contains(@title, 'Paint')]");
 
         parent::__construct($importer);
     }
@@ -29,7 +29,7 @@ class DodgeColorButton extends WButton
 
         return $this
                     ->colorLabel
-                    ->returnSeleniumElement()
+                    ->returnOperations()
                     ->get()
                     ->attribute('data-lid')
                     ;

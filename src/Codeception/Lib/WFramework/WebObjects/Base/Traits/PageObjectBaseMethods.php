@@ -17,6 +17,7 @@ use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Exceptions\WaitUntilElement;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Wait\WaitUntil;
+use Codeception\Lib\WFramework\Operations\Wait\WaitWhile;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
 trait PageObjectBaseMethods
@@ -38,10 +39,9 @@ trait PageObjectBaseMethods
     protected function fail(string $description = '')
     {
         $this
-            ->getParent()
             ->returnCodeceptionActor()
-            ->fail($this . PHP_EOL . ' -> ' . $description)
-        ;
+            ->fail($description)
+            ;
     }
 
     /**

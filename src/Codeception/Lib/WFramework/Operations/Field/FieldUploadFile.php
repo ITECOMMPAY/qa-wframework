@@ -38,8 +38,6 @@ class FieldUploadFile extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Загружаем файл: ' . $this->filename);
-
         $element = $pageObject->returnSeleniumElement();
 
         $element->setFileDetector(new \Facebook\WebDriver\Remote\LocalFileDetector());

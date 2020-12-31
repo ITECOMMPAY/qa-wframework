@@ -6,9 +6,6 @@ namespace Codeception\Lib\WFramework\Operations\Mouse;
 
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Properties\TestProperties;
-use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
-use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use Facebook\WebDriver\Exception\WebDriverException;
@@ -22,9 +19,6 @@ class MouseClick extends AbstractOperation
 
     /**
      * Осуществляет клик на данном элементе.
-     *
-     * Если в настройках тестового модуля опция clickViaJS стоит в True, то клик на элементе будет осуществляться
-     * посредством JavaScript. Такой клик игнорирует перекрытие данного элемента другим элементом.
      *
      * Если в настройках тестового модуля опция autoClickViaJS стоит в True, то первый клик на элементе будет
      * осуществляться посредством Селениума, и, если элемент окажется перекрыт, то будет произведён второй клик,
@@ -49,25 +43,16 @@ class MouseClick extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Кликаем на элементе');
-
-        $element = $pageObject->returnSeleniumElement();
-
-        $clickViaJs = (bool) TestProperties::getValue('clickViaJS');
-
-        if ($clickViaJs)
-        {
-            $pageObject->accept(new MouseClickViaJS());
-            return;
-        }
-
         try
         {
-            $element->click();
+            $pageObject
+                ->returnSeleniumElement()
+                ->click()
+                ;
         }
         catch (WebDriverException $e)
         {
-            if (strpos($e->getMessage(), 'is not clickable at point') === False)
+            if (strpos($e->getMessage(), 'is not clickable at point') === false)
             {
                 throw $e;
             }
@@ -85,7 +70,7 @@ class MouseClick extends AbstractOperation
 
             if ($autoClickViaJS)
             {
-                WLogger::logDebug('autoClickViaJS == True -> пробуем кликнуть с помощью JS');
+                WLogger::logDebug('autoClickViaJS = true -> пробуем кликнуть с помощью JS');
 
                 $pageObject->accept(new MouseClickViaJS());
                 return;

@@ -62,7 +62,7 @@ abstract class Composite extends ModernObject
      *
      * @param Composite $parent
      */
-    protected function setParent(Composite $parent)
+    public function setParent(Composite $parent)
     {
         $this->parent = $parent;
     }
@@ -106,7 +106,7 @@ abstract class Composite extends ModernObject
      *
      * @param Composite $child
      */
-    protected function addChild(Composite $child)
+    public function addChild(Composite $child)
     {
         $this->children->put($child->getName(), $child);
         $child->setParent($this);
@@ -115,7 +115,7 @@ abstract class Composite extends ModernObject
     /**
      * Очищает массив своих детей
      */
-    protected function clearChildren()
+    public function clearChildren()
     {
         $this->children->clear();
     }
@@ -166,41 +166,11 @@ abstract class Composite extends ModernObject
         return 'Composite ' . $this->getName();
     }
 
-    /**
-     * @return Composite
-     */
-    protected function getParentOfSubclass(string $classFull)
-    {
-        $parent = $this->getParent();
-
-        while (!$parent instanceof $classFull)
-        {
-            if ($parent instanceof EmptyComposite)
-            {
-                throw new UsageException($this . ' -> не имеет среди родителей экземпляра подкласса: ' . $classFull);
-            }
-
-            $parent = $parent->getParent();
-        }
-
-        return $parent;
-    }
-
     public function accept($visitor)
     {
         $methodToCall = 'accept' . $this->getClassShort();
 
         return $visitor->$methodToCall($this);
-    }
-
-    public function callDepthFirst(callable $func) : void
-    {
-        $func($this);
-
-        foreach ($this->getChildren() as $name => $child)
-        {
-            $child->callDepthFirst($func);
-        }
     }
 
     /**
@@ -316,5 +286,26 @@ abstract class Composite extends ModernObject
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $class
+     * @return Composite
+     * @throws UsageException
+     */
+    public function getFirstParentWithClass(string $class)
+    {
+        $parents = $this->traverseToRoot();
+        $parents->shift();
+
+        foreach ($parents as $parent)
+        {
+            if ($parent instanceof $class)
+            {
+                return $parent;
+            }
+        }
+
+        throw new UsageException($this . ' -> не содержит родителя с классом: ' . $class);
     }
 }

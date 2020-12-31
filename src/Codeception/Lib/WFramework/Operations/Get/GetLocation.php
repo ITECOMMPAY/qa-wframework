@@ -46,8 +46,6 @@ class GetLocation extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WebDriverPoint
     {
-        WLogger::logDebug('Получаем координаты элемента (левый верхний угол)');
-
         $result = $pageObject
                         ->returnSeleniumElement()
                         ->getLocation()

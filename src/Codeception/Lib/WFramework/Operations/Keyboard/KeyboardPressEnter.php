@@ -41,8 +41,6 @@ class KeyboardPressEnter extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Посылаем элементу Enter');
-
         $pageObject
             ->returnSeleniumElement()
             ->sendKeys(WebDriverKeys::ENTER)

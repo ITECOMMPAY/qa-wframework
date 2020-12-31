@@ -14,7 +14,7 @@ use Codeception\Lib\WFramework\Conditions\CountEmpty;
 use Codeception\Lib\WFramework\Conditions\CountEquals;
 use Codeception\Lib\WFramework\Conditions\CountGreaterThanOrEqual;
 use Codeception\Lib\WFramework\Conditions\CountLessThanOrEqual;
-use Codeception\Lib\WFramework\Operations\Get\GetRawText;
+use Codeception\Lib\WFramework\Operations\Get\GetTextRaw;
 use Codeception\Lib\WFramework\Operations\Get\GetText;
 use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElements;
@@ -82,7 +82,7 @@ use function is_callable;
  *
  * @package Common\Module\WFramework\WebObjects\Base\WCollection
  */
-abstract class WCollection extends Composite implements IPageObject, FacadeWebElementsListener
+abstract class WCollection extends Composite implements IPageObject
 {
     use PageObjectBaseMethods;
 
@@ -157,8 +157,6 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
 
     public function returnSeleniumElements() : ProxyWebElements
     {
-        WLogger::logInfo($this . ' -> обращаемся к низлежащему API');
-
         if ($this->proxyWebElements === null)
         {
             if ($this->relative === true)
@@ -414,6 +412,27 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
         return $elements->first();
     }
 
+    public function getElement(int $index) : WElement
+    {
+        WLogger::logInfo($this . " -> получаем элемент по индексу: $index");
+
+        $elementsArray = $this->getElementsArray();
+
+        if (!isset($elementsArray[$index]))
+        {
+            throw new UsageException($this . ' - не содержит элемента по индексу: ' . $index);
+        }
+
+        return $elementsArray[$index];
+    }
+
+    public function hasElement(int $index) : bool
+    {
+        WLogger::logInfo($this . " -> содержит элемент по индексу: $index?");
+
+        return isset($elementsArray[$index]);
+    }
+
     /**
      * Возвращает последний элемент коллекции
      */
@@ -567,7 +586,7 @@ abstract class WCollection extends Composite implements IPageObject, FacadeWebEl
         WLogger::logInfo($this . " -> получаем все тексты (включая невидимые) всех элементов коллекции");
 
         /** @var Sequence $result */
-        $result = $this->accept(new GetRawText());
+        $result = $this->accept(new GetTextRaw());
 
         $texts = implode(', ', $result->toArray());
 

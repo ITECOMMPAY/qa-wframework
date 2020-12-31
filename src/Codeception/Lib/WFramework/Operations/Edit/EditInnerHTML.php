@@ -15,7 +15,7 @@ class EditInnerHTML extends AbstractOperation
 {
     public function getName() : string
     {
-        return "заменяем внутренний HTML на: " . substr($this->text, 0, 64);
+        return 'заменяем внутренний HTML на: ' . substr($this->text, 0, 64) . ' ...';
     }
 
     /**
@@ -48,8 +48,6 @@ class EditInnerHTML extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Задаём innerHTML равное: ' . $this->text);
-
         $pageObject->returnSeleniumElement()->executeScriptOnThis('arguments[0].innerHTML = arguments[1];', [$this->text]);
     }
 }

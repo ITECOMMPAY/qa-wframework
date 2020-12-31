@@ -62,8 +62,6 @@ class ExecuteScript extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Выполняем скрипт: ' . $this->script);
-
         return $pageObject
                     ->returnSeleniumElement()
                     ->executeScript($this->script, $this->arguments)

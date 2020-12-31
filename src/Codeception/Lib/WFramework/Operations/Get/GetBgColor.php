@@ -46,8 +46,6 @@ class GetBgColor extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Color
     {
-        WLogger::logDebug('Получаем цвет фона элемента');
-
         $bgColor = $pageObject->accept(new GetCssValue('background-color'));
 
         $result = Color::fromString($bgColor);

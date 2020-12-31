@@ -41,8 +41,8 @@ abstract class AbstractPageObjectNode extends Composite
      */
     public function getFacade()
     {
-        /** @var AbstractFacadeNode[] $children */
-        $children = $this->getChildren();
-        return reset($children);
+        return $this->getChildren()->first()->value;
     }
+
+    abstract public function getVisitorNames() : array;
 }

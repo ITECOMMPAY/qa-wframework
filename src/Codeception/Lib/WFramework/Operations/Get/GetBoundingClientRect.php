@@ -46,8 +46,6 @@ class GetBoundingClientRect extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Rect
     {
-        WLogger::logDebug('Получаем boundingClientRect элемента');
-
         $rect = Rect::fromDOMRect($pageObject->returnSeleniumElement()->executeScriptOnThis('return arguments[0].getBoundingClientRect();'));
 
         WLogger::logDebug('Получили boundingClientRect элемента: ' . $rect);

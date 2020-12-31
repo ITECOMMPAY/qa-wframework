@@ -76,8 +76,6 @@ class ExecuteScriptOnThis extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Выполняем скрипт для элемента: ' . $this->script);
-
         return $pageObject
                     ->returnSeleniumElement()
                     ->executeScriptOnThis($this->script, $this->arguments)

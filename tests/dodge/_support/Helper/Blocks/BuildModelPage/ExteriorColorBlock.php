@@ -8,7 +8,7 @@ use dodge\DodgeTester;
 use dodge\Helper\AliasMaps\ChallengerExteriorColorsMap;
 use dodge\Helper\Blocks\DodgeBlock;
 use dodge\Helper\Elements\DodgeColorPicker\DodgeColorPicker;
-use dodge\Helper\TestSteps\DodgeSteps;
+use dodge\Helper\Steps\DodgeSteps;
 
 class ExteriorColorBlock extends DodgeBlock
 {

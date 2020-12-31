@@ -5,15 +5,15 @@ namespace dodge\Helper\Elements\DodgeColorPicker;
 
 
 use Codeception\Lib\WFramework\AliasMaps\AliasMap;
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WArray;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WLabel;
+use dodge\Helper\Collections\DodgeCollection;
+use dodge\Helper\Elements\Basic\DodgeLabel;
 use dodge\Helper\Elements\DodgeColorPicker\Inner\DodgeColorButton;
+use dodge\Helper\Elements\DodgeElement;
 
-class DodgeColorPicker extends WElement
+class DodgeColorPicker extends DodgeElement
 {
 
     protected function initTypeName() : string
@@ -23,8 +23,8 @@ class DodgeColorPicker extends WElement
 
     public function __construct(WFrom $importer)
     {
-        $this->currentColorLabel = WLabel::fromXpath('Выбранный цвет', ".//label");
-        $this->colors = WArray::fromFirstElement(DodgeColorButton::fromXpath('Кнопка цвета', ".//div[contains(@class, 'sdp-form-radio ')]"));
+        $this->currentColorLabel = DodgeLabel::fromXpath('Выбранный цвет', ".//label");
+        $this->colors = DodgeCollection::fromFirstElement(DodgeColorButton::fromXpath('Кнопка цвета', ".//div[contains(@class, 'sdp-form-radio ')]"));
 
         parent::__construct($importer);
     }

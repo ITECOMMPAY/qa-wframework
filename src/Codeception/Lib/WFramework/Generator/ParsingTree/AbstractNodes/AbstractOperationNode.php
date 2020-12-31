@@ -18,22 +18,18 @@ abstract class AbstractOperationNode extends Composite
 
     public $source = null;
 
-    protected function __construct(string $operationClassFull, \ReflectionClass $reflectionClass)
+    protected function __construct(string $operationClassFull, \ReflectionClass $reflectionClass, array $visitorNames)
     {
         parent::__construct();
 
         $this->classFull = $operationClassFull;
         $this->reflectionClass = $reflectionClass;
-        $this->reflectionMethod = $this->getReflectionMethod();
+        $this->reflectionMethod = $this->getReflectionMethod($visitorNames);
     }
 
-    /**
-     * @param string $operationClassFull
-     * @return static|null
-     */
-    public static function tryFrom(string $operationClassFull, \ReflectionClass $reflectionClass)
+    public static function tryCreateFrom(string $operationClassFull, \ReflectionClass $reflectionClass, array $visitorNames)
     {
-        $operationNode = new static($operationClassFull, $reflectionClass);
+        $operationNode = new static($operationClassFull, $reflectionClass, $visitorNames);
 
         if ($operationNode->reflectionMethod === null)
         {
@@ -43,29 +39,19 @@ abstract class AbstractOperationNode extends Composite
         return $operationNode;
     }
 
-    abstract protected function getVisitorName() : string;
-
-    protected function getReflectionMethod() : ?\ReflectionMethod
+    protected function getReflectionMethod(array $visitorNames) : ?\ReflectionMethod
     {
-        $inherited = function ($reflectionMethod, $reflectionClass) {
-            return $reflectionMethod->getDeclaringClass()->getName() !== $reflectionClass->getName();
-        };
-
-        $methodName = $this->getVisitorName();
-
-        if (!$this->reflectionClass->hasMethod($methodName))
+        foreach ($visitorNames as $methodName)
         {
-            return null;
+            if (!$this->reflectionClass->hasMethod($methodName))
+            {
+                continue;
+            }
+
+            return $this->reflectionClass->getMethod($methodName);
         }
 
-        $reflectionMethod = $this->reflectionClass->getMethod($methodName);
-
-        if ($inherited($reflectionMethod, $this->reflectionClass))
-        {
-            return null;
-        }
-
-        return $reflectionMethod;
+        return null;
     }
 
     /**

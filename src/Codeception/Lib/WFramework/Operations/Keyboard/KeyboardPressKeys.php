@@ -61,8 +61,6 @@ class KeyboardPressKeys extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Посылаем элементу символы: ' . json_encode($this->keys));
-
         $pageObject
             ->returnSeleniumElement()
             ->sendKeys($this->keys)

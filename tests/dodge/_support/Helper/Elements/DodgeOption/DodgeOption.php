@@ -4,15 +4,15 @@
 namespace dodge\Helper\Elements\DodgeOption;
 
 
-use Codeception\Lib\WFramework\Exceptions\Common\FrameworkStaledException;
+use Codeception\Lib\WFramework\Exceptions\FrameworkStaledException;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WButton;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WCheckbox;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WLabel;
+use dodge\Helper\Elements\Basic\DodgeButton;
+use dodge\Helper\Elements\Basic\DodgeCheckbox;
+use dodge\Helper\Elements\Basic\DodgeLabel;
+use dodge\Helper\Elements\DodgeElement;
 
-class DodgeOption extends WElement
+class DodgeOption extends DodgeElement
 {
     protected function initTypeName() : string
     {
@@ -21,9 +21,9 @@ class DodgeOption extends WElement
 
     public function __construct(WFrom $importer)
     {
-        $this->button    = WButton::fromXpath('Кнопка', ".");
-        $this->nameLabel = WLabel::fromXpath('Название опции', ".//label[contains(@title, 'Apply')]");
-        $this->_checkbox = WCheckbox::fromXpath('Галочка', ".//input");
+        $this->button    = DodgeButton::fromXpath('Кнопка', ".");
+        $this->nameLabel = DodgeLabel::fromXpath('Название опции', ".//label[contains(@title, 'Apply')]");
+        $this->_checkbox = DodgeCheckbox::fromXpath('Галочка', ".//input");
 
         parent::__construct($importer);
     }
@@ -34,7 +34,7 @@ class DodgeOption extends WElement
 
         return $this
                     ->nameLabel
-                    ->returnSeleniumElement()
+                    ->returnOperations()
                     ->get()
                     ->attribute('data-lid')
                     ;
@@ -46,7 +46,7 @@ class DodgeOption extends WElement
 
         $priceText = $this
                         ->nameLabel
-                        ->returnSeleniumElement()
+                        ->returnOperations()
                         ->get()
                         ->attribute('title')
                         ;
@@ -63,7 +63,7 @@ class DodgeOption extends WElement
     {
         WLogger::logInfo($this . " -> выбрана?");
 
-        return $this->_checkbox->checked();
+        return $this->_checkbox->isChecked();
     }
 
     public function select() : DodgeOption

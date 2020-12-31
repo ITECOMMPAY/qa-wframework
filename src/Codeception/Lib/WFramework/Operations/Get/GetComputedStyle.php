@@ -56,8 +56,6 @@ class GetComputedStyle extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : array
     {
-        WLogger::logDebug('Получаем массив стилей элемента');
-
         $element = $pageObject->returnSeleniumElement();
 
         $computedStyle = $element->executeScriptOnThis(static::SCRIPT_GET_COMPUTED_STYLE, [$this->pseudoElement]);
@@ -67,12 +65,6 @@ class GetComputedStyle extends AbstractOperation
         foreach ($computedStyle as $entry)
         {
             [$key, $value] = $entry;
-
-            if (is_numeric($key))
-            {
-                continue;
-            }
-
             $result[$key] = $value;
         }
 
@@ -80,16 +72,22 @@ class GetComputedStyle extends AbstractOperation
     }
 
     protected const SCRIPT_GET_COMPUTED_STYLE = <<<EOF
+function getStyles(element, pseudoElement = null) {
+    var result = [];
 
-var result = [];
+    let styles = window.getComputedStyle(element, pseudoElement);
 
-var obj = window.getComputedStyle(arguments[0], arguments[1]);
+    for (const [key, value] of Object.entries(styles)) {
+        if (!isNaN(key)) {
+            continue;
+        }
 
-for(var key in obj) {
-    var value = obj[key];
-    result.push([key, value]);
+        result.push([key, value]);
+    }
+
+    return result;
 }
 
-return result;
+return getStyles(arguments[0], arguments[1]);
 EOF;
 }

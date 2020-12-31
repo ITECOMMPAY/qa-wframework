@@ -63,11 +63,9 @@ class GetPrimaryColor extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Color
     {
-        WLogger::logDebug('Получаем основной цвет элемента');
-
         if ($this->screenshot === null)
         {
-            $this->screenshot = $pageObject->accept(new GetScreenshot());
+            $this->screenshot = $pageObject->accept(new GetScreenshotRaw());
         }
 
         $stat = $pageObject->accept(new GetHistogram($this->ignoredColor, $this->screenshot));

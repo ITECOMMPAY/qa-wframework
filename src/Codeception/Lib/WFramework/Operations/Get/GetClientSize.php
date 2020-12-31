@@ -46,8 +46,6 @@ class GetClientSize extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WebDriverDimension
     {
-        WLogger::logDebug('Получаем внутренний размер элемента без границ и полос прокруток (clientWidth x clientHeight)');
-
         $size = $pageObject->returnSeleniumElement()->executeScriptOnThis('return {"width": arguments[0].clientWidth, "height": arguments[0].clientHeight};');
 
         WLogger::logDebug('Внутренний размер элемента: ' . $size['width'] . 'x' . $size['height']);

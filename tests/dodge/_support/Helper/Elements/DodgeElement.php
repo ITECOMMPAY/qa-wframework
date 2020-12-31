@@ -15,8 +15,8 @@ abstract class DodgeElement extends WElement
         return parent::returnCodeceptionActor();
     }
    
-    public function returnAdvanced() : Operations
+    public function returnOperations() : Operations
     {
-        return $this->advanced ?? $this->advanced = new Operations($this);
+        return $this->operations ?? $this->operations = new Operations($this);
     }
 }

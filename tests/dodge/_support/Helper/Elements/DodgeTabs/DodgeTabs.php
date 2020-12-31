@@ -5,12 +5,12 @@ namespace dodge\Helper\Elements\DodgeTabs;
 
 use Codeception\Lib\WFramework\AliasMaps\AliasMap;
 use Codeception\Lib\WFramework\AliasMaps\EmptyAliasMap;
-use Codeception\Lib\WFramework\Exceptions\Common\UsageException;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WArray;
+use dodge\Helper\Collections\DodgeCollection;
+use dodge\Helper\Elements\DodgeElement;
 use dodge\Helper\Elements\DodgeTabs\Inner\DodgeTab;
 
 /**
@@ -22,7 +22,7 @@ use dodge\Helper\Elements\DodgeTabs\Inner\DodgeTab;
  *
  * @package dodge\Helper\Elements\DodgeTabs
  */
-class DodgeTabs extends WElement
+class DodgeTabs extends DodgeElement
 {
     protected function initTypeName() : string
     {
@@ -36,7 +36,7 @@ class DodgeTabs extends WElement
     {
         $this->headersAliasMap = new EmptyAliasMap();
 
-        $this->tabs = WArray::fromFirstElement(DodgeTab::fromXpath('Вкладка', ".//li"));
+        $this->tabs = DodgeCollection::fromFirstElement(DodgeTab::fromXpath('Вкладка', ".//li"));
 
         parent::__construct($importer);
     }

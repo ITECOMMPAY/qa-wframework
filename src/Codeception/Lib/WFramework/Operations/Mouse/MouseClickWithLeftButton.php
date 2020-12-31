@@ -15,7 +15,7 @@ class MouseClickWithLeftButton extends AbstractOperation
 {
     public function getName() : string
     {
-        return "кликаем ЛКМ со смещением от центра ($this->offsetX; $this->offsetY)";
+        return "кликаем ЛКМ со смещением от центра X:$this->offsetX; Y:$this->offsetY";
     }
 
     /**
@@ -56,12 +56,9 @@ class MouseClickWithLeftButton extends AbstractOperation
 
     public function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug("Кликаем левой кнопкой мыши на элементе, смещение от центра: X$this->offsetX, Y$this->offsetY");
-
         $pageObject
-            ->returnSeleniumElement()
-            ->executeActions()
-            ->moveToElement($this->offsetX, $this->offsetY)
+            ->returnSeleniumActions()
+            ->moveOnto($this->offsetX, $this->offsetY)
             ->click()
             ->perform()
             ;

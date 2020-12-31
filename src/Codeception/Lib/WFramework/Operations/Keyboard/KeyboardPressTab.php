@@ -41,8 +41,6 @@ class KeyboardPressTab extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Посылаем элементу Tab');
-
         $pageObject
             ->returnSeleniumElement()
             ->sendKeys(WebDriverKeys::TAB)

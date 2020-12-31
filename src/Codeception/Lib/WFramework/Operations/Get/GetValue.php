@@ -46,8 +46,6 @@ class GetValue extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : string
     {
-        WLogger::logDebug("Получаем значение атрибута 'value'");
-
         $element = $pageObject->returnSeleniumElement();
 
         $tag = $element->getTagName();

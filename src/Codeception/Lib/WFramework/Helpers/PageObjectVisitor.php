@@ -6,17 +6,19 @@ namespace Codeception\Lib\WFramework\Helpers;
 
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Exceptions\VisitorNotImplementedException;
+use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
+use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
 /**
  * Class PageObjectVisitor
  *
- * @method mixed acceptWElement($element)
- * @method mixed acceptWBlock($block)
- * @method mixed acceptWCollection($collection)
+ * @method mixed acceptWElement(WElement $element)
+ * @method mixed acceptWBlock(WBlock $block)
+ * @method mixed acceptWCollection(WCollection $collection)
  * @package Codeception\Lib\WFramework\Helpers
  */
 abstract class PageObjectVisitor
@@ -43,47 +45,55 @@ abstract class PageObjectVisitor
             throw new UsageException('Первым аргументов визитора должен быть IPageObject');
         }
 
-        $methodToCall = $this->getDefaultMethod($pageObject);
-
-        if (!method_exists($this, $methodToCall))
+        foreach ($this->getParentAcceptMethods($pageObject) as $methodToCall)
         {
-            $poClassFull = $pageObject->getClass();
-            $poClassShort = $pageObject->getClassShort();
-
-            throw new VisitorNotImplementedException( "Визитор: " . static::class . " - не умеет работать с $poClassFull. Если это необходимо, реализуйте в визиторе метод 'accept$poClassShort' или более общий - '$methodToCall'");
+            if (method_exists($this, $methodToCall))
+            {
+                return $this->$methodToCall($pageObject);
+            }
         }
 
-        return $this->$methodToCall($pageObject);
-    }
+        $poClassFull = $pageObject->getClass();
+        $poClassShort = $pageObject->getClassShort();
 
-    private function getDefaultMethod(IPageObject $pageObject) : string
-    {
-        if ($pageObject instanceof WElement)
-        {
-            return 'acceptWElement';
-        }
-
-        if ($pageObject instanceof WBlock)
-        {
-            return 'acceptWBlock';
-        }
-
-        if ($pageObject instanceof WCollection)
-        {
-            return 'acceptWCollection';
-        }
-
-        throw new UsageException('PageObject должен быть наследником WBlock, WElement или WCollection');
+        throw new VisitorNotImplementedException( "Визитор: " . static::class . " - не умеет работать с $poClassFull. Если это необходимо, реализуйте в визиторе метод 'accept$poClassShort' или более общий - '$methodToCall'");
     }
 
     public function applicable(IPageObject $pageObject) : bool
     {
+        WLogger::logDebug('Применимо ли к: ' . $pageObject . ' - условие: ' . $this);
+
         if (method_exists($this, 'accept' . $pageObject->getClassShort()))
         {
             return true;
         }
 
-        return method_exists($this, $this->getDefaultMethod($pageObject));
+        foreach ($this->getParentAcceptMethods($pageObject) as $methodToCall)
+        {
+            if (method_exists($this, $methodToCall))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getParentAcceptMethods(IPageObject $pageObject) : array
+    {
+        $result = [];
+
+        foreach (class_parents($pageObject) as $class)
+        {
+            if ($class === WPageObject::class)
+            {
+                break;
+            }
+
+            $result[] = 'accept' . ClassHelper::getShortName($class);
+        }
+
+        return $result;
     }
 
     public function __toString() : string

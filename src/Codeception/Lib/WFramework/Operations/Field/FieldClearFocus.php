@@ -28,8 +28,6 @@ class FieldClearFocus extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug('Снимаем фокус с элемента: ');
-
         $pageObject->returnSeleniumElement()->executeScriptOnThis('arguments[0].blur();');
     }
 }

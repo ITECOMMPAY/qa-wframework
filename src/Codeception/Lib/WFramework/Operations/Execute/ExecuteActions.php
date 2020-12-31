@@ -48,8 +48,6 @@ class ExecuteActions extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : ProxyWebElementActions
     {
-        WLogger::logDebug('Выполняем Selenium Actions для элемента');
-
         return $pageObject
                     ->returnSeleniumElement()
                     ->executeActions()

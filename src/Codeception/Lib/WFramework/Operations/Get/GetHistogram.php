@@ -64,11 +64,9 @@ class GetHistogram extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : array
     {
-        WLogger::logDebug('Получаем гистограмму для элемента');
-
         if ($this->screenshot === null)
         {
-            $this->screenshot = $pageObject->accept(new GetScreenshot());
+            $this->screenshot = $pageObject->accept(new GetScreenshotRaw());
         }
 
         $imagick = new Imagick();

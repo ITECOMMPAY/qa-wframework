@@ -8,8 +8,5 @@ use Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNodes\AbstractOpera
 
 class BlockOperationNode extends AbstractOperationNode
 {
-    protected function getVisitorName() : string
-    {
-        return 'acceptWBlock';
-    }
+
 }

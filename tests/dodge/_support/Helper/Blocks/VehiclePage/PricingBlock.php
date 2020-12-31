@@ -3,11 +3,12 @@
 
 namespace dodge\Helper\Blocks\VehiclePage;
 
-use Codeception\Lib\WFramework\WebObjects\Primitive\WButton;
-use Codeception\Lib\WFramework\WebObjects\Primitive\WLabel;
+
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\DodgeBlock;
-use dodge\Helper\TestSteps\DodgeSteps;
+use dodge\Helper\Elements\Basic\DodgeButton;
+use dodge\Helper\Elements\Basic\DodgeLabel;
+use dodge\Helper\Steps\DodgeSteps;
 
 class PricingBlock extends DodgeBlock
 {
@@ -36,8 +37,8 @@ class PricingBlock extends DodgeBlock
 
     public function __construct(DodgeTester $actor)
     {
-        $this->zipLabel = WLabel::fromXpath(            'ZIP',           ".//div[@class='zipContainer']//div[@class='heading']/span");
-        $this->buildAndPriceButton = WButton::fromXpath('Build & Price', ".//a[@data-cats-id='Build & Price']");
+        $this->zipLabel = DodgeLabel::fromXpath(            'ZIP',           ".//div[@class='zipContainer']//div[@class='heading']/span");
+        $this->buildAndPriceButton = DodgeButton::fromXpath('Build & Price', ".//a[@data-cats-id='Build & Price']");
 
         parent::__construct($actor);
     }
@@ -49,12 +50,12 @@ class PricingBlock extends DodgeBlock
 
 
 
-    public function getZipLabel() : WLabel
+    public function getZipLabel() : DodgeLabel
     {
         return $this->zipLabel;
     }
 
-    public function getBuildAndPriceButton() : WButton
+    public function getBuildAndPriceButton() : DodgeButton
     {
         return $this->buildAndPriceButton;
     }

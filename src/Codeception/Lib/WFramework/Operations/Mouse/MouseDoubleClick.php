@@ -4,10 +4,6 @@
 namespace Codeception\Lib\WFramework\Operations\Mouse;
 
 
-use Codeception\Lib\WFramework\Logger\WLogger;
-use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
-use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 
@@ -15,7 +11,7 @@ class MouseDoubleClick extends AbstractOperation
 {
     public function getName() : string
     {
-        return "двойной клик со смещением от центра ($this->offsetX; $this->offsetY)";
+        return "двойной клик со смещением от центра X:$this->offsetX; Y:$this->offsetY";
     }
 
     /**
@@ -56,12 +52,9 @@ class MouseDoubleClick extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        WLogger::logDebug("Выполняем двойной клик на элементе, смещение от центра: X$this->offsetX, Y$this->offsetY");
-
         $pageObject
-            ->returnSeleniumElement()
-            ->executeActions()
-            ->moveToElement($this->offsetX, $this->offsetY)
+            ->returnSeleniumActions()
+            ->moveOnto($this->offsetX, $this->offsetY)
             ->doubleClick()
             ->perform()
             ;

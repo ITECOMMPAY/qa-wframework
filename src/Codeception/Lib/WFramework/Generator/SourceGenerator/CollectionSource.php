@@ -22,7 +22,7 @@ use {{w_collection_reference}};
 use {{actor_class_full}};
 use {{collection_facade_class_full}};
 
-abstract class {{collection_class_short}} extends WCollection
+class {{collection_class_short}} extends WCollection
 {
     public function returnOperations() : {{collection_facade_class_short}}
     {

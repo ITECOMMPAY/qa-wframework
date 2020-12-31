@@ -5,7 +5,6 @@ namespace Codeception\Lib\WFramework\Operations\Wait;
 
 
 use Codeception\Lib\WFramework\Conditions\AbstractCondition;
-use Codeception\Lib\WFramework\Exceptions\WaitUntilElement;
 use Codeception\Lib\WFramework\Exceptions\WaitWhileElement;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
@@ -20,15 +19,15 @@ class WaitWhile extends AbstractOperation
 
     public function getName() : string
     {
-        return "ждём выполнения условия: " . $this->condition;
+        return "ждём окончания выполнения условия: " . $this->condition;
     }
 
     /**
-     * Ожидает, пока для данного PageObject'а начнут выполняться условия,
+     * Ожидает, пока для данного PageObject'а перестанут выполняться условия,
      * или не пройдёт, заданный в настройках модуля, elementTimeout / collectionTimeout.
      *
      * @param AbstractCondition $condition - условие
-     * @throws WaitUntilElement - не удалось дождаться выполнения условий для данного элемента
+     * @throws WaitWhileElement - не удалось дождаться выполнения условий для данного элемента
      */
     public function __construct(AbstractCondition $condition)
     {
@@ -61,7 +60,7 @@ class WaitWhile extends AbstractOperation
                 $pageObject->refresh();
             }
 
-            if ($pageObject->accept($this->condition))
+            if (!$pageObject->accept($this->condition))
             {
                 return $this;
             }
@@ -69,6 +68,6 @@ class WaitWhile extends AbstractOperation
             usleep(500000);
         }
 
-        throw new WaitWhileElement('Не удалось дождаться выполнения условия: ' . $this->condition);
+        throw new WaitWhileElement('Не удалось дождаться окончания выполнения условия: ' . $this->condition);
     }
 }

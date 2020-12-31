@@ -53,14 +53,19 @@ class GetAttribute extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : ?string
     {
-        WLogger::logDebug('Получаем значение атрибута: ' . $this->attribute);
-
         $result = $pageObject
                         ->returnSeleniumElement()
                         ->getAttribute($this->attribute)
                         ;
 
-        WLogger::logDebug('Атрибут имеет значение: ' . json_encode($result));
+        $resultText = json_encode($result);
+
+        if (mb_strlen($resultText) > 64)
+        {
+            $resultText = substr($resultText, 0, 64) . ' ...';
+        }
+
+        WLogger::logDebug('Атрибут имеет значение: ' . $resultText);
 
         return $result;
     }
