@@ -9,13 +9,8 @@
 namespace Codeception\Lib\WFramework\WebObjects\Base\WElement;
 
 
-use Codeception\Lib\WFramework\Conditions\Text;
-use Codeception\Lib\WFramework\Conditions\Value;
-use Codeception\Lib\WFramework\Conditions\ValueContains;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
-use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
-use Codeception\Lib\WFramework\Operations\Get\GetValue;
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
@@ -56,7 +51,7 @@ abstract class WElement extends WPageObject
      *
      * @var string
      */
-    protected $typeName = '';
+    private $typeName = '';
 
     /**
      * Данный метод должен возвращать общее имя для данной разновидности веб-элементов.
@@ -164,8 +159,8 @@ abstract class WElement extends WPageObject
 
         $this->typeName = $this->initTypeName();
         $this->name = $importer->getName();
-        $this->locator = $importer->getLocator();
-        $this->relative = $importer->getRelative();
+        $this->setLocator($importer->getLocator());
+        $this->setRelative($importer->getRelative());
         $this->facadeWebElement = $importer->getProxyWebElement();
         $this->setParent($importer->getParent());
     }
@@ -178,16 +173,6 @@ abstract class WElement extends WPageObject
     public function getTypeName() : string
     {
         return $this->typeName;
-    }
-
-    public function __toString() : string
-    {
-        if ($this->relative && !$this->getParent() instanceof EmptyComposite)
-        {
-            return $this->getParent() . ' / ' . $this->getClassShort() . ' (' . $this->getName() . ')';
-        }
-
-        return '/ ' . $this->getClassShort() . ' (' . $this->getName() . ')';
     }
 
     /**
@@ -211,129 +196,13 @@ abstract class WElement extends WPageObject
         throw new UsageException($this . ' -> должен располагаться на WBlock.');
     }
 
-    /**
-     * PageObject должен иметь заданный текст.
-     *
-     * Для этого элемент на который ссылается локатор PageObject'а должен иметь заданный текст в любом регистре,
-     * при этом пробельные символы приводятся к одному пробелу.
-     *
-     * Т.е. строка "блаблаблазаданный текстблаблабла" - НЕ имеет "заданный текст".
-     * Но строка: "ЗаДаННый     тЕкСт" - имеет "заданный текст".
-     *
-     * Если условие не будет выполнено в течении заданного таймаута (elementTimeout) - валит тест.
-     *
-     * @param string $text
-     * @return WElement
-     * @throws UsageException
-     */
-    public function shouldHaveText(string $text)
+    public function __toString() : string
     {
-        return $this->should(new Text($text), false);
-    }
+        if ($this->isRelative() && !$this->getParent() instanceof EmptyComposite)
+        {
+            return $this->getParent() . ' / ' . $this->getClassShort() . ' (' . $this->getName() . ')';
+        }
 
-    /**
-     * PageObject имеет заданный текст?
-     *
-     * Для этого элемент на который ссылается локатор PageObject'а должен иметь заданный текст в любом регистре,
-     * при этом пробельные символы приводятся к одному пробелу.
-     *
-     * Т.е. строка "блаблаблазаданный текстблаблабла" - НЕ имеет "заданный текст".
-     * Но строка: "ЗаДаННый     тЕкСт" - имеет "заданный текст".
-     *
-     * Ничего не ожидает. Возвращает true или false.
-     *
-     * @param string $text
-     * @return bool
-     */
-    public function isHavingText(string $text) : bool
-    {
-        return $this->is(new Text($text), false);
-    }
-
-    /**
-     * PageObject должен иметь заданное значение атрибута value.
-     *
-     * Для этого элемент на который ссылается локатор PageObject'а должен иметь value состоящее из заданного текста
-     * в любом регистре, при этом пробельные символы приводятся к одному пробелу.
-     *
-     * Т.е. value "блаблаблазаданный текстблаблабла" - НЕ имеет "заданный текст".
-     * Но value: "ЗаДаННый     тЕкСт" - имеет "заданный текст".
-     *
-     * Если условие не будет выполнено в течении заданного таймаута (elementTimeout) - валит тест.
-     *
-     * @param string $value
-     * @return WElement
-     * @throws UsageException
-     */
-    public function shouldHaveValue(string $value)
-    {
-        return $this->should(new Value($value), false);
-    }
-
-    /**
-     * PageObject имеет заданное значение атрибута value?
-     *
-     * Для этого элемент на который ссылается локатор PageObject'а должен иметь value состоящее из заданного текста
-     * в любом регистре, при этом пробельные символы приводятся к одному пробелу.
-     *
-     * Т.е. value "блаблаблазаданный текстблаблабла" - НЕ имеет "заданный текст".
-     * Но value: "ЗаДаННый     тЕкСт" - имеет "заданный текст".
-     *
-     * Ничего не ожидает. Возвращает true или false.
-     *
-     * @param string $value
-     * @return bool
-     */
-    public function isHavingValue(string $value) : bool
-    {
-        return $this->is(new Value($value), false);
-    }
-
-    /**
-     * PageObject должен содержать заданное значение атрибута value.
-     *
-     * Для этого элемент на который ссылается локатор PageObject'а должен иметь value содержащее заданный текст
-     * в любом регистре, при этом пробельные символы приводятся к одному пробелу.
-     *
-     * Т.е. value "блаблаблазаданный текстблаблабла" - содержит "заданный текст".
-     *
-     * Если условие не будет выполнено в течении заданного таймаута (elementTimeout) - валит тест.
-     *
-     * @param string $value
-     * @return WElement
-     * @throws UsageException
-     */
-    public function shouldContainValue(string $value)
-    {
-        return $this->should(new ValueContains($value), false);
-    }
-
-    /**
-     * PageObject содержит заданное значение атрибута value?
-     *
-     * Для этого элемент на который ссылается локатор PageObject'а должен иметь value содержащее заданный текст
-     * в любом регистре, при этом пробельные символы приводятся к одному пробелу.
-     *
-     * Т.е. value "блаблаблазаданный текстблаблабла" - содержит "заданный текст".
-     *
-     * Ничего не ожидает. Возвращает true или false.
-     *
-     * @param string $value
-     * @return bool
-     */
-    public function isContainingValue(string $value) : bool
-    {
-        return $this->is(new ValueContains($value), false);
-    }
-
-    public function getValue() : string
-    {
-        WLogger::logInfo($this . " -> получаем значение");
-
-        $result = $this->accept(new GetValue());
-
-        WLogger::logInfo($this . " -> имеет значение: '$result'");
-
-        return $result;
+        return '/ ' . $this->getClassShort() . ' (' . $this->getName() . ')';
     }
 }

@@ -11,7 +11,7 @@ use Ds\Map;
 /**
  * Interface IPageObject
  *
- * Описывает базовый интерфейс, который реализуют все PageObject'ы.
+ * Описывает базовый интерфейс, который реализуют все PageObject'ы и объекты который косят под них (WCollection).
  *
  * По сути, у PageObject'а есть две группы методов:
  * - методы которые начинаются с is - проверяют, что для PageObject'а выполняется заданное условие и возвращают true или
@@ -40,6 +40,13 @@ interface IPageObject
     public function getClassShort() : string;
 
     /**
+     * Возвращает своё имя
+     *
+     * @return string
+     */
+    public function getName() : string;
+
+    /**
      * Возвращает своего родителя
      *
      * Если родителя нет, то возвращает EmptyComposite
@@ -60,11 +67,18 @@ interface IPageObject
     public function __toString() : string;
 
     /**
-     * Возвращает свой локатор
+     * Возвращает локатор данного PageObject'а
      *
      * @return WLocator
      */
     public function getLocator() : WLocator;
+
+    /**
+     * Определён ли локатор данного PageObject'а относительно его родителя (другого PageObject'а)?
+     *
+     * @return bool
+     */
+    public function isRelative() : bool;
 
     /**
      * Принимает визитор ().
@@ -199,6 +213,23 @@ interface IPageObject
     public function shouldBeDisabled(bool $deep = true);
 
     /**
+     * PageObject должен иметь заданный текст.
+     *
+     * Для этого элемент на который ссылается локатор PageObject'а должен иметь заданный текст в любом регистре,
+     * при этом пробельные символы приводятся к одному пробелу.
+     *
+     * Т.е. строка "блаблаблазаданный текстблаблабла" - НЕ имеет "заданный текст".
+     * Но строка: "ЗаДаННый     тЕкСт" - имеет "заданный текст".
+     *
+     * Если условие не будет выполнено в течении заданного таймаута (elementTimeout для наследников WElement,
+     * collectionTimeout для наследников WCollection) - валит тест.
+     *
+     * @param string $text
+     * @return static
+     */
+    public function shouldHaveText(string $text);
+
+    /**
      * PageObject должен содержать заданный текст.
      *
      * Для этого элемент на который ссылается локатор PageObject'а должен содержать заданный текст, начиная с любого
@@ -212,6 +243,39 @@ interface IPageObject
      * @return static
      */
     public function shouldContainText(string $text);
+
+    /**
+     * PageObject должен иметь заданное значение атрибута value.
+     *
+     * Для этого элемент на который ссылается локатор PageObject'а должен иметь value состоящее из заданного текста
+     * в любом регистре, при этом пробельные символы приводятся к одному пробелу.
+     *
+     * Т.е. value "блаблаблазаданный текстблаблабла" - НЕ имеет "заданный текст".
+     * Но value: "ЗаДаННый     тЕкСт" - имеет "заданный текст".
+     *
+     * Если условие не будет выполнено в течении заданного таймаута (elementTimeout
+     * для наследников WElement, collectionTimeout для наследников WCollection) - валит тест.
+     *
+     * @param string $value
+     * @return static
+     */
+    public function shouldHaveValue(string $value);
+
+    /**
+     * PageObject должен содержать заданное значение атрибута value.
+     *
+     * Для этого элемент на который ссылается локатор PageObject'а должен иметь value содержащее заданный текст
+     * в любом регистре, при этом пробельные символы приводятся к одному пробелу.
+     *
+     * Т.е. value "блаблаблазаданный текстблаблабла" - содержит "заданный текст".
+     *
+     * Если условие не будет выполнено в течении заданного таймаута (elementTimeout
+     * для наследников WElement, collectionTimeout для наследников WCollection) - валит тест.
+     *
+     * @param string $value
+     * @return static
+     */
+    public function shouldContainValue(string $value);
 
     /**
      * PageObject должен быть не только виден, но и находиться внутри рамок окна браузера
@@ -337,6 +401,8 @@ interface IPageObject
      */
     public function finallyDisabled(bool $deep = true) : bool;
 
+    public function finallyHaveText(string $text) : bool;
+
     /**
      * PageObject должен содержать заданный текст.
      *
@@ -351,6 +417,10 @@ interface IPageObject
      * @return bool
      */
     public function finallyContainText(string $text) : bool;
+
+    public function finallyHaveValue(string $value) : bool;
+
+    public function finallyContainValue(string $value) : bool;
 
     /**
      * PageObject должен быть не только виден, но и находиться внутри рамок окна браузера
@@ -472,6 +542,22 @@ interface IPageObject
     public function isDisabled(bool $deep = true) : bool;
 
     /**
+     * PageObject имеет заданный текст?
+     *
+     * Для этого элемент на который ссылается локатор PageObject'а должен иметь заданный текст в любом регистре,
+     * при этом пробельные символы приводятся к одному пробелу.
+     *
+     * Т.е. строка "блаблаблазаданный текстблаблабла" - НЕ имеет "заданный текст".
+     * Но строка: "ЗаДаННый     тЕкСт" - имеет "заданный текст".
+     *
+     * Ничего не ожидает. Возвращает true или false.
+     *
+     * @param string $text
+     * @return bool
+     */
+    public function isHaveText(string $text) : bool;
+
+    /**
      * PageObject содержит заданный текст?
      *
      * Для этого элемент на который ссылается локатор PageObject'а должен содержать заданный текст, начиная с любого
@@ -484,6 +570,37 @@ interface IPageObject
      * @return bool
      */
     public function isContainText(string $text) : bool;
+
+    /**
+     * PageObject имеет заданное значение атрибута value?
+     *
+     * Для этого элемент на который ссылается локатор PageObject'а должен иметь value состоящее из заданного текста
+     * в любом регистре, при этом пробельные символы приводятся к одному пробелу.
+     *
+     * Т.е. value "блаблаблазаданный текстблаблабла" - НЕ имеет "заданный текст".
+     * Но value: "ЗаДаННый     тЕкСт" - имеет "заданный текст".
+     *
+     * Ничего не ожидает. Возвращает true или false.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public function isHaveValue(string $value) : bool;
+
+    /**
+     * PageObject содержит заданное значение атрибута value?
+     *
+     * Для этого элемент на который ссылается локатор PageObject'а должен иметь value содержащее заданный текст
+     * в любом регистре, при этом пробельные символы приводятся к одному пробелу.
+     *
+     * Т.е. value "блаблаблазаданный текстблаблабла" - содержит "заданный текст".
+     *
+     * Ничего не ожидает. Возвращает true или false.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public function isContainValue(string $value) : bool;
 
     /**
      * PageObject находится внутри рамок окна браузера?

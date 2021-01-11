@@ -6,7 +6,7 @@ namespace Codeception\Lib\WFramework\WLocator;
 
 use function get_called_class;
 
-class HtmlRoot extends WLocator
+class HtmlRootLocator extends WLocator
 {
     // Здесь начинается стандартный код синглтона
 
@@ -19,7 +19,7 @@ class HtmlRoot extends WLocator
         throw new \Exception('Cannot unserialize singleton!');
     }
 
-    public static function get() : HtmlRoot
+    public static function get() : HtmlRootLocator
     {
         $class = get_called_class();
 

@@ -16,6 +16,7 @@ use Codeception\Lib\WFramework\Operations\Get\GetScreenshot;
 use Codeception\Lib\WFramework\Operations\Get\GetTextRaw;
 use Codeception\Lib\WFramework\Operations\Get\GetText;
 use Codeception\Lib\WFramework\Operations\Get\GetLayoutViewportSize;
+use Codeception\Lib\WFramework\Operations\Get\GetValue;
 use Codeception\Lib\WFramework\Operations\Mouse\MouseScrollTo;
 use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebDriver;
@@ -47,14 +48,14 @@ abstract class WPageObject extends Composite implements IPageObject
      *
      * @var WLocator
      */
-    protected $locator = null;
+    private $locator = null;
 
     /**
      * Все PageObject'ы имеют ссылку на главного актора Codeception, чтобы дёргать его методы
      *
      * @var ImaginaryActor
      */
-    protected $actor = null;
+    private $actor = null;
 
     /**
      * Все PageObject'ы имеют ссылку на Сервер Селениума, чтобы дёргать его методы
@@ -63,14 +64,14 @@ abstract class WPageObject extends Composite implements IPageObject
      *
      * @var ProxyWebDriver
      */
-    protected $proxyWebDriver = null;
+    private $proxyWebDriver = null;
 
     /**
      * Все PageObject'ы имеют ссылку на свой элемент Селениума, чтобы дёргать его методы
      *
      * @var  ProxyWebElement
      */
-    protected $proxyWebElement = null;
+    private $proxyWebElement = null;
 
     /**
      * Все PageObject'ы могут являться частью других PageObject'ов.
@@ -82,30 +83,51 @@ abstract class WPageObject extends Composite implements IPageObject
      *
      * @var bool
      */
-    protected $relative = true;
+    private $relative = true;
 
-    public function __construct()
+    /**
+     * @param WLocator $locator
+     * @return $this
+     */
+    protected function setLocator(WLocator $locator)
     {
-        parent::__construct();
+        $this->locator = $locator;
 
-        $this->locator = EmptyLocator::get();
+        return $this;
     }
 
     /**
-     * Возвращает локатор данного элемента
-     *
-     * @return WLocator
+     * @param bool $relative
+     * @return $this
      */
+    protected function setRelative(bool $relative)
+    {
+        $this->relative = $relative;
+
+        return $this;
+    }
+
+    /**
+     * @param Actor $actor
+     * @return $this
+     */
+    protected function setCodeceptionActor(Actor $actor)
+    {
+        $this->actor = $actor;
+
+        return $this;
+    }
+
     public function getLocator() : WLocator
     {
+        if ($this->locator === null)
+        {
+            $this->locator = EmptyLocator::get();
+        }
+
         return $this->locator;
     }
 
-    /**
-     * Определён ли локатор данного веб-элемента относительно его родителя (другого PageObject'а)?
-     *
-     * @return bool
-     */
     public function isRelative() : bool
     {
         return $this->relative;
@@ -149,28 +171,10 @@ abstract class WPageObject extends Composite implements IPageObject
     {
         if ($this->proxyWebDriver === null)
         {
-            if ($this->getParent() instanceof EmptyComposite)
-            {
-                throw new UsageException($this . ' -> не содержит ссылку на webDriver. Это странно.');
-            }
-
-            $this->proxyWebDriver = $this->getParent()->returnSeleniumServer();
+            $this->proxyWebDriver = $this->returnCodeceptionActor()->getWebDriver();
         }
 
         return $this->proxyWebDriver;
-    }
-
-    /**
-     * С помощью этого метода можно обратиться к методам Selenium Actions
-     *
-     * https://selenium.dev/selenium/docs/api/java/org/openqa/selenium/interactions/Actions.html
-     *
-     * @return WebDriverActions
-     * @throws UsageException
-     */
-    public function returnSeleniumActions() : ProxyWebElementActions
-    {
-        return $this->accept(new ExecuteActions());
     }
 
     /**
@@ -192,6 +196,19 @@ abstract class WPageObject extends Composite implements IPageObject
         }
 
         return $this->actor;
+    }
+
+    /**
+     * С помощью этого метода можно обратиться к методам Selenium Actions
+     *
+     * https://selenium.dev/selenium/docs/api/java/org/openqa/selenium/interactions/Actions.html
+     *
+     * @return WebDriverActions
+     * @throws UsageException
+     */
+    public function returnSeleniumActions() : ProxyWebElementActions
+    {
+        return $this->accept(new ExecuteActions());
     }
 
     /**
@@ -228,6 +245,15 @@ abstract class WPageObject extends Composite implements IPageObject
         $result = $this->accept(new GetTextRaw());
 
         WLogger::logInfo($this . " -> имеет весь текст: '$result'");
+
+        return $result;
+    }
+
+    public function getValue() : string
+    {
+        $result = $this->accept(new GetValue());
+
+        WLogger::logInfo($this . " -> имеет значение: '$result'");
 
         return $result;
     }

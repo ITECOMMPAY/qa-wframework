@@ -12,7 +12,7 @@ namespace Codeception\Lib\WFramework\WebObjects\Base\WBlock;
 use Codeception\Actor;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
-use Codeception\Lib\WFramework\WLocator\HtmlRoot;
+use Codeception\Lib\WFramework\WLocator\HtmlRootLocator;
 use Codeception\Lib\WFramework\WLocator\WLocator;
 
 /**
@@ -38,14 +38,6 @@ use Codeception\Lib\WFramework\WLocator\WLocator;
 abstract class WBlock extends WPageObject
 {
     /**
-     * WBlock всегда задаются относительно корня страницы и не могут быть объявлены внутри других PageObject'ов.
-     *
-     * Поэтому параметр $relative для них всегда стоит в false.
-     * @var bool
-     */
-    protected $relative = false;
-
-    /**
      * Данный метод должен возвращать конкретное имя данного PageObject'а
      *
      * Например: 'Страница сброса пароля', 'Панель выбранных фильтров'
@@ -55,6 +47,21 @@ abstract class WBlock extends WPageObject
      * @return string
      */
     abstract protected function initName() : string;
+
+    /**
+     * Этот метод возвращает локатор, относительно которого будет производиться поиск всех веб-элементов на данном
+     * PageObject'е. По умолчанию, данный метод возвращает корень страницы (/html).
+     *
+     * Для использования в PageObject'ах - его следует переопределить.
+     *
+     * Метод может вернуть экземпляр WLocator или строку. Строка, по-умолчанию, считается за XPath.
+     *
+     * @return WLocator|string
+     */
+    protected function initPageLocator()
+    {
+        return HtmlRootLocator::get();
+    }
 
     /**
      * Данный метод должен описывать - как с первой страницы дойти до данного PageObject'а.
@@ -87,21 +94,6 @@ abstract class WBlock extends WPageObject
         $this->shouldExist();
 
         return $this;
-    }
-
-    /**
-     * Этот метод возвращает локатор, относительно которого будет производиться поиск всех веб-элементов на данном
-     * PageObject'е. По умолчанию, данный метод возвращает корень страницы (/html).
-     *
-     * Для использования в PageObject'ах - его следует переопределить.
-     *
-     * Метод может вернуть экземпляр WLocator или строку. Строка, по-умолчанию, считается за XPath.
-     *
-     * @return WLocator|string
-     */
-    protected function initPageLocator()
-    {
-        return HtmlRoot::get();
     }
 
     /**
@@ -143,23 +135,19 @@ abstract class WBlock extends WPageObject
     {
         parent::__construct();
 
+        $this->setCodeceptionActor($actor);
+
+        $this->setRelative(false); //WBlock всегда задаются относительно корня страницы и не могут быть объявлены внутри других PageObject'ов.
         $this->name = $this->initName();
+        $locator = $this->initPageLocator();
 
-        if (!method_exists($actor, 'getWebDriver'))
+        if ($locator instanceof WLocator)
         {
-            throw new \Exception('Для актора не подключен модуль Common\WebFramework\WebModule\WebModule');
-        }
-
-        $this->actor = $actor;
-        $this->proxyWebDriver = $actor->getWebDriver();
-
-        if ($this->initPageLocator() instanceof WLocator)
-        {
-            $this->locator = $this->initPageLocator();
+            $this->setLocator($locator);
         }
         else
         {
-            $this->locator = WLocator::xpath($this->initPageLocator()); //Локаторы заданные строкой считаются за Xpath-локаторы
+            $this->setLocator(WLocator::xpath($locator)); //Локаторы заданные строкой считаются за Xpath-локаторы
         }
     }
 

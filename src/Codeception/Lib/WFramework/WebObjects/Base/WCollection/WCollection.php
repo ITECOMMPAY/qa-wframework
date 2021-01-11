@@ -16,6 +16,7 @@ use Codeception\Lib\WFramework\Conditions\CountGreaterThanOrEqual;
 use Codeception\Lib\WFramework\Conditions\CountLessThanOrEqual;
 use Codeception\Lib\WFramework\Operations\Get\GetTextRaw;
 use Codeception\Lib\WFramework\Operations\Get\GetText;
+use Codeception\Lib\WFramework\Operations\Get\GetValue;
 use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElements;
 use Codeception\Lib\WFramework\WebObjects\Base\Traits\PageObjectBaseMethods;
@@ -283,6 +284,11 @@ abstract class WCollection extends Composite implements IPageObject
     public function getLocator() : WLocator
     {
         return $this->locator;
+    }
+
+    public function isRelative() : bool
+    {
+        return $this->relative;
     }
 
     /**
@@ -591,6 +597,20 @@ abstract class WCollection extends Composite implements IPageObject
         $texts = implode(', ', $result->toArray());
 
         WLogger::logInfo($this . " -> имеет все тексты: '$texts'");
+
+        return $result;
+    }
+
+    public function getValues() : Sequence
+    {
+        WLogger::logInfo($this . " -> получаем значение атрибута value всех элементов коллекции");
+
+        /** @var Sequence $result */
+        $result = $this->accept(new GetValue());
+
+        $values = implode(', ', $result->toArray());
+
+        WLogger::logInfo($this . " -> имеет значения: '$values'");
 
         return $result;
     }

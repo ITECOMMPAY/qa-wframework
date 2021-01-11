@@ -9,7 +9,7 @@
 namespace Codeception\Lib\WFramework\Steps;
 
 /**
- * Класс, от которого должны наследовать все группы тест-степов.
+ * Класс, от которого должны наследовать все группы тест-степов (StepObject'ы).
  *
  * @package Common\Module\WFramework\StepsGroup
  */
