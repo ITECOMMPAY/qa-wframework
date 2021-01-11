@@ -5,36 +5,42 @@ namespace dodge\Helper\Steps;
 
 
 use Codeception\Lib\WFramework\Steps\StepsGroup;
+use dodge\Helper\Steps\BuildModelSteps;
+use dodge\Helper\Steps\FrontPageSteps;
+use dodge\Helper\Steps\SelectModelSteps;
+use dodge\Helper\Steps\VehiclePageSteps;
+use dodge\Helper\Steps\VehiclesMenuSteps;
 
 class DodgeSteps extends StepsGroup
 {
-    /** @var FrontPageSteps */
-    public static $frontPageSteps;
-
-    /** @var VehiclesMenuSteps */
-    public static $vehiclesMenuSteps;
-
-    /** @var VehiclePageSteps */
-    public static $vehiclePageSteps;
-
-    /** @var SelectModelSteps */
-    public static $selectModelSteps;
-
     /** @var BuildModelSteps */
     public static $buildModelSteps;
+    
+    /** @var FrontPageSteps */
+    public static $frontPageSteps;
+    
+    /** @var SelectModelSteps */
+    public static $selectModelSteps;
+    
+    /** @var VehiclePageSteps */
+    public static $vehiclePageSteps;
+    
+    /** @var VehiclesMenuSteps */
+    public static $vehiclesMenuSteps;
+    
 
     public function __construct(
+        BuildModelSteps $buildModelSteps,
         FrontPageSteps $frontPageSteps,
-        VehiclesMenuSteps $vehiclesMenuSteps,
-        VehiclePageSteps $vehiclePageSteps,
         SelectModelSteps $selectModelSteps,
-        BuildModelSteps $buildModelSteps
+        VehiclePageSteps $vehiclePageSteps,
+        VehiclesMenuSteps $vehiclesMenuSteps
     )
     {
-        static::$frontPageSteps = $frontPageSteps;
-        static::$vehiclesMenuSteps = $vehiclesMenuSteps;
-        static::$vehiclePageSteps = $vehiclePageSteps;
-        static::$selectModelSteps = $selectModelSteps;
         static::$buildModelSteps = $buildModelSteps;
+        static::$frontPageSteps = $frontPageSteps;
+        static::$selectModelSteps = $selectModelSteps;
+        static::$vehiclePageSteps = $vehiclePageSteps;
+        static::$vehiclesMenuSteps = $vehiclesMenuSteps;
     }
 }

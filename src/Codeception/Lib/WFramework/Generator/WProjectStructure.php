@@ -7,9 +7,9 @@ namespace Codeception\Lib\WFramework\Generator;
 use Codeception\Lib\WFramework\Generator\FileGenerator\FileGeneratorVisitor;
 use Codeception\Lib\WFramework\Generator\ParsingTree\RootNode;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\SourceGeneratorVisitor;
-use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
+use Codeception\Lib\WFramework\Steps\StepsGroup;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
@@ -31,6 +31,9 @@ class WProjectStructure
     protected $operationsPath = [];
 
     /** @var string */
+    protected $stepObjectsPath;
+
+    /** @var string */
     protected $actorNameShort;
 
     /** @var string */
@@ -44,6 +47,7 @@ class WProjectStructure
         $this->actorNameShort = $actorNameShort;
         $this->actorNameFull = $this->getActorNameFull();
         $this->operationsPath = [__DIR__ . '/../Operations', $supportDir . '/Helper/Operations'];
+        $this->stepObjectsPath = $supportDir . '/Helper/Steps';
     }
 
     protected function getActorNameFull() : string
@@ -58,7 +62,7 @@ class WProjectStructure
 
     public function build()
     {
-        $parsingTree = new RootNode($this->projectName, $this->actorNameFull, $this->outputNamespace, $this->getOperationClasses());
+        $parsingTree = new RootNode($this->projectName, $this->actorNameFull, $this->outputNamespace, $this->getOperationClasses(), $this->getStepObjectsClasses());
 
         $sourceGenerator = new SourceGeneratorVisitor();
 
@@ -97,6 +101,28 @@ class WProjectStructure
         return $result;
     }
 
+    protected function getStepObjectsClasses() : array
+    {
+        if (!is_dir($this->stepObjectsPath))
+        {
+            return [];
+        }
+
+        $result = $this->loadSubclassesFromDir($this->stepObjectsPath, StepsGroup::class);
+
+        $result = array_keys($result);
+
+        sort($result);
+
+        return $result;
+    }
+
+    /**
+     * @param string $path
+     * @param string $classOrInterface
+     * @return array - [class full name => reflection object]
+     * @throws \ReflectionException
+     */
     protected function loadSubclassesFromDir(string $path, string $classOrInterface) : array
     {
         $directory = new RecursiveDirectoryIterator($path);

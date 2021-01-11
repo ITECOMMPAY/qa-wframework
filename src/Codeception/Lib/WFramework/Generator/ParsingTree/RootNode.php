@@ -19,7 +19,7 @@ use Codeception\Lib\WFramework\Generator\ParsingTree\Collection\CollectionOperat
 use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementFacadeNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementOperationNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\OperationTemplate\OperationTemplateNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\Steps\StepsNode;
 use Codeception\Lib\WFramework\Helpers\Composite;
 
 class RootNode extends Composite
@@ -34,7 +34,10 @@ class RootNode extends Composite
 
     public $source = null;
 
-    public function __construct(string $projectName, string $projectActorClassFull, string $outputNamespace, array $operationClassFullToReflectionClass)
+    /** @var string[] */
+    protected $stepObjectClassesFull;
+
+    public function __construct(string $projectName, string $projectActorClassFull, string $outputNamespace, array $operationClassFullToReflectionClass, array $stepObjectClassesFull)
     {
         parent::__construct();
 
@@ -42,6 +45,7 @@ class RootNode extends Composite
         $this->projectActorClassFull = $projectActorClassFull;
         $this->outputNamespace = $outputNamespace;
         $this->operationClassFullToReflectionClass = $operationClassFullToReflectionClass;
+        $this->stepObjectClassesFull = $stepObjectClassesFull;
 
         $this->buildTree();
     }
@@ -128,5 +132,8 @@ class RootNode extends Composite
             $helperNamespace . '\Elements\Basic'
         );
         $this->addChild($textBoxNode);
+
+        $stepsNode = new StepsNode($this->name . 'Steps', $helperNamespace . '\Steps', $this->stepObjectClassesFull);
+        $this->addChild($stepsNode);
     }
 }

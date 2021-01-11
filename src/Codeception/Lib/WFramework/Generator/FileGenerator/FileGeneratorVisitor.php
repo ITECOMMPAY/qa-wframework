@@ -6,6 +6,7 @@ namespace Codeception\Lib\WFramework\Generator\FileGenerator;
 
 use Codeception\Lib\WFramework\Exceptions\GeneralException;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
+use Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNodes\AbstractBasicElement;
 use Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNodes\AbstractPageObjectNode;
 use Codeception\Lib\WFramework\Helpers\Composite;
 
@@ -15,6 +16,8 @@ class FileGeneratorVisitor
      * @var string
      */
     protected $outputPath;
+
+    protected $neverOverwriteTheseNodes = [AbstractPageObjectNode::class, AbstractBasicElement::class];
 
     public function __construct(string $outputPath)
     {
@@ -41,17 +44,30 @@ class FileGeneratorVisitor
 
         $filename = $folder . '/' . $node->getName() . '.php';
 
-        if ($node instanceof AbstractPageObjectNode && file_exists($filename))
-        {
-            return;
-        }
-
         if (file_exists($filename))
         {
+            if ($this->mustNotBeOverwritten($node))
+            {
+                return;
+            }
+
             unlink($filename);
         }
 
         file_put_contents($filename, $node->source);
+    }
+
+    protected function mustNotBeOverwritten($node) : bool
+    {
+        foreach ($this->neverOverwriteTheseNodes as $nodeClass)
+        {
+            if ($node instanceof $nodeClass)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function namespaceToPath(string $namespace) : string

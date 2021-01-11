@@ -26,6 +26,7 @@ use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementOperationGroupNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementOperationNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\RootNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\Steps\StepsNode;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\BasicElements\ButtonSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\BasicElements\CheckboxSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\BasicElements\ImageSource;
@@ -235,4 +236,13 @@ class SourceGeneratorVisitor
         $node->source = (new TextBoxSource($node->outputNamespace, $node->classFull, $node->getElementNode()->classFull))->produce();
     }
 
+    public function acceptStepsNode(StepsNode $node)
+    {
+        if ($node->source !== null)
+        {
+            return;
+        }
+
+        $node->source = (new StepsSource($node->outputNamespace, $node->name, $node->stepObjectClassesFull))->produce();
+    }
 }
