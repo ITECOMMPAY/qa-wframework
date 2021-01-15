@@ -3,10 +3,13 @@
 
 namespace Codeception\Lib\WFramework\WebObjects\Base\Interfaces;
 
+use Codeception\Lib\WFramework\Exceptions\UsageException;
+use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 use Codeception\Lib\WFramework\WLocator\WLocator;
 use Ds\Map;
+use Ds\Sequence;
 
 /**
  * Interface IPageObject
@@ -79,6 +82,82 @@ interface IPageObject
      * @return bool
      */
     public function isRelative() : bool;
+
+    /**
+     * Возвращает детей узла в следующем порядке, включая этот узел (1 - этот узел):
+     * ```
+     *         (1)
+     *         / \
+     *        /   \
+     *       /     \
+     *      /       \
+     *      2       3
+     *     / \     / \
+     *    /   \   /   \
+     *    4   5   6   7
+     * ```
+     * @return \Generator
+     */
+    public function traverseBreadthFirst() : \Generator;
+
+    /**
+     * Возвращает детей узла в следующем порядке, включая этот узел (1 - этот узел):
+     * ```
+     *         (1)
+     *         / \
+     *        /   \
+     *       /     \
+     *      /       \
+     *      2       5
+     *     / \     / \
+     *    /   \   /   \
+     *    3   4   6   7
+     * ```
+     *
+     * Для PageObject'ов, по умолчанию, следует использовать этот способ т.к. он перебирает элементы страницы сверху-вниз.
+     *
+     * @return \Generator
+     */
+    public function traverseDepthFirst() : \Generator;
+
+    /**
+     * Возвращает родителей узла в следующем порядке, включая этот узел (1 - этот узел):
+     * ```
+     *      3
+     *      |
+     *      |
+     *      2
+     *     / \
+     *    /   \
+     *   (1)   X
+     * ```
+     * @return Sequence
+     */
+    public function traverseToRoot() : Sequence;
+
+    /**
+     * Возвращает родителей узла в следующем порядке, включая этот узел (3 - этот узел):
+     * ```
+     *      1
+     *      |
+     *      |
+     *      2
+     *     / \
+     *    /   \
+     *   (3)   X
+     * ```
+     * @return Sequence
+     */
+    public function traverseFromRoot() : Sequence;
+
+    /**
+     * Возвращает первого родителя узла с классом $class
+     *
+     * @param string $class
+     * @return Composite
+     * @throws UsageException
+     */
+    public function getFirstParentWithClass(string $class);
 
     /**
      * Принимает визитор ().

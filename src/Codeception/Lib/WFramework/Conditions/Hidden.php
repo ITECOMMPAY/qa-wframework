@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
+use Codeception\Lib\WFramework\Explanations\TraverseFromRootExplanation;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
 class Hidden extends AbstractCondition
@@ -36,5 +37,10 @@ class Hidden extends AbstractCondition
     public function apply(WPageObject $pageObject)
     {
         return $pageObject->accept(new Not_(new Visible()));
+    }
+
+    protected function getExplanationClasses() : array
+    {
+        return [TraverseFromRootExplanation::class];
     }
 }

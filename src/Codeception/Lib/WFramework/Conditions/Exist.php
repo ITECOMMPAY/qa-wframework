@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
+use Codeception\Lib\WFramework\Explanations\TraverseFromRootExplanation;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
 class Exist extends AbstractCondition
@@ -31,5 +32,10 @@ class Exist extends AbstractCondition
     protected function apply(WPageObject $pageObject) : bool
     {
         return $pageObject->returnSeleniumElement()->isExist();
+    }
+
+    protected function getExplanationClasses() : array
+    {
+        return [TraverseFromRootExplanation::class];
     }
 }

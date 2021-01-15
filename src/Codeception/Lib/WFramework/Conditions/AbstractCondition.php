@@ -4,8 +4,10 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
-use Codeception\Lib\WFramework\Explanations\DummyExplanation;
+use Codeception\Lib\WFramework\Explanations\Dummy;
+use Codeception\Lib\WFramework\Explanations\Result\ExplanationResult;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
+use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -27,21 +29,23 @@ abstract class AbstractCondition extends PageObjectVisitor
      */
     protected function getExplanationClasses() : array
     {
-        return [DummyExplanation::class];
+        return [Dummy::class];
     }
 
     /**
-     * Почему условие выполнилось/не выполнилось для данного PageObject'а
+     * Почему условие выполнилось/не выполнилось для заданного PageObject'а
      *
-     * @return string[] - список причин
+     * @param IPageObject $pageObject   - заданный PageObject
+     * @param bool $actualValue         - актуальное значение условия
+     * @return ExplanationResult[]      - список причин
      */
-    public function why(IPageObject $pageObject, bool $actualValue = true) : array
+    public function why(IPageObject $pageObject, bool $actualValue = false) : array
     {
         $result = [];
 
         foreach ($this->getExplanationClasses() as $explanationClass)
         {
-            $result[] = $pageObject->accept(new $explanationClass($actualValue));
+            $result[] = $pageObject->accept(new $explanationClass($this, $actualValue));
         }
 
         return $result;

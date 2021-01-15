@@ -252,8 +252,6 @@ class WebAssertsModule extends Asserts
 
     public function fail($message = '', $context = [])
     {
-        WLogger::logAlert("Fail: $message", $context);
-
         parent::fail($message);
     }
 

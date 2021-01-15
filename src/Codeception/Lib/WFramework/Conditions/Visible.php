@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
+use Codeception\Lib\WFramework\Explanations\TraverseFromRootExplanation;
 use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\Operations\Mouse\MouseScrollTo;
 use Codeception\Lib\WFramework\Properties\TestProperties;
@@ -77,6 +78,11 @@ class Visible extends AbstractCondition
         }
 
         return static::$isSafari;
+    }
+
+    protected function getExplanationClasses() : array
+    {
+        return [TraverseFromRootExplanation::class];
     }
 
     //https://github.com/jquery/jquery/blob/master/src/css/hiddenVisibleSelectors.js
