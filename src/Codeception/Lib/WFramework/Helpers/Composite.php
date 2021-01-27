@@ -54,6 +54,11 @@ abstract class Composite extends ModernObject
      */
     public function getName() : string
     {
+        if (empty($this->name))
+        {
+            throw new UsageException('Наследники Composite должны задавать поле $name уникальным значением');
+        }
+
         return $this->name;
     }
 

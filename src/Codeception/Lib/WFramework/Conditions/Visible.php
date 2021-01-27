@@ -18,7 +18,7 @@ class Visible extends AbstractCondition
 
     public function getName() : string
     {
-        return "отображается на странице?";
+        return "виден?";
     }
 
     public function acceptWBlock($block) : bool

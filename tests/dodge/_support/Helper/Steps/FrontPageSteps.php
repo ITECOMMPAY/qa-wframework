@@ -68,17 +68,21 @@ class FrontPageSteps extends StepsGroup
     {
         $this->I->logNotice('Ожидаем всплывающее окно Choose Your Site и закрываем его');
 
-        $this
-            ->chooseYourSiteBlock
-            ->shouldBeDisplayed()
-            ->getCloseButton()
-            ->click()
-            ;
+        if ($this
+                ->chooseYourSiteBlock
+                ->finallyDisplayed())
+        {
+            $this
+                ->chooseYourSiteBlock
+                ->getCloseButton()
+                ->click()
+                ;
 
-        $this
-            ->chooseYourSiteBlock
-            ->shouldBeHidden()
-            ;
+            $this
+                ->chooseYourSiteBlock
+                ->shouldBeHidden()
+                ;
+        }
 
         return $this;
     }

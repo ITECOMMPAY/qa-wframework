@@ -81,12 +81,9 @@ trait PageObjectBaseMethods
             }
             catch (WaitUntilElement $e)
             {
-                $explanations = $condition->why($selfOrChild, false);
+                $explanation = $condition->why($selfOrChild, false);
 
-                foreach ($explanations as $explanation)
-                {
-                    WLogger::logError($explanation->getMessage(), $explanation->getContext());
-                }
+                WLogger::logError($explanation);
 
                 $this->fail($this . " -> условие: '$condition' - не выполнилось в течение таймаута: " . $this->getTimeout());
             }

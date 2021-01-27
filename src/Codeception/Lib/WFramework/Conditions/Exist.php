@@ -11,7 +11,7 @@ class Exist extends AbstractCondition
 {
     public function getName() : string
     {
-        return "присутствует в коде страницы?";
+        return "присутствует в коде?";
     }
 
     public function acceptWBlock($block) : bool

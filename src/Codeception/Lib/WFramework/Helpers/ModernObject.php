@@ -35,7 +35,7 @@ class ModernObject extends stdClass implements Hashable
      *
      * @return mixed
      */
-    public function hash()
+    public function hash() : string
     {
         return spl_object_hash($this);
     }

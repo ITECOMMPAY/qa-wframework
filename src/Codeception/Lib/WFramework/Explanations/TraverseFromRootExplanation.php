@@ -6,7 +6,8 @@ namespace Codeception\Lib\WFramework\Explanations;
 
 use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Explanations\Formatters\TraverseFromRootExplanationFormatter;
-use Codeception\Lib\WFramework\Explanations\Result\ExplanationResult;
+use Codeception\Lib\WFramework\Explanations\Result\AbstractExplanationResult;
+use Codeception\Lib\WFramework\Explanations\Result\TraverseFromRootExplanationResult;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 
 /**
@@ -21,41 +22,39 @@ class TraverseFromRootExplanation extends AbstractExplanation
 {
     public function getName() : string
     {
-        return "почему " . ($this->actualValue ? '' : 'НЕ ') . $this->condition;
+        return "почему он или его родители " . ($this->actualValue ? '' : 'НЕ ') . $this->condition;
     }
 
-    public function acceptWElement($element) : ExplanationResult
+    public function acceptWElement($element) : AbstractExplanationResult
     {
         return $this->apply($element);
     }
 
-    public function acceptWBlock($block) : ExplanationResult
+    public function acceptWBlock($block) : AbstractExplanationResult
     {
         return $this->apply($block);
     }
 
-    public function acceptWCollection($collection) : ExplanationResult
+    public function acceptWCollection($collection) : AbstractExplanationResult
     {
         return $this->apply($collection);
     }
 
-    protected function apply(IPageObject $pageObject) : ExplanationResult
+    protected function apply(IPageObject $pageObject) : AbstractExplanationResult
     {
+        $result = new TraverseFromRootExplanationResult();
+
         $checkResult = $this->actualValue;
-        $formatter = new TraverseFromRootExplanationFormatter();
 
         /** @var IPageObject $parentOrSelf */
         foreach ($pageObject->traverseFromRoot() as $parentOrSelf)
         {
-            if (!$this->condition instanceof Exist) // Сначала проверяем что элемент вообще присутствует в коде страницы
-            {
-                $existCondition = new Exist();
-                $checkResult = $parentOrSelf->accept($existCondition);
-                $formatter->addNext($parentOrSelf, $existCondition, $checkResult);
-            }
+            $existCondition = new Exist();
+            $checkResult = $parentOrSelf->accept($existCondition);
+            $result->addNext($parentOrSelf, $existCondition, $checkResult);
 
-            $checkResult = $parentOrSelf->accept($this->condition); // А затем и само условие
-            $formatter->addNext($parentOrSelf, $this->condition, $checkResult);
+            $checkResult = $parentOrSelf->accept($this->condition);
+            $result->addNext($parentOrSelf, $this->condition, $checkResult);
 
             if ($checkResult === false) //Дошли до первого невалидного элемента - дальше идти смысла нет
             {
@@ -63,15 +62,8 @@ class TraverseFromRootExplanation extends AbstractExplanation
             }
         }
 
-        $message = $formatter->getMessage();
+        $result->setProblemNotFound($checkResult !== $this->actualValue);
 
-        if ($checkResult !== $this->actualValue)
-        {
-            $message .= $formatter::EXPLANATIONS_DELIMITER;
-            $message .= 'ПРОБЛЕМА НЕ ВЫЯВЛЕНА! ' . PHP_EOL;
-            $message .= '                            возможно в тесте отсутствует умное ожидание перед операцией' . PHP_EOL;
-        }
-
-        return new ExplanationResult($message);
+        return $result;
     }
 }

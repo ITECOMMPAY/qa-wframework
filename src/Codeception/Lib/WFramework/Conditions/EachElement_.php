@@ -48,7 +48,7 @@ class EachElement_ extends AbstractCondition
         return $this->condition->getExplanationClasses();
     }
 
-    public function why(IPageObject $pageObject, bool $actualValue = true) : array
+    public function why(IPageObject $pageObject, bool $actualValue = true) : string
     {
         if ($this->firstInvalidElement !== null)
         {

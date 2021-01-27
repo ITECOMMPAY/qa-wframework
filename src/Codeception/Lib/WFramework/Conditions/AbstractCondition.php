@@ -4,8 +4,11 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
-use Codeception\Lib\WFramework\Explanations\Dummy;
-use Codeception\Lib\WFramework\Explanations\Result\ExplanationResult;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
+use Codeception\Lib\WFramework\Explanations\EmptyExplanation;
+use Codeception\Lib\WFramework\Explanations\Formatters\DefaultExplanationResultFormatter;
+use Codeception\Lib\WFramework\Explanations\Result\AbstractExplanationResult;
+use Codeception\Lib\WFramework\Explanations\Result\ExplanationResultAggregate;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
@@ -29,7 +32,7 @@ abstract class AbstractCondition extends PageObjectVisitor
      */
     protected function getExplanationClasses() : array
     {
-        return [Dummy::class];
+        return [EmptyExplanation::class];
     }
 
     /**
@@ -37,18 +40,33 @@ abstract class AbstractCondition extends PageObjectVisitor
      *
      * @param IPageObject $pageObject   - заданный PageObject
      * @param bool $actualValue         - актуальное значение условия
-     * @return ExplanationResult[]      - список причин
+     * @return string                   - описание проблем
      */
-    public function why(IPageObject $pageObject, bool $actualValue = false) : array
+    public function why(IPageObject $pageObject, bool $actualValue = false) : string
     {
-        $result = [];
+        $resultAggregate = new ExplanationResultAggregate($pageObject, $this, $actualValue);
 
         foreach ($this->getExplanationClasses() as $explanationClass)
         {
-            $result[] = $pageObject->accept(new $explanationClass($this, $actualValue));
+            $explanationResult = $pageObject->accept(new $explanationClass($this, $actualValue));
+
+            if (!$explanationResult instanceof AbstractExplanationResult)
+            {
+                throw new UsageException($explanationClass . ' -> должен возвращать наследника AbstractExplanationResult в качестве результата проверки');
+            }
+
+            $resultAggregate->addChild($explanationResult);
         }
 
-        return $result;
+        $formatter = new DefaultExplanationResultFormatter();
+
+        /** @var AbstractExplanationResult $explanationResult */
+        foreach ($resultAggregate->traverseDepthFirst() as $explanationResult)
+        {
+            $explanationResult->accept($formatter);
+        }
+
+        return $formatter->getMessage();
     }
 
     public function __call($name, $arguments) : bool
