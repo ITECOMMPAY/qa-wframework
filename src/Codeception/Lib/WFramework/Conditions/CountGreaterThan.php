@@ -9,20 +9,27 @@ class CountGreaterThan extends AbstractCondition
     /**
      * @var int
      */
-    protected $size;
+    public $expected;
+
+    /**
+     * @var int
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "содержит больше '$this->size' элементов?";
+        return "содержит больше '$this->expected' элементов?";
     }
 
-    public function __construct(int $size)
+    public function __construct(int $expectedValue)
     {
-        $this->size = $size;
+        $this->expected = $expectedValue;
     }
 
     public function acceptWCollection($collection) : bool
     {
-        return $collection->getElementsArray()->count() > $this->size;
+        $this->actual = $collection->getElementsArray()->count();
+
+        return $this->actual > $this->expected;
     }
 }

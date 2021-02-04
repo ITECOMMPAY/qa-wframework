@@ -16,7 +16,7 @@ class TextMatchesRegex extends AbstractCondition
 
     public function getName() : string
     {
-        return "видимый текст соответствует регулярке '" . $this->regex . "'?";
+        return "содержит видимый текст который соответствует регулярке '" . $this->regex . "'?";
     }
 
     public function __construct(string $regex)
@@ -32,16 +32,6 @@ class TextMatchesRegex extends AbstractCondition
     public function acceptWElement($element) : bool
     {
         return $this->apply($element);
-    }
-
-    public function acceptWCollection($collection) : bool
-    {
-        if ($collection->isEmpty())
-        {
-            return false;
-        }
-
-        return $this->apply($collection->getFirstElement());
     }
 
     protected function apply(WPageObject $pageObject) : bool

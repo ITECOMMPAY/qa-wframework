@@ -11,9 +11,19 @@ class TextEmpty extends AbstractCondition
 {
     protected const BLANK = '/[\s\n\r\t\x{00a0}]+/m';
 
+    /**
+     * @var string
+     */
+    public $expected = '';
+
+    /**
+     * @var string
+     */
+    public $actual;
+
     public function getName() : string
     {
-        return "видимый текст пустой? (без учёта пробелов)";
+        return "содержит пустой видимый текст? (без учёта пробелов)";
     }
 
     public function __construct(){}
@@ -28,20 +38,12 @@ class TextEmpty extends AbstractCondition
         return $this->apply($element);
     }
 
-    public function acceptWCollection($collection) : bool
-    {
-        if ($collection->isEmpty())
-        {
-            return true;
-        }
-
-        return $this->apply($collection->getFirstElement());
-    }
-
     protected function apply(WPageObject $pageObject) : bool
     {
         $actualText = $pageObject->accept(new GetText());
 
-        return '' === trim(preg_replace(static::BLANK, ' ', $actualText));
+        $this->actual = trim(preg_replace(static::BLANK, ' ', $actualText));
+
+        return $this->actual === $this->expected;
     }
 }

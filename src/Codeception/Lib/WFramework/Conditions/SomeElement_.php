@@ -4,10 +4,13 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
+use Codeception\Lib\WFramework\Conditions\Interfaces\IWrapOtherCondition;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
+use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
-class SomeElement_ extends AbstractCondition
+class SomeElement_ extends AbstractCondition implements IWrapOtherCondition
 {
     /**
      * @var AbstractCondition
@@ -31,6 +34,11 @@ class SomeElement_ extends AbstractCondition
 
     public function acceptWCollection($collection) : bool
     {
+        if ($collection->isEmpty())
+        {
+            return false;
+        }
+
         foreach ($collection->getElementsArray() as $element)
         {
             if ($element->accept($this->condition))
@@ -50,11 +58,26 @@ class SomeElement_ extends AbstractCondition
 
     public function why(IPageObject $pageObject, bool $actualValue = true) : string
     {
-        if ($this->firstValidElement !== null)
+        if (!$pageObject instanceof WCollection)
         {
-            return parent::why($this->firstValidElement, $actualValue);
+            throw new UsageException($this . " -> должен применяться к WCollection");
         }
 
-        return parent::why($pageObject, $actualValue);
+        if ($this->firstValidElement !== null)
+        {
+            return $this->getWrappedCondition()->why($this->firstValidElement, $actualValue);
+        }
+
+        if ($pageObject->isEmpty())
+        {
+            return $pageObject . ' -> не содержит элементов';
+        }
+
+        return $this->getWrappedCondition()->why($pageObject->getFirstElement(), $actualValue);
+    }
+
+    public function getWrappedCondition() : AbstractCondition
+    {
+        return $this->condition;
     }
 }

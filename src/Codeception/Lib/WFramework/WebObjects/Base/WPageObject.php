@@ -7,6 +7,10 @@ namespace Codeception\Lib\WFramework\WebObjects\Base;
 use Codeception\Actor;
 use Codeception\Lib\WFramework\Actor\ImaginaryActor;
 use Codeception\Lib\WFramework\Conditions\LikeBefore;
+use Codeception\Lib\WFramework\Conditions\Text;
+use Codeception\Lib\WFramework\Conditions\TextContains;
+use Codeception\Lib\WFramework\Conditions\Value;
+use Codeception\Lib\WFramework\Conditions\ValueContains;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
@@ -212,6 +216,54 @@ abstract class WPageObject extends Composite implements IPageObject
     }
 
     /**
+     * Скроллит экран к элементу
+     *
+     * @return $this
+     * @throws UsageException
+     */
+    public function scrollTo()
+    {
+        $this->accept(new MouseScrollTo());
+
+        return $this;
+    }
+
+    /**
+     * @param PageObjectVisitor $visitor
+     * @return mixed
+     */
+    public function accept($visitor)
+    {
+        WLogger::logDebug($this . ' -> ' . $visitor->getName());
+
+        return parent::accept($visitor);
+    }
+
+    public function getTimeout() : int
+    {
+        return (int) TestProperties::getValue('elementTimeout');
+    }
+
+    /**
+     * @return EmptyComposite|WPageObject
+     * @throws UsageException
+     */
+    public function getParent()
+    {
+        $parent = parent::getParent();
+
+        if (!$parent instanceof EmptyComposite && !$parent instanceof WPageObject)
+        {
+            throw new UsageException($this . ' -> родителем WPageObject должен быть другой WPageObject или EmptyComposite');
+        }
+
+        return $parent;
+    }
+
+
+
+
+    /**
      * Возвращает видимый текст PageObject'а
      *
      * В корне этого метода лежит дефолтный метод Селениума: getText()
@@ -258,18 +310,8 @@ abstract class WPageObject extends Composite implements IPageObject
         return $result;
     }
 
-    /**
-     * Скроллит экран к элементу
-     *
-     * @return $this
-     * @throws UsageException
-     */
-    public function scrollTo()
-    {
-        $this->accept(new MouseScrollTo());
 
-        return $this;
-    }
+
 
     /**
      * PageObject должен выглядеть, как сохранённый эталон.
@@ -423,66 +465,72 @@ abstract class WPageObject extends Composite implements IPageObject
         return $this->is(new LikeBefore($suffix, $waitClosure));
     }
 
-    /**
-     * @param PageObjectVisitor $visitor
-     * @return mixed
-     */
-    public function accept($visitor)
+
+
+
+    public function shouldHaveText(string $text)
     {
-        $logMessage = $this . ' -> ' . $visitor->getName();
-
-        $calledFromVisitor = static function ()
-        {
-            $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 8);
-            array_shift($backtrace);
-            array_shift($backtrace);
-
-            foreach ($backtrace as $trace)
-            {
-                if (!isset($trace['function']))
-                {
-                    continue;
-                }
-
-                if ($trace['function'] === 'accept')
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        };
-
-        if ($calledFromVisitor())
-        {
-            WLogger::logDebug($logMessage);
-        }
-        else
-        {
-            WLogger::logInfo($logMessage);
-        }
-
-        return parent::accept($visitor);
+        return $this->should(new Text($text), false);
     }
 
-    public function getTimeout() : int
+    public function shouldContainText(string $text)
     {
-        return (int) TestProperties::getValue('elementTimeout');
+        return $this->should(new TextContains($text), false);
     }
 
-    /**
-     * @return EmptyComposite|WPageObject
-     * @throws UsageException
-     */
-    public function getParent()
+    public function shouldHaveValue(string $value)
     {
-        $parent = parent::getParent();
+        return $this->should(new Value($value), false);
+    }
 
-        if (!$parent instanceof EmptyComposite && !$parent instanceof WPageObject)
-        {
-            throw new UsageException($this . ' -> родителем WPageObject должен быть другой WPageObject или EmptyComposite');
-        }
+    public function shouldContainValue(string $value)
+    {
+        return $this->should(new ValueContains($value), false);
+    }
 
-        return $parent;
+
+
+
+    public function finallyHaveText(string $text) : bool
+    {
+        return $this->finally_(new Text($text), false);
+    }
+
+    public function finallyContainText(string $text) : bool
+    {
+        return $this->finally_(new TextContains($text), false);
+    }
+
+    public function finallyHaveValue(string $value) : bool
+    {
+        return $this->finally_(new Value($value), false);
+    }
+
+    public function finallyContainValue(string $value) : bool
+    {
+        return $this->finally_(new ValueContains($value), false);
+    }
+
+
+
+
+    public function isHaveText(string $text) : bool
+    {
+        return $this->is(new Text($text), false);
+    }
+
+    public function isContainText(string $text) : bool
+    {
+        return $this->is(new TextContains($text), false);
+    }
+
+    public function isHaveValue(string $value) : bool
+    {
+        return $this->is(new Value($value), false);
+    }
+
+    public function isContainValue(string $value) : bool
+    {
+        return $this->is(new ValueContains($value), false);
     }
 }

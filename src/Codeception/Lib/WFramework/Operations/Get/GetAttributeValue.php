@@ -12,7 +12,7 @@ use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use Ds\Sequence;
 
-class GetAttribute extends AbstractOperation
+class GetAttributeValue extends AbstractOperation
 {
     public function getName() : string
     {

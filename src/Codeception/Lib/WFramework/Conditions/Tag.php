@@ -12,16 +12,21 @@ class Tag extends AbstractCondition
     /**
      * @var string
      */
-    protected $tagName;
+    public $expected;
+
+    /**
+     * @var string
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "имеет тэг '$this->tagName'?";
+        return "содержит тэг '$this->expected'?";
     }
 
-    public function __construct(string $tagName)
+    public function __construct(string $name)
     {
-        $this->tagName = $tagName;
+        $this->expected = $name;
     }
 
     public function acceptWBlock($block) : bool
@@ -46,6 +51,8 @@ class Tag extends AbstractCondition
 
     protected function apply(WPageObject $pageObject) : bool
     {
-        return $pageObject->accept(new GetTagName()) === $this->tagName;
+        $this->actual = $pageObject->accept(new GetTagName());
+
+        return $this->actual === $this->expected;
     }
 }

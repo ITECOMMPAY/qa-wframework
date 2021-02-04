@@ -4,9 +4,10 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
+use Codeception\Lib\WFramework\Conditions\Interfaces\IWrapOtherCondition;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 
-class Because_ extends AbstractCondition
+class Because_ extends AbstractCondition implements IWrapOtherCondition
 {
     /**
      * @var AbstractCondition
@@ -49,8 +50,8 @@ class Because_ extends AbstractCondition
         return $pageObject->accept($this->condition);
     }
 
-    public function getExplanationClasses() : array
+    public function getWrappedCondition() : AbstractCondition
     {
-        return $this->condition->getExplanationClasses();
+        return $this->condition;
     }
 }

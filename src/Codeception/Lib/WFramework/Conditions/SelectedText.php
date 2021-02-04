@@ -14,18 +14,23 @@ class SelectedText extends AbstractCondition
     /**
      * @var string
      */
-    protected $expectedValue;
+    public $expected;
+
+    /**
+     * @var string
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "выделенный текст соответствует '" . $this->expectedValue . "'? (без учёта регистра и пробелов)";
+        return "содержит выделенный текст '" . $this->expected . "'? (без учёта регистра и пробелов)";
     }
 
-    public function __construct(string $expectedText)
+    public function __construct(string $text)
     {
-        $this->expectedValue = strtolower(
+        $this->expected = strtolower(
                                         trim(
-                                            preg_replace(static::BLANK, ' ', $expectedText)));
+                                            preg_replace(static::BLANK, ' ', $text)));
     }
 
     public function acceptWBlock($block) : bool
@@ -42,9 +47,11 @@ class SelectedText extends AbstractCondition
     {
         $selectedText = $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_SELECTED_TEXT));
 
-        return $this->expectedValue === strtolower(
-                                                trim(
-                                                    preg_replace(static::BLANK, ' ', $selectedText)));
+        $this->actual = strtolower(
+                                trim(
+                                    preg_replace(static::BLANK, ' ', $selectedText)));
+
+        return $this->actual === $this->expected;
     }
 
     protected const SCRIPT_SELECTED_TEXT = "return arguments[0].value.substring(arguments[0].selectionStart, arguments[0].selectionEnd);";

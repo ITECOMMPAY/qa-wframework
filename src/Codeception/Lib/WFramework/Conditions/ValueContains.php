@@ -14,18 +14,28 @@ class ValueContains extends AbstractCondition
     /**
      * @var string
      */
-    protected $expectedValue;
+    public $expected;
+
+    /**
+     * @var string
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "значение свойства value содержит '" . $this->expectedValue . "'? (без учёта регистра и пробелов)";
+        return "содержит свойство value с подстрокой '" . $this->expected . "'? (без учёта регистра и пробелов)";
     }
 
     public function __construct(string $expectedValue)
     {
-        $this->expectedValue = strtolower(
+        $this->expected = strtolower(
                                         trim(
                                             preg_replace(static::BLANK, ' ', $expectedValue)));
+    }
+
+    public function getExpected() : string
+    {
+        return $this->expected;
     }
 
     public function acceptWBlock($block) : bool
@@ -38,22 +48,12 @@ class ValueContains extends AbstractCondition
         return $this->apply($element);
     }
 
-    public function acceptWCollection($collection) : bool
-    {
-        if ($collection->isEmpty())
-        {
-            return false;
-        }
-
-        return $this->apply($collection->getFirstElement());
-    }
-
     protected function apply(WPageObject $pageObject) : bool
     {
-        $actualValue = strtolower(
+        $this->actual = strtolower(
                                 trim(
                                     preg_replace(static::BLANK, ' ', $pageObject->accept(new GetValue()))));
 
-        return false !== strpos($actualValue, $this->expectedValue);
+        return false !== strpos($this->actual, $this->expected);
     }
 }

@@ -4,8 +4,9 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
-use Codeception\Lib\WFramework\Operations\Get\GetCssValue;
+use Codeception\Lib\WFramework\Operations\Get\GetCssMap;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
+use Ds\Map;
 
 class CssPropertyWithValue extends AbstractCondition
 {
@@ -19,19 +20,24 @@ class CssPropertyWithValue extends AbstractCondition
     /**
      * @var string
      */
-    protected $expectedValue;
+    public $expected;
+
+    /**
+     * @var Map
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "CSS свойство '$this->property' имеет значение '$this->expectedValue'?";
+        return "содержит CSS свойство '$this->property' со значением '$this->expected'?";
     }
 
-    public function __construct(string $property, string $expectedValue)
+    public function __construct(string $property, string $value)
     {
         $this->property = $property;
-        $this->expectedValue = strtolower(
+        $this->expected = strtolower(
                                         trim(
-                                            preg_replace(static::BLANK, ' ', $expectedValue)));
+                                            preg_replace(static::BLANK, ' ', $value)));
     }
 
     public function acceptWBlock($block) : bool
@@ -56,8 +62,17 @@ class CssPropertyWithValue extends AbstractCondition
 
     protected function apply(WPageObject $pageObject) : bool
     {
-        return $this->expectedValue === strtolower(
+        $this->actual = $pageObject->accept(new GetCssMap());
+
+        if (!$this->actual->hasKey($this->property))
+        {
+            return false;
+        }
+
+        $this->actual = $this->actual->get($this->property);
+
+        return $this->expected === strtolower(
                                                 trim(
-                                                    preg_replace(static::BLANK, ' ', $pageObject->accept(new GetCssValue($this->property)))));
+                                                    preg_replace(static::BLANK, ' ',  $this->actual)));
     }
 }

@@ -4,13 +4,13 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
+use Codeception\Lib\WFramework\Conditions\Interfaces\IWrapOtherCondition;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
-use Codeception\Lib\WFramework\Explanations\EmptyExplanation;
+use Codeception\Lib\WFramework\Explanations\DefaultExplanation;
 use Codeception\Lib\WFramework\Explanations\Formatters\DefaultExplanationResultFormatter;
 use Codeception\Lib\WFramework\Explanations\Result\AbstractExplanationResult;
 use Codeception\Lib\WFramework\Explanations\Result\ExplanationResultAggregate;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
-use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -32,7 +32,7 @@ abstract class AbstractCondition extends PageObjectVisitor
      */
     protected function getExplanationClasses() : array
     {
-        return [EmptyExplanation::class];
+        return [DefaultExplanation::class];
     }
 
     /**
@@ -44,11 +44,18 @@ abstract class AbstractCondition extends PageObjectVisitor
      */
     public function why(IPageObject $pageObject, bool $actualValue = false) : string
     {
-        $resultAggregate = new ExplanationResultAggregate($pageObject, $this, $actualValue);
+        $condition = $this;
 
-        foreach ($this->getExplanationClasses() as $explanationClass)
+        if ($this instanceof IWrapOtherCondition)
         {
-            $explanationResult = $pageObject->accept(new $explanationClass($this, $actualValue));
+            $condition = $this->getWrappedCondition();
+        }
+
+        $resultAggregate = new ExplanationResultAggregate($pageObject, $condition, $actualValue);
+
+        foreach ($condition->getExplanationClasses() as $explanationClass)
+        {
+            $explanationResult = $pageObject->accept(new $explanationClass($condition, $actualValue));
 
             if (!$explanationResult instanceof AbstractExplanationResult)
             {

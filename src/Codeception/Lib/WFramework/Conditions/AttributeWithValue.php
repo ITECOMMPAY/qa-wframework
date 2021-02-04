@@ -4,30 +4,36 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
-use Codeception\Lib\WFramework\Operations\Get\GetAttribute;
+use Codeception\Lib\WFramework\Operations\Get\GetAttributesMap;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
+use Ds\Map;
 
 class AttributeWithValue extends AbstractCondition
 {
     /**
      * @var string
      */
-    protected $attributeName;
+    protected $attribute;
 
     /**
      * @var string
      */
-    protected $expectedValue;
+    public $expected;
+
+    /**
+     * @var Map
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "атрибут '$this->attributeName' имеет значение '$this->expectedValue'?";
+        return "содержит атрибут '$this->attribute' со значением '$this->expected'?";
     }
 
-    public function __construct(string $attributeName, string $expectedValue)
+    public function __construct(string $attribute, string $value)
     {
-        $this->attributeName = $attributeName;
-        $this->expectedValue = $expectedValue;
+        $this->attribute = $attribute;
+        $this->expected = $value;
     }
 
     public function acceptWBlock($block) : bool
@@ -52,6 +58,15 @@ class AttributeWithValue extends AbstractCondition
 
     protected function apply(WPageObject $pageObject) : bool
     {
-        return $this->expectedValue === $pageObject->accept(new GetAttribute($this->attributeName));
+        $this->actual = $pageObject->accept(new GetAttributesMap);
+
+        if (!$this->actual->hasKey($this->attribute))
+        {
+            return false;
+        }
+
+        $this->actual = $this->actual->get($this->attribute);
+
+        return $this->actual === $this->expected;
     }
 }

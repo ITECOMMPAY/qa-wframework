@@ -14,6 +14,11 @@ use Codeception\Lib\WFramework\Conditions\CountEmpty;
 use Codeception\Lib\WFramework\Conditions\CountEquals;
 use Codeception\Lib\WFramework\Conditions\CountGreaterThanOrEqual;
 use Codeception\Lib\WFramework\Conditions\CountLessThanOrEqual;
+use Codeception\Lib\WFramework\Conditions\SomeElement_;
+use Codeception\Lib\WFramework\Conditions\Text;
+use Codeception\Lib\WFramework\Conditions\TextContains;
+use Codeception\Lib\WFramework\Conditions\Value;
+use Codeception\Lib\WFramework\Conditions\ValueContains;
 use Codeception\Lib\WFramework\Operations\Get\GetTextRaw;
 use Codeception\Lib\WFramework\Operations\Get\GetText;
 use Codeception\Lib\WFramework\Operations\Get\GetValue;
@@ -457,6 +462,84 @@ abstract class WCollection extends Composite implements IPageObject
     }
 
     /**
+     * @return EmptyComposite|WPageObject
+     * @throws UsageException
+     */
+    public function getParent()
+    {
+        $parent = parent::getParent();
+
+        if (!$parent instanceof EmptyComposite && !$parent instanceof WPageObject)
+        {
+            throw new UsageException($this . ' -> родителем WCollection должен быть наследник WPageObject или EmptyComposite');
+        }
+
+        return $parent;
+    }
+
+    public function getTimeout() : int
+    {
+        return (int) TestProperties::getValue('collectionTimeout');
+    }
+
+
+
+
+    /**
+     * Возвращает массив видимых текстов всех элементов коллекции
+     * @return Sequence
+     */
+    public function getVisibleTexts() : Sequence
+    {
+        WLogger::logInfo($this . " -> получаем видимые тексты всех элементов коллекции");
+
+        /** @var Sequence $result */
+        $result = $this->accept(new GetText());
+
+        $texts = implode(', ', $result->toArray());
+
+        WLogger::logInfo($this . " -> имеет видимые тексты: '$texts'");
+
+        return $result;
+    }
+
+    /**
+     * Возвращает массив сырых текстов (включая невидимые тексты) всех элементов коллекции
+     *
+     * @return Sequence
+     */
+    public function getAllTexts() : Sequence
+    {
+        WLogger::logInfo($this . " -> получаем все тексты (включая невидимые) всех элементов коллекции");
+
+        /** @var Sequence $result */
+        $result = $this->accept(new GetTextRaw());
+
+        $texts = implode(', ', $result->toArray());
+
+        WLogger::logInfo($this . " -> имеет все тексты: '$texts'");
+
+        return $result;
+    }
+
+    public function getValues() : Sequence
+    {
+        WLogger::logInfo($this . " -> получаем значение атрибута value всех элементов коллекции");
+
+        /** @var Sequence $result */
+        $result = $this->accept(new GetValue());
+
+        $values = implode(', ', $result->toArray());
+
+        WLogger::logInfo($this . " -> имеет значения: '$values'");
+
+        return $result;
+    }
+
+
+
+
+    /**
      * Коллеция должна содержать >= заданного числа элементов.
      *
      * Если условие не будет выполнено в течении заданного таймаута (collectionTimeout) - валит тест.
@@ -564,75 +647,72 @@ abstract class WCollection extends Composite implements IPageObject
         return $this->is(new CountLessThanOrEqual($size), false);
     }
 
-    /**
-     * Возвращает массив видимых текстов всех элементов коллекции
-     * @return Sequence
-     */
-    public function getVisibleTexts() : Sequence
+
+
+
+    public function shouldHaveText(string $text)
     {
-        WLogger::logInfo($this . " -> получаем видимые тексты всех элементов коллекции");
-
-        /** @var Sequence $result */
-        $result = $this->accept(new GetText());
-
-        $texts = implode(', ', $result->toArray());
-
-        WLogger::logInfo($this . " -> имеет видимые тексты: '$texts'");
-
-        return $result;
+        return $this->should(new SomeElement_(new Text($text)), false);
     }
 
-    /**
-     * Возвращает массив сырых текстов (включая невидимые тексты) всех элементов коллекции
-     *
-     * @return Sequence
-     */
-    public function getAllTexts() : Sequence
+    public function shouldContainText(string $text)
     {
-        WLogger::logInfo($this . " -> получаем все тексты (включая невидимые) всех элементов коллекции");
-
-        /** @var Sequence $result */
-        $result = $this->accept(new GetTextRaw());
-
-        $texts = implode(', ', $result->toArray());
-
-        WLogger::logInfo($this . " -> имеет все тексты: '$texts'");
-
-        return $result;
+        return $this->should(new SomeElement_(new TextContains($text)), false);
     }
 
-    public function getValues() : Sequence
+    public function shouldHaveValue(string $value)
     {
-        WLogger::logInfo($this . " -> получаем значение атрибута value всех элементов коллекции");
-
-        /** @var Sequence $result */
-        $result = $this->accept(new GetValue());
-
-        $values = implode(', ', $result->toArray());
-
-        WLogger::logInfo($this . " -> имеет значения: '$values'");
-
-        return $result;
+        return $this->should(new SomeElement_(new Value($value)), false);
     }
 
-    /**
-     * @return EmptyComposite|WPageObject
-     * @throws UsageException
-     */
-    public function getParent()
+    public function shouldContainValue(string $value)
     {
-        $parent = parent::getParent();
-
-        if (!$parent instanceof EmptyComposite && !$parent instanceof WPageObject)
-        {
-            throw new UsageException($this . ' -> родителем WCollection должен быть наследник WPageObject или EmptyComposite');
-        }
-
-        return $parent;
+        return $this->should(new SomeElement_(new ValueContains($value)), false);
     }
 
-    public function getTimeout() : int
+
+
+
+    public function finallyHaveText(string $text) : bool
     {
-        return (int) TestProperties::getValue('collectionTimeout');
+        return $this->finally_(new SomeElement_(new Text($text)), false);
+    }
+
+    public function finallyContainText(string $text) : bool
+    {
+        return $this->finally_(new SomeElement_(new TextContains($text)), false);
+    }
+
+    public function finallyHaveValue(string $value) : bool
+    {
+        return $this->finally_(new SomeElement_(new Value($value)), false);
+    }
+
+    public function finallyContainValue(string $value) : bool
+    {
+        return $this->finally_(new SomeElement_(new ValueContains($value)), false);
+    }
+
+
+
+
+    public function isHaveText(string $text) : bool
+    {
+        return $this->is(new SomeElement_(new Text($text)), false);
+    }
+
+    public function isContainText(string $text) : bool
+    {
+        return $this->is(new SomeElement_(new TextContains($text)), false);
+    }
+
+    public function isHaveValue(string $value) : bool
+    {
+        return $this->is(new SomeElement_(new Value($value)), false);
+    }
+
+    public function isContainValue(string $value) : bool
+    {
+        return $this->is(new SomeElement_(new ValueContains($value)), false);
     }
 }

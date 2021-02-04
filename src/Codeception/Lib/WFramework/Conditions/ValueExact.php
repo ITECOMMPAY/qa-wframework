@@ -12,16 +12,21 @@ class ValueExact extends AbstractCondition
     /**
      * @var string
      */
-    protected $expectedValue;
+    public $expected;
+
+    /**
+     * @var string
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "значение свойства value точно соответствует '" . $this->expectedValue . "'?";
+        return "содержит свойство value с точным значением '" . $this->expected . "'?";
     }
 
     public function __construct(string $expectedValue)
     {
-        $this->expectedValue = $expectedValue;
+        $this->expected = $expectedValue;
     }
 
     public function acceptWBlock($block) : bool
@@ -34,18 +39,10 @@ class ValueExact extends AbstractCondition
         return $this->apply($element);
     }
 
-    public function acceptWCollection($collection) : bool
-    {
-        if ($collection->isEmpty())
-        {
-            return false;
-        }
-
-        return $this->apply($collection->getFirstElement());
-    }
-
     protected function apply(WPageObject $pageObject) : bool
     {
-        return $this->expectedValue === $pageObject->accept(new GetValue());
+        $this->actual = $pageObject->accept(new GetValue());
+
+        return $this->actual === $this->expected;
     }
 }

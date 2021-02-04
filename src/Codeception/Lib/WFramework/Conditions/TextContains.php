@@ -14,16 +14,21 @@ class TextContains extends AbstractCondition
     /**
      * @var string
      */
-    protected $expectedValue;
+    public $expected;
+
+    /**
+     * @var string
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "видимый текст содержит '" . $this->expectedValue . "'? (без учёта регистра и пробелов)";
+        return "содержит видимый текст с подстрокой '" . $this->expected . "'? (без учёта регистра и пробелов)";
     }
 
     public function __construct(string $expectedText)
     {
-        $this->expectedValue = strtolower(
+        $this->expected = strtolower(
                                         trim(
                                             preg_replace(static::BLANK, ' ', $expectedText)));
     }
@@ -38,22 +43,12 @@ class TextContains extends AbstractCondition
         return $this->apply($element);
     }
 
-    public function acceptWCollection($collection) : bool
-    {
-        if ($collection->isEmpty())
-        {
-            return false;
-        }
-
-        return $this->apply($collection->getFirstElement());
-    }
-
     protected function apply(WPageObject $pageObject) : bool
     {
-        $actualValue = strtolower(
+        $this->actual = strtolower(
                                 trim(
                                     preg_replace(static::BLANK, ' ', $pageObject->accept(new GetText()))));
 
-        return false !== strpos($actualValue, $this->expectedValue);
+        return false !== strpos($this->actual, $this->expected);
     }
 }

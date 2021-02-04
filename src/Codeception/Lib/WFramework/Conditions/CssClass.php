@@ -4,7 +4,7 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
-use Codeception\Lib\WFramework\Operations\Get\GetAttribute;
+use Codeception\Lib\WFramework\Operations\Get\GetAttributeValue;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
 class CssClass extends AbstractCondition
@@ -12,16 +12,21 @@ class CssClass extends AbstractCondition
     /**
      * @var string
      */
-    protected $className;
+    public $expected;
+
+    /**
+     * @var array
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "CSS класс '$this->className' присутствует?";
+        return "содержит CSS класс '$this->expected'?";
     }
 
-    public function __construct(string $className)
+    public function __construct(string $name)
     {
-        $this->className = $className;
+        $this->expected = $name;
     }
 
     public function acceptWBlock($block) : bool
@@ -46,10 +51,10 @@ class CssClass extends AbstractCondition
 
     protected function apply(WPageObject $pageObject) : bool
     {
-        $classes = $pageObject->accept(new GetAttribute('class')) ?? '';
+        $classes = $pageObject->accept(new GetAttributeValue('class')) ?? '';
 
-        $classes = explode(' ', $classes);
+        $this->actual = explode(' ', $classes);
 
-        return in_array($this->className, $classes, true);
+        return in_array($this->expected, $this->actual, true);
     }
 }

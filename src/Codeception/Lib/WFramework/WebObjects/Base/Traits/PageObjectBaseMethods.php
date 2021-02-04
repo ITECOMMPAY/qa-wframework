@@ -211,25 +211,7 @@ trait PageObjectBaseMethods
         return $this->should(new Not_(new FullyVisible()), $deep);
     }
 
-    public function shouldHaveText(string $text)
-    {
-        return $this->should(new Text($text), false);
-    }
 
-    public function shouldContainText(string $text)
-    {
-        return $this->should(new TextContains($text), false);
-    }
-
-    public function shouldHaveValue(string $value)
-    {
-        return $this->should(new Value($value), false);
-    }
-
-    public function shouldContainValue(string $value)
-    {
-        return $this->should(new ValueContains($value), false);
-    }
 
 
     public function finallyExist(bool $deep = true) : bool
@@ -272,25 +254,7 @@ trait PageObjectBaseMethods
         return $this->finally_(new Not_(new FullyVisible()), $deep);
     }
 
-    public function finallyHaveText(string $text) : bool
-    {
-        return $this->finally_(new Text($text), false);
-    }
 
-    public function finallyContainText(string $text) : bool
-    {
-        return $this->finally_(new TextContains($text), false);
-    }
-
-    public function finallyHaveValue(string $value) : bool
-    {
-        return $this->finally_(new Value($value), false);
-    }
-
-    public function finallyContainValue(string $value) : bool
-    {
-        return $this->finally_(new ValueContains($value), false);
-    }
 
 
     public function isExist(bool $deep = true) : bool
@@ -331,25 +295,5 @@ trait PageObjectBaseMethods
     public function isOutOfViewport(bool $deep = true) : bool
     {
         return $this->is(new Not_(new FullyVisible()), $deep);
-    }
-
-    public function isHaveText(string $text) : bool
-    {
-        return $this->is(new Text($text), false);
-    }
-
-    public function isContainText(string $text) : bool
-    {
-        return $this->is(new TextContains($text), false);
-    }
-
-    public function isHaveValue(string $value) : bool
-    {
-        return $this->is(new Value($value), false);
-    }
-
-    public function isContainValue(string $value) : bool
-    {
-        return $this->is(new ValueContains($value), false);
     }
 }

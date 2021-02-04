@@ -245,7 +245,7 @@ class Log
     {
         if ($this->debug)
         {
-            echo preg_replace('/^/m', '        ', $message) . PHP_EOL;
+            echo  '        ' . $message . PHP_EOL;
         }
 
         if ($this->debug)
@@ -268,7 +268,7 @@ class Log
     {
         if ($this->debug)
         {
-            echo preg_replace('/^/m', '                ', $message) . PHP_EOL;
+            echo '                ' . $message . PHP_EOL;
         }
 
         $this->logger->debug($message, $context);

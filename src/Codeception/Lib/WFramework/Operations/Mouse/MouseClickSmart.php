@@ -6,7 +6,7 @@ namespace Codeception\Lib\WFramework\Operations\Mouse;
 
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
-use Codeception\Lib\WFramework\Operations\Get\GetAttribute;
+use Codeception\Lib\WFramework\Operations\Get\GetAttributeValue;
 use Codeception\Lib\WFramework\Operations\Get\GetTagName;
 use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
@@ -80,7 +80,7 @@ class MouseClickSmart extends AbstractOperation
 
         if (!$clickOnHref)
         {
-            $href = $pageObject->accept(new GetAttribute('href'));
+            $href = $pageObject->accept(new GetAttributeValue('href'));
 
             if ($href !== null)
             {
@@ -95,7 +95,7 @@ class MouseClickSmart extends AbstractOperation
             }
         }
 
-        $innerHtml = $pageObject->accept(new GetAttribute('innerHTML'));
+        $innerHtml = $pageObject->accept(new GetAttributeValue('innerHTML'));
 
         if (preg_match('%<a\s+\X*\s+href=\X*<\/a>%iUu', $innerHtml, $matches))
         {

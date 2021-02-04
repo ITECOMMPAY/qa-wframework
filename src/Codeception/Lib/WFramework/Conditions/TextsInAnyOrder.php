@@ -4,46 +4,57 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
+use Codeception\Lib\WFramework\Operations\Get\GetText;
+
 class TextsInAnyOrder extends AbstractCondition
 {
     /**
      * @var string[]
      */
-    protected $texts;
+    public $expected;
+
+    /**
+     * @var string[]
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "содержит строки: " . implode(', ', $this->texts) . " (без учёта регистра и пробелов) - в произвольном порядке?";
+        return "содержит строки: " . implode(', ', $this->expected) . " (без учёта регистра и пробелов) - в произвольном порядке?";
     }
 
     public function __construct(string ...$texts)
     {
-        $this->texts = array_values($texts);
+        $this->expected = array_values($texts);
     }
 
     public function acceptWCollection($collection) : bool
     {
         $elements = $collection->getElementsArray();
 
-        if ($elements->count() < count($this->texts))
+        $this->actual = $collection->accept(new GetText());
+
+        if ($elements->count() < count($this->expected))
         {
             return false;
         }
 
+        $remainingTexts = $this->expected;
+
         foreach ($elements as $element)
         {
-            foreach ($this->texts as $index => $text)
+            foreach ($this->expected as $index => $text)
             {
                 if (!$element->accept(new Text($text)))
                 {
                     continue;
                 }
 
-                unset($this->texts[$index]);
+                unset($remainingTexts[$index]);
                 break;
             }
         }
 
-        return empty($this->texts);
+        return empty($remainingTexts);
     }
 }

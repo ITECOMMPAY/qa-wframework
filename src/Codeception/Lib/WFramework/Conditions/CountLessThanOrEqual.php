@@ -9,20 +9,27 @@ class CountLessThanOrEqual extends AbstractCondition
     /**
      * @var int
      */
-    protected $size;
+    public $expected;
+
+    /**
+     * @var int
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "содержит меньше или равно '$this->size' элементов?";
+        return "содержит меньше или равно '$this->expected' элементов?";
     }
 
-    public function __construct(int $size)
+    public function __construct(int $count)
     {
-        $this->size = $size;
+        $this->expected = $count;
     }
 
     public function acceptWCollection($collection) : bool
     {
-        return $collection->getElementsArray()->count() <= $this->size;
+        $this->actual = $collection->getElementsArray()->count();
+
+        return $this->actual <= $this->expected;
     }
 }

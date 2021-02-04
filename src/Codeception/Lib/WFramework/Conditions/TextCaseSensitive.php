@@ -14,16 +14,21 @@ class TextCaseSensitive extends AbstractCondition
     /**
      * @var string
      */
-    protected $expectedValue;
+    public $expected;
+
+    /**
+     * @var string
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "видимый текст соответствует '" . $this->expectedValue . "'? (с учётом регистра, без учёта пробелов)";
+        return "содержит видимый текст '" . $this->expected . "'? (с учётом регистра, без учёта пробелов)";
     }
 
     public function __construct(string $expectedText)
     {
-        $this->expectedValue = trim(preg_replace(static::BLANK, ' ', $expectedText));
+        $this->expected = trim(preg_replace(static::BLANK, ' ', $expectedText));
     }
 
     public function acceptWBlock($block) : bool
@@ -36,18 +41,12 @@ class TextCaseSensitive extends AbstractCondition
         return $this->apply($element);
     }
 
-    public function acceptWCollection($collection) : bool
-    {
-        if ($collection->isEmpty())
-        {
-            return false;
-        }
-
-        return $this->apply($collection->getFirstElement());
-    }
-
     protected function apply(WPageObject $pageObject) : bool
     {
-        return $this->expectedValue === trim(preg_replace(static::BLANK, ' ', $pageObject->accept(new GetText())));
+        $actualText = $pageObject->accept(new GetText());
+
+        $this->actual = trim(preg_replace(static::BLANK, ' ', $actualText));
+
+        return $this->actual === $this->expected;
     }
 }

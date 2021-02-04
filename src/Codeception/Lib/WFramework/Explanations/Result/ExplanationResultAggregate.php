@@ -22,13 +22,13 @@ class ExplanationResultAggregate extends AbstractExplanationResult
      */
     protected $actualResult;
 
-    public function __construct(IPageObject $pageObject, AbstractCondition $condition, bool $actualResult)
+    public function __construct(IPageObject $pageObject, AbstractCondition $condition, bool $actualValue)
     {
         parent::__construct();
 
         $this->pageObject = $pageObject;
         $this->condition = $condition;
-        $this->actualResult = $actualResult;
+        $this->actualResult = $actualValue;
     }
 
 

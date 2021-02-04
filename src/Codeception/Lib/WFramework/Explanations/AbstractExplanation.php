@@ -7,13 +7,16 @@ namespace Codeception\Lib\WFramework\Explanations;
 use Codeception\Lib\WFramework\Conditions\AbstractCondition;
 use Codeception\Lib\WFramework\Explanations\Result\AbstractExplanationResult;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
+use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
+use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 
 /**
  * Class AbstractExplanation
  *
- * @method AbstractExplanationResult acceptWElement($element)
- * @method AbstractExplanationResult acceptWBlock($block)
- * @method AbstractExplanationResult acceptWCollection($collection)
+ * @method AbstractExplanationResult acceptWElement(WElement $element)
+ * @method AbstractExplanationResult acceptWBlock(WBlock $block)
+ * @method AbstractExplanationResult acceptWCollection(WCollection $collection)
  *
  * @package Codeception\Lib\WFramework\Explanations
  */
@@ -27,12 +30,12 @@ abstract class AbstractExplanation extends PageObjectVisitor
     /**
      * @var bool
      */
-    protected $actualValue;
+    protected $conditionResult;
 
-    public function __construct(AbstractCondition $condition, bool $actualValue = true)
+    public function __construct(AbstractCondition $condition, bool $conditionResult = true)
     {
         $this->condition = $condition;
-        $this->actualValue = $actualValue;
+        $this->conditionResult = $conditionResult;
     }
 
     //Диагностика всегда возвращает AbstractExplanationResult с описанием проблемы

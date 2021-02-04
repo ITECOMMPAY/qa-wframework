@@ -4,9 +4,10 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
+use Codeception\Lib\WFramework\Conditions\Interfaces\IWrapOtherCondition;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 
-class And_ extends AbstractCondition
+class And_ extends AbstractCondition implements IWrapOtherCondition
 {
     /**
      * @var AbstractCondition[]
@@ -49,8 +50,8 @@ class And_ extends AbstractCondition
         return true;
     }
 
-    public function getExplanationClasses() : array
+    public function getWrappedCondition() : AbstractCondition
     {
-        return $this->firstFailedCondition->getExplanationClasses();
+        return $this->firstFailedCondition ?? reset($this->conditions);
     }
 }

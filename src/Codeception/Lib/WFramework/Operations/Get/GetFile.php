@@ -55,7 +55,7 @@ class GetFile extends AbstractOperation
          * ...
          */
 
-        $innerHtml = $pageObject->accept(new GetAttribute('innerHTML'));
+        $innerHtml = $pageObject->accept(new GetAttributeValue('innerHTML'));
 
         if (preg_match('%<a\s+\X*\s+href=\X*<\/a>%iUu', $innerHtml, $matches))
         {
@@ -71,7 +71,7 @@ class GetFile extends AbstractOperation
             $pageObject = $button;
         }
 
-        $url = $pageObject->accept(new GetAttribute('href'));
+        $url = $pageObject->accept(new GetAttributeValue('href'));
 
         if ($url === null)
         {

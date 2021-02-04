@@ -14,16 +14,21 @@ class Value extends AbstractCondition
     /**
      * @var string
      */
-    protected $expectedValue;
+    public $expected;
+
+    /**
+     * @var string
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "значение свойства value соответствует '" . $this->expectedValue . "'? (без учёта регистра и пробелов)";
+        return "содержит свойство value со значением '" . $this->expected . "'? (без учёта регистра и пробелов)";
     }
 
     public function __construct(string $expectedValue)
     {
-        $this->expectedValue = strtolower(
+        $this->expected = strtolower(
                                         trim(
                                             preg_replace(static::BLANK, ' ', $expectedValue)));
     }
@@ -38,20 +43,14 @@ class Value extends AbstractCondition
         return $this->apply($element);
     }
 
-    public function acceptWCollection($collection) : bool
-    {
-        if ($collection->isEmpty())
-        {
-            return false;
-        }
-
-        return $this->apply($collection->getFirstElement());
-    }
-
     protected function apply(WPageObject $pageObject) : bool
     {
-        return $this->expectedValue === strtolower(
-                                                trim(
-                                                    preg_replace(static::BLANK, ' ', $pageObject->accept(new GetValue()))));
+        $actualValue = $pageObject->accept(new GetValue());
+
+        $this->actual = strtolower(
+                                trim(
+                                    preg_replace(static::BLANK, ' ', $actualValue)));
+
+        return $this->actual === $this->expected;
     }
 }

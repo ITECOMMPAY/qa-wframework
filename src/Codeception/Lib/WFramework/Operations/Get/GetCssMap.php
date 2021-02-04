@@ -10,9 +10,10 @@ use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
+use Ds\Map;
 use Ds\Sequence;
 
-class GetComputedStyle extends AbstractOperation
+class GetCssMap extends AbstractOperation
 {
     public function getName() : string
     {
@@ -35,12 +36,12 @@ class GetComputedStyle extends AbstractOperation
         $this->pseudoElement = $pseudoElement;
     }
 
-    public function acceptWBlock($block) : array
+    public function acceptWBlock($block) : Map
     {
         return $this->apply($block);
     }
 
-    public function acceptWElement($element) : array
+    public function acceptWElement($element) : Map
     {
         return $this->apply($element);
     }
@@ -54,26 +55,18 @@ class GetComputedStyle extends AbstractOperation
         return $collection->getElementsArray()->map([$this, 'apply']);
     }
 
-    protected function apply(WPageObject $pageObject) : array
+    protected function apply(WPageObject $pageObject) : Map
     {
         $element = $pageObject->returnSeleniumElement();
 
-        $computedStyle = $element->executeScriptOnThis(static::SCRIPT_GET_COMPUTED_STYLE, [$this->pseudoElement]);
+        $computedStyles = $element->executeScriptOnThis(static::SCRIPT_GET_COMPUTED_STYLE, [$this->pseudoElement]);
 
-        $result = [];
-
-        foreach ($computedStyle as $entry)
-        {
-            [$key, $value] = $entry;
-            $result[$key] = $value;
-        }
-
-        return $result;
+        return new Map($computedStyles);
     }
 
     protected const SCRIPT_GET_COMPUTED_STYLE = <<<EOF
 function getStyles(element, pseudoElement = null) {
-    var result = [];
+    var result = {};
 
     let styles = window.getComputedStyle(element, pseudoElement);
 
@@ -82,7 +75,7 @@ function getStyles(element, pseudoElement = null) {
             continue;
         }
 
-        result.push([key, value]);
+        result[key] = value;
     }
 
     return result;

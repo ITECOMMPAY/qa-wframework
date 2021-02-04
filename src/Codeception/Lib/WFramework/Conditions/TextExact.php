@@ -12,16 +12,21 @@ class TextExact extends AbstractCondition
     /**
      * @var string
      */
-    protected $expectedValue;
+    public $expected;
+
+    /**
+     * @var string
+     */
+    public $actual;
 
     public function getName() : string
     {
-        return "видимый текст точно соответствует '" . $this->expectedValue . "'?";
+        return "содержит текст который точно соответствует '" . $this->expected . "'?";
     }
 
     public function __construct(string $expectedText)
     {
-        $this->expectedValue = $expectedText;
+        $this->expected = $expectedText;
     }
 
     public function acceptWBlock($block) : bool
@@ -34,18 +39,10 @@ class TextExact extends AbstractCondition
         return $this->apply($element);
     }
 
-    public function acceptWCollection($collection) : bool
-    {
-        if ($collection->isEmpty())
-        {
-            return false;
-        }
-
-        return $this->apply($collection->getFirstElement());
-    }
-
     protected function apply(WPageObject $pageObject) : bool
     {
-        return $this->expectedValue === $pageObject->accept(new GetText());
+        $this->actual = $pageObject->accept(new GetText());
+
+        return $this->actual === $this->expected;
     }
 }
