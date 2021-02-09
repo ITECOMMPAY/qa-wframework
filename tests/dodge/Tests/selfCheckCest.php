@@ -32,7 +32,7 @@ class selfCheckCest
      * Этот тест проверяет, что все локаторы всех PageObject'ов (кроме тех, что указаны в $ignoredPageObjects) - валидные
      * Т.к. он гоняет проверку в один поток - то лучше вместо него использовать параллельный прогон через Robo:
      *
-     * ./vendor/bin/robo --load-from ./tests/dodge/cases/robo/RoboFile.php parallel:self-check
+     * ./vendor/bin/robo --load-from ./tests/dodge/_robo/RoboFile.php parallel:self-check
      *
      * @param DodgeTester $I
      * @param DodgeSteps $steps
@@ -40,7 +40,7 @@ class selfCheckCest
      * @throws \ImagickException
      * @throws \ReflectionException
      */
-    public function selfCheckAll(DodgeTester $I, DodgeSteps $steps)
+    public function checkAll(DodgeTester $I, DodgeSteps $steps)
     {
         $I->wantToTest('Все PageObject\'ы имеют валидные локаторы');
 
@@ -56,7 +56,7 @@ class selfCheckCest
     /**
      * Этот тест проверяет, что локаторы заданного PageObject'а - валидные
      *
-     * ./vendor/bin/codecept run cases selfCheckCest:checkPageObject -c ./tests/dodge --env dodge-loc,dodge-loc-chrome,dodge-loc-1920
+     * ./vendor/bin/codecept run webui selfCheckCest:checkPageObject -c ./tests/dodge --env dodge-loc,dodge-loc-chrome,dodge-loc-1920
      *
      * @param DodgeTester $I
      * @param DodgeSteps $steps

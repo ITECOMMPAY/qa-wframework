@@ -16,7 +16,7 @@ class RoboFile extends \Robo\Tasks
 
         $env = 'dodge-loc,dodge-loc-chrome,dodge-loc-1920';
 
-        $codeceptConfig = realpath(__DIR__ . '/../../codeception.yml');
+        $codeceptConfig = realpath(__DIR__ . '/../codeception.yml');
 
         $config = Yaml::parse(file_get_contents($codeceptConfig));
         $codeceptOutputDir = realpath(dirname($codeceptConfig) . '/' . $config['paths']['output']);
@@ -32,7 +32,7 @@ class RoboFile extends \Robo\Tasks
             $parallel->process(
                 $this->taskCodecept()
                      ->configFile($codeceptConfig)
-                     ->suite('cases')
+                     ->suite('webui')
                      ->env($env)
                      ->group($group)
             );
