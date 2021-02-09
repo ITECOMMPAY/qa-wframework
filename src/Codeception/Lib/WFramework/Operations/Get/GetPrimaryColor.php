@@ -74,7 +74,7 @@ class GetPrimaryColor extends AbstractOperation
 
         $primaryColor = reset($stat);
 
-        WLogger::logDebug('Получили основной цвет: ' . $primaryColor);
+        WLogger::logDebug($this, 'Получили основной цвет: ' . $primaryColor);
 
         return $primaryColor;
     }

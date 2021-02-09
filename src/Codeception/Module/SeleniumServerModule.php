@@ -62,13 +62,13 @@ class SeleniumServerModule extends CodeceptionModule
      */
     public function startSeleniumServer(bool $autoUpdateDrivers = false)
     {
-        WLogger::logDebug('Начинаем настройку и запуск Selenium Server.');
+        WLogger::logNotice($this, 'Начинаем настройку и запуск Selenium Server.');
 
         $this->lock();
 
         if ($this->seleniumIsStarted())
         {
-            WLogger::logDebug('Selenium Server уже запущен.');
+            WLogger::logDebug($this, 'Selenium Server уже запущен.');
             $this->unlock();
             return;
         }
@@ -86,7 +86,7 @@ class SeleniumServerModule extends CodeceptionModule
 
         $cmd = "java -Dwebdriver.chrome.driver=$chromedriverPath -Dwebdriver.gecko.driver=$geckodriverPath -jar $seleniumServerPath -sessionTimeout 7200";
 
-        WLogger::logDebug('Команда для запуска: ' . $cmd);
+        WLogger::logDebug($this, 'Команда для запуска: ' . $cmd);
 
         $this->process = new UnixProcess($cmd); // Symfony/Process убивает Selenium Server при завершении тестов, а нам этого не нужно.
         // Selenium Server должен всегда быть в одном экземпляре.
@@ -179,7 +179,7 @@ class SeleniumServerModule extends CodeceptionModule
             return;
         }
 
-        WLogger::logDebug('Останавливаем Selenium Server.');
+        WLogger::logDebug($this, 'Останавливаем Selenium Server.');
 
         $this->process->stop();
     }
@@ -203,7 +203,7 @@ class SeleniumServerModule extends CodeceptionModule
                 return;
             }
 
-            WLogger::logDebug('Другой экземпляр скрипта пытается настроить и запустить Selenium Server - ждём');
+            WLogger::logDebug($this, 'Другой экземпляр скрипта пытается настроить и запустить Selenium Server - ждём');
             sleep(3);
         }
 
@@ -234,7 +234,7 @@ class SeleniumServerModule extends CodeceptionModule
 
     protected function updateChromeDriver(string $defaultLocalChromedriver) : string
     {
-        WLogger::logDebug('Получаем версию Google Chrome');
+        WLogger::logDebug($this, 'Получаем версию Google Chrome');
 
         if ($this->chromiumIsFromSnap())
         {
@@ -247,27 +247,27 @@ class SeleniumServerModule extends CodeceptionModule
 
         if (empty($chromeVersion))
         {
-            WLogger::logDebug('Не удалось установить версию Google Chrome - используем дефолтный chromedriver');
+            WLogger::logDebug($this, 'Не удалось установить версию Google Chrome - используем дефолтный chromedriver');
             return $defaultLocalChromedriver;
         }
 
-        WLogger::logDebug("Версия Google Chrome: $chromeVersion");
+        WLogger::logDebug($this, "Версия Google Chrome: $chromeVersion");
 
         $currentLocalChromedriver = substr($defaultLocalChromedriver, 0, strlen($defaultLocalChromedriver) - strlen('default')) . $chromeVersion;
 
         if (file_exists($currentLocalChromedriver))
         {
-            WLogger::logDebug('chromedriver уже скачан - используем его');
+            WLogger::logDebug($this, 'chromedriver уже скачан - используем его');
             return $currentLocalChromedriver;
         }
 
-        WLogger::logDebug("Скачиваем chromedriver под Google Chrome $chromeVersion");
+        WLogger::logDebug($this, "Скачиваем chromedriver под Google Chrome $chromeVersion");
 
         $chromedriverVersion = @file_get_contents("https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$chromeVersion");
 
         if ($chromedriverVersion === false)
         {
-            WLogger::logDebug("Не удалось установить версию chromedriver для Google Chrome $chromeVersion - используем дефолтный");
+            WLogger::logDebug($this, "Не удалось установить версию chromedriver для Google Chrome $chromeVersion - используем дефолтный");
             return $defaultLocalChromedriver;
         }
 
@@ -285,13 +285,13 @@ class SeleniumServerModule extends CodeceptionModule
 
         if (!@file_put_contents($zipfile, fopen($url, 'rb')))
         {
-            WLogger::logDebug("Не удалось скачать $url - используем дефолтный chromedriver");
+            WLogger::logDebug($this, "Не удалось скачать $url - используем дефолтный chromedriver");
             return $defaultLocalChromedriver;
         }
 
         if (!copy('zip://' . $zipfile . '#chromedriver', $currentLocalChromedriver))
         {
-            WLogger::logDebug('Не удалось распаковать скачанный chromedriver - используем дефолтный');
+            WLogger::logDebug($this, 'Не удалось распаковать скачанный chromedriver - используем дефолтный');
             return $defaultLocalChromedriver;
         }
 
@@ -323,27 +323,27 @@ class SeleniumServerModule extends CodeceptionModule
 
     protected function updateFirefoxDriver(string $defaultLocalGeckodriver) : string
     {
-        WLogger::logDebug('Получаем версию Firefox');
+        WLogger::logDebug($this, 'Получаем версию Firefox');
 
         $firefoxVersion = $this->getBrowserVersion(['firefox', 'iceweasel'], '--version', '%\s+(\d+).\d+%m');
 
         if (empty($firefoxVersion))
         {
-            WLogger::logDebug('Не удалось установить версию Firefox - используем дефолтный geckodriver');
+            WLogger::logDebug($this, 'Не удалось установить версию Firefox - используем дефолтный geckodriver');
             return $defaultLocalGeckodriver;
         }
 
-        WLogger::logDebug("Версия Firefox: $firefoxVersion");
+        WLogger::logDebug($this, "Версия Firefox: $firefoxVersion");
 
         $currentLocalGeckodriver = substr($defaultLocalGeckodriver, 0, strlen($defaultLocalGeckodriver) - strlen('default')) . $firefoxVersion;
 
         if (file_exists($currentLocalGeckodriver))
         {
-            WLogger::logDebug('geckodriver уже скачан - используем его');
+            WLogger::logDebug($this, 'geckodriver уже скачан - используем его');
             return $currentLocalGeckodriver;
         }
 
-        WLogger::logDebug('Скачиваем последний geckodriver');
+        WLogger::logDebug($this, 'Скачиваем последний geckodriver');
 
         $seleniumBinDir = pathinfo($defaultLocalGeckodriver, PATHINFO_DIRNAME);
 
@@ -357,7 +357,7 @@ class SeleniumServerModule extends CodeceptionModule
 
         if ($latestReleaseInfo === false)
         {
-            WLogger::logDebug('Не удалось установить версию последнего geckodriver с github - используем дефолтный');
+            WLogger::logDebug($this, 'Не удалось установить версию последнего geckodriver с github - используем дефолтный');
             return $defaultLocalGeckodriver;
         }
 
@@ -365,7 +365,7 @@ class SeleniumServerModule extends CodeceptionModule
 
         if (!isset($info['assets'][0]['browser_download_url']))
         {
-            WLogger::logDebug('Формат ответа от github изменился - используем дефолтный geckodriver');
+            WLogger::logDebug($this, 'Формат ответа от github изменился - используем дефолтный geckodriver');
             return $defaultLocalGeckodriver;
         }
 
@@ -394,7 +394,7 @@ class SeleniumServerModule extends CodeceptionModule
 
         if (empty($url))
         {
-            WLogger::logDebug("Не удалось найти последний geckodriver для $needle на github - используем дефолтный");
+            WLogger::logDebug($this, "Не удалось найти последний geckodriver для $needle на github - используем дефолтный");
             return $defaultLocalGeckodriver;
         }
 
@@ -405,7 +405,7 @@ class SeleniumServerModule extends CodeceptionModule
 
         if (!@file_put_contents($gzFile, fopen($url, 'rb')))
         {
-            WLogger::logDebug("Не удалось скачать $url - используем дефолтный geckodriver");
+            WLogger::logDebug($this, "Не удалось скачать $url - используем дефолтный geckodriver");
             return $defaultLocalGeckodriver;
         }
 
@@ -415,7 +415,7 @@ class SeleniumServerModule extends CodeceptionModule
         $tar = new PharData($tarFile);
         if (!$tar->extractTo($seleniumBinDir, 'geckodriver', true))
         {
-            WLogger::logDebug('Не удалось распаковать скачанный geckodriver - используем дефолтный');
+            WLogger::logDebug($this, 'Не удалось распаковать скачанный geckodriver - используем дефолтный');
             return $defaultLocalGeckodriver;
         }
 
@@ -423,7 +423,7 @@ class SeleniumServerModule extends CodeceptionModule
 
         if (!$temp)
         {
-            WLogger::logDebug('Не удалось распаковать скачанный geckodriver - используем дефолтный');
+            WLogger::logDebug($this, 'Не удалось распаковать скачанный geckodriver - используем дефолтный');
             return $defaultLocalGeckodriver;
         }
 

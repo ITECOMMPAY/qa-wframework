@@ -64,7 +64,7 @@ class GetText extends AbstractOperation
             $result = $element->getText();
         }
 
-        WLogger::logDebug('Получили видимый текст: ' . $result);
+        WLogger::logDebug($this, 'Получили видимый текст: ' . $result);
 
         return $result;
     }

@@ -73,7 +73,7 @@ class GetScreenshot extends AbstractOperation
     {
         $getVolatile = function (IPageObject $pageObject, array &$result) use (&$getVolatile)
         {
-            WLogger::logDebug('Получаем список элементов, которые нужно скрыть/сбросить на скриншоте');
+            WLogger::logDebug($this, 'Получаем список элементов, которые нужно скрыть/сбросить на скриншоте');
 
             foreach ($pageObject->getChildren() as $child)
             {
@@ -100,7 +100,7 @@ class GetScreenshot extends AbstractOperation
         /** @var IResetOnShot|IPageObject $volatileChild */
         foreach ($volatileChildren['shouldBeReset'] as $volatileChild)
         {
-            WLogger::logDebug($volatileChild . ' -> задаём дефолтное состояние');
+            WLogger::logDebug($volatileChild, 'задаём дефолтное состояние');
 
             $volatileChild->defaultStateSet();
         }
@@ -126,7 +126,7 @@ class GetScreenshot extends AbstractOperation
         /** @var IHiddenOnShot|IPageObject $volatileChild */
         foreach ($volatileChildren['shouldBeHidden'] as $volatileChild)
         {
-            WLogger::logDebug($volatileChild . ' -> скрываем на скриншоте');
+            WLogger::logDebug($volatileChild, 'скрываем на скриншоте');
 
             $childRect = $getChildRect($volatileChild);
 
@@ -145,7 +145,7 @@ class GetScreenshot extends AbstractOperation
         /** @var IResetOnShot|IPageObject $volatileChild */
         foreach ($volatileChildren['shouldBeReset'] as $volatileChild)
         {
-            WLogger::logDebug($volatileChild . ' -> снимаем дефолтное состояние');
+            WLogger::logDebug($volatileChild, 'снимаем дефолтное состояние');
 
             $volatileChild->defaultStateUnset();
         }

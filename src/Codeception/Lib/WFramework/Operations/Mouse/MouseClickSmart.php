@@ -60,7 +60,7 @@ class MouseClickSmart extends AbstractOperation
 
         if ($clickViaJs)
         {
-            WLogger::logDebug("clickViaJS = true, значит кликаем с помощью JavaScript.");
+            WLogger::logDebug($this, "clickViaJS = true, значит кликаем с помощью JavaScript.");
 
             $pageObject->accept(new MouseClickViaJS());
             return;
@@ -68,7 +68,7 @@ class MouseClickSmart extends AbstractOperation
 
         if ($pageObject->accept(new GetTagName()) === 'svg')
         {
-            WLogger::logDebug("Кнопка является SVG. Единственный способ по ней кликнуть - с помощью JavaScript.");
+            WLogger::logDebug($this, "Кнопка является SVG. Единственный способ по ней кликнуть - с помощью JavaScript.");
 
             //https://stackoverflow.com/questions/14592213/selenium-webdriver-clicking-on-elements-within-an-svg-using-xpath
             $pageObject->accept(new MouseClickViaJS());
@@ -84,7 +84,7 @@ class MouseClickSmart extends AbstractOperation
 
             if ($href !== null)
             {
-                WLogger::logDebug("Кнопка является ссылкой: '$href' - и clickOnHref = false, значит пробуем по ней перейти.");
+                WLogger::logDebug($this, "Кнопка является ссылкой: '$href' - и clickOnHref = false, значит пробуем по ней перейти.");
 
                 $pageObject
                     ->returnCodeceptionActor()
@@ -106,7 +106,7 @@ class MouseClickSmart extends AbstractOperation
              * Если текст ссылки короткий, выравнен по краю и не доходит до центра элемента - клик промахнётся.
              * Поэтому в такой ситуации мы должны кликать не по div, а по a.
              */
-            WLogger::logDebug('Кнопка является ссылкой, но локатор данного элемента не указывает на ссылку. Пробуем кликнуть по ссылке.');
+            WLogger::logDebug($this, 'Кнопка является ссылкой, но локатор данного элемента не указывает на ссылку. Пробуем кликнуть по ссылке.');
 
             /** @var WPageObject $poClass */
             $poClass = get_class($pageObject);

@@ -19,7 +19,6 @@ suites:
 
 modules:
     enabled:
-        - Codeception\Module\LoggerModule
         - Codeception\Module\WebAssertsModule
         - Codeception\Module\SeleniumServerModule
         - Codeception\Module\ShotsStorageModule:
@@ -29,7 +28,6 @@ modules:
               bucket:    '***bucket***'
         - Codeception\Module\WebTestingModule:
               depends:
-                  - Codeception\Module\LoggerModule
                   - Codeception\Module\SeleniumServerModule
                   - Codeception\Module\WebAssertsModule
                   - Codeception\Module\ShotsStorageModule

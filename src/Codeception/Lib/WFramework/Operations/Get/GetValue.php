@@ -66,7 +66,7 @@ class GetValue extends AbstractOperation
 
         $result = $result ?? '';
 
-        WLogger::logDebug('Получили значение: ' . $result);
+        WLogger::logDebug($this, 'Получили значение: ' . $result);
 
         return $result;
     }

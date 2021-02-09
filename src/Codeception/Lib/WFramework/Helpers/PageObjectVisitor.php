@@ -61,7 +61,7 @@ abstract class PageObjectVisitor
 
     public function applicable(IPageObject $pageObject) : bool
     {
-        WLogger::logDebug('Применимо ли к: ' . $pageObject . ' - условие: ' . $this);
+        WLogger::logDebug($this, 'Применимо ли к: ' . $pageObject . ' - условие: ' . $this);
 
         if (method_exists($this, 'accept' . $pageObject->getClassShort()))
         {

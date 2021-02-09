@@ -4,6 +4,7 @@
 namespace dodge\Helper\Elements\Basic;
 
 
+use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IClickable;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IHaveReadableText;
 use dodge\Helper\Elements\DodgeElement;
@@ -17,6 +18,8 @@ class DodgeButton extends DodgeElement implements IClickable, IHaveReadableText
 
     public function click() : DodgeButton
     {
+        WLogger::logAction($this, "кликаем");
+
         $this
             ->returnOperations()
             ->mouse()
@@ -28,6 +31,8 @@ class DodgeButton extends DodgeElement implements IClickable, IHaveReadableText
 
     public function clickMouseDown() : DodgeButton
     {
+        WLogger::logAction($this, "кликаем (Mouse Down)");
+
         $this
             ->returnOperations()
             ->mouse()

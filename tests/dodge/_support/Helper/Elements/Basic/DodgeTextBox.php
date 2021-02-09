@@ -6,6 +6,7 @@ namespace dodge\Helper\Elements\Basic;
 
 use Codeception\Lib\WFramework\Conditions\Not_;
 use Codeception\Lib\WFramework\Conditions\TextEmpty;
+use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IHaveCurrentValue;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IHaveWritableText;
 use dodge\Helper\Elements\DodgeElement;
@@ -19,6 +20,8 @@ class DodgeTextBox extends DodgeElement implements IHaveWritableText, IHaveCurre
 
     public function set(string $text) : DodgeTextBox
     {
+        WLogger::logAction($this, "задаём текст: $text");
+
         $this
             ->returnOperations()
             ->field()
@@ -30,6 +33,8 @@ class DodgeTextBox extends DodgeElement implements IHaveWritableText, IHaveCurre
 
     public function append(string $text) : DodgeTextBox
     {
+        WLogger::logAction($this, "дописываем в конец: $text");
+
         $this
             ->returnOperations()
             ->field()
@@ -41,6 +46,8 @@ class DodgeTextBox extends DodgeElement implements IHaveWritableText, IHaveCurre
 
     public function prepend(string $text) : DodgeTextBox
     {
+        WLogger::logAction($this, "дописываем в начало: $text");
+
         $this
             ->returnOperations()
             ->field()
@@ -52,6 +59,8 @@ class DodgeTextBox extends DodgeElement implements IHaveWritableText, IHaveCurre
 
     public function clear() : DodgeTextBox
     {
+        WLogger::logAction($this, "очищаем");
+
         $this
             ->returnOperations()
             ->field()

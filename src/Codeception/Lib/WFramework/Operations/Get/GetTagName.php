@@ -42,7 +42,7 @@ class GetTagName extends AbstractOperation
                         ->getTagName()
                         ;
 
-        WLogger::logDebug('Имя тега элемента: ' . $result);
+        WLogger::logDebug($this, 'Имя тега элемента: ' . $result);
 
         return $result;
     }

@@ -53,7 +53,7 @@ class DodgeTabs extends DodgeElement
     {
         $tabText = $this->headersAliasMap->getValue($alias);
 
-        WLogger::logInfo($this . " -> выбираем вкладку: $tabText");
+        WLogger::logInfo($this, "выбираем вкладку: $tabText");
 
         /** @var DodgeTab $tab */
         $tab = $this->getTab($alias);
@@ -69,7 +69,7 @@ class DodgeTabs extends DodgeElement
     {
         $tabText = $this->headersAliasMap->getValue($alias);
 
-        WLogger::logInfo($this . " -> получаем вкладку: $tabText");
+        WLogger::logInfo($this, "получаем вкладку: $tabText");
 
         $tabs = $this
                     ->tabs

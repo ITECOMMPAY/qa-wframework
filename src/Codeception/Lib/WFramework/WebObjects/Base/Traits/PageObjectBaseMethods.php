@@ -65,7 +65,7 @@ trait PageObjectBaseMethods
      */
     public function should(AbstractCondition $condition, bool $deep = false)
     {
-        WLogger::logInfo($this . " -> условие: '$condition' - должно выполниться в течение таймаута");
+        WLogger::logAction($this, "условие: '$condition' - должно выполниться в течение таймаута");
 
         /** @var WPageObject $selfOrChild */
         foreach ($this->traverseDepthFirst() as $selfOrChild)
@@ -83,7 +83,7 @@ trait PageObjectBaseMethods
             {
                 $explanation = $condition->why($selfOrChild, false);
 
-                WLogger::logError($explanation);
+                WLogger::logError($this, $explanation);
 
                 $this->fail($this . " -> условие: '$condition' - не выполнилось в течение таймаута: " . $this->getTimeout());
             }
@@ -108,7 +108,7 @@ trait PageObjectBaseMethods
      */
     public function finally_(AbstractCondition $condition, bool $deep = false) : bool
     {
-        WLogger::logInfo($this . " -> условие: '$condition' - может быть выполнится в течение таймаута");
+        WLogger::logAction($this, "условие: '$condition' - может быть выполнится в течение таймаута");
 
         /** @var WPageObject $selfOrChild */
         foreach ($this->traverseDepthFirst() as $selfOrChild)
@@ -146,7 +146,7 @@ trait PageObjectBaseMethods
      */
     public function is(AbstractCondition $condition, bool $deep = false) : bool
     {
-        WLogger::logInfo($this . " -> условие: '$condition'");
+        WLogger::logAction($this, "условие: '$condition'");
 
         /** @var WPageObject $selfOrChild */
         foreach ($this->traverseDepthFirst() as $selfOrChild)

@@ -38,7 +38,7 @@ class SelectModelSteps extends StepsGroup
 
     public function shouldBeDisplayed() : SelectModelSteps
     {
-        $this->I->logNotice('Проверяем, что страница выбора модели авто - отобразилась');
+        $this->I->logNotice($this, 'Проверяем, что страница выбора модели авто - отобразилась');
 
         $this->selectModelBlock->shouldBeDisplayed();
 
@@ -47,7 +47,7 @@ class SelectModelSteps extends StepsGroup
 
     public function selectBuyOption() : SelectModelSteps
     {
-        $this->I->logNotice('Выбираем опцию покупки авто (а не кредита)');
+        $this->I->logNotice($this, 'Выбираем опцию покупки авто (а не кредита)');
 
         $this
             ->selectModelBlock
@@ -62,7 +62,7 @@ class SelectModelSteps extends StepsGroup
     {
         $name = $this->challengerModelsMap->getValue($alias);
 
-        $this->I->logNotice('Выбираем модель: ' . $name);
+        $this->I->logNotice($this, 'Выбираем модель: ' . $name);
 
         $models = $this
                         ->selectModelBlock
@@ -75,9 +75,9 @@ class SelectModelSteps extends StepsGroup
             throw new UsageException('Среди отображаемых моделей: ' . implode(', ', array_keys($models)) . ' - нет модели с названием: ' . $name);
         }
 
-        /** @var DodgeModelCard $vehicle */
+        /** @var DodgeModelCard $model */
         $model = $models[$name];
-        $model->click();
+        $model->build();
 
         TestProperties::setValue('currentModel', $name);
 

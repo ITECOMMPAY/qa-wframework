@@ -51,7 +51,7 @@ class GetLocation extends AbstractOperation
                         ->getLocation()
                         ;
 
-        WLogger::logDebug(sprintf("Координаты элемента: x:%d , y:%d", $result->getX(), $result->getY()));
+        WLogger::logDebug($this, sprintf("Координаты элемента: x:%d , y:%d", $result->getX(), $result->getY()));
 
         return $result;
     }

@@ -50,7 +50,7 @@ class GetTextRaw extends AbstractOperation
                         ->executeScriptOnThis(static::SCRIPT_GET_TEXT)
                         ;
 
-        WLogger::logDebug('Получили сырой текст: ' . $result);
+        WLogger::logDebug($this, 'Получили сырой текст: ' . $result);
 
         return $result;
     }

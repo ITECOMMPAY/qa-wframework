@@ -41,7 +41,7 @@ class GetAttributesMap extends AbstractOperation
     {
         $result = $pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_GET_ATTRIBUTES);
 
-        WLogger::logDebug('Элемент имеет атрибуты: ' . json_encode($result));
+        WLogger::logDebug($this, 'Элемент имеет атрибуты: ' . json_encode($result));
 
         return new Map($result);
     }

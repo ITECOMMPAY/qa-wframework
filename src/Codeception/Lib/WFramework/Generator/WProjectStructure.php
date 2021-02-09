@@ -87,7 +87,7 @@ class WProjectStructure
         {
             if (!is_dir($path))
             {
-                WLogger::logDebug("Директория: $path -  не существует");
+                WLogger::logDebug($this, "Директория: $path -  не существует");
                 continue;
             }
 

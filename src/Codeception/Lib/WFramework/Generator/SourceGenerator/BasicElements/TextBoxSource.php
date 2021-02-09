@@ -21,6 +21,7 @@ use Codeception\Lib\WFramework\Conditions\Not_;
 use Codeception\Lib\WFramework\Conditions\TextEmpty;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IHaveCurrentValue;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IHaveWritableText;
+use Codeception\Lib\WFramework\Logger\WLogger;
 use {{element_class_full}};
 
 class {{text_box_class_short}} extends {{element_class_short}} implements IHaveWritableText, IHaveCurrentValue
@@ -32,6 +33,8 @@ class {{text_box_class_short}} extends {{element_class_short}} implements IHaveW
 
     public function set(string $text) : {{text_box_class_short}}
     {
+        WLogger::logAction($this, "задаём текст: $text");
+    
         $this
             ->returnOperations()
             ->field()
@@ -43,6 +46,8 @@ class {{text_box_class_short}} extends {{element_class_short}} implements IHaveW
 
     public function append(string $text) : {{text_box_class_short}}
     {
+        WLogger::logAction($this, "дописываем в конец: $text");
+    
         $this
             ->returnOperations()
             ->field()
@@ -54,6 +59,8 @@ class {{text_box_class_short}} extends {{element_class_short}} implements IHaveW
 
     public function prepend(string $text) : {{text_box_class_short}}
     {
+        WLogger::logAction($this, "дописываем в начало: $text");
+    
         $this
             ->returnOperations()
             ->field()
@@ -65,6 +72,8 @@ class {{text_box_class_short}} extends {{element_class_short}} implements IHaveW
 
     public function clear() : {{text_box_class_short}}
     {
+        WLogger::logAction($this, "очищаем");
+    
         $this
             ->returnOperations()
             ->field()

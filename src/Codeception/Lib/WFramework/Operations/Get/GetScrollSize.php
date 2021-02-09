@@ -48,7 +48,7 @@ class GetScrollSize extends AbstractOperation
     {
         $size = $pageObject->returnSeleniumElement()->executeScriptOnThis('return {"width": arguments[0].scrollWidth, "height": arguments[0].scrollHeight};');
 
-        WLogger::logDebug('Реальный размер элемента: ' . $size['width'] . 'x' . $size['height']);
+        WLogger::logDebug($this, 'Реальный размер элемента: ' . $size['width'] . 'x' . $size['height']);
 
         return new WebDriverDimension($size['width'], $size['height']);
     }

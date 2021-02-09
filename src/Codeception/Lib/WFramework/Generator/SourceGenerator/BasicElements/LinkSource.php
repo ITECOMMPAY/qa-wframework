@@ -17,6 +17,7 @@ class LinkSource implements IGenerator
 namespace {{namespace}};
 
 
+use Codeception\Lib\WFramework\Logger\WLogger;
 use {{element_class_full}};
 
 class {{link_class_short}} extends {{element_class_short}}
@@ -28,6 +29,8 @@ class {{link_class_short}} extends {{element_class_short}}
 
     public function download() : string
     {
+        WLogger::logAction($this, "скачиваем файл");
+    
         return $this
                     ->returnOperations()
                     ->get()

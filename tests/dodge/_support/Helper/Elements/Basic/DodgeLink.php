@@ -4,6 +4,7 @@
 namespace dodge\Helper\Elements\Basic;
 
 
+use Codeception\Lib\WFramework\Logger\WLogger;
 use dodge\Helper\Elements\DodgeElement;
 
 class DodgeLink extends DodgeElement
@@ -15,6 +16,8 @@ class DodgeLink extends DodgeElement
 
     public function download() : string
     {
+        WLogger::logAction($this, "скачиваем файл");
+
         return $this
                     ->returnOperations()
                     ->get()

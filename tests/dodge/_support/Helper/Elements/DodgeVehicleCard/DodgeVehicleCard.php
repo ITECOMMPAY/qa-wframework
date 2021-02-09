@@ -27,25 +27,25 @@ class DodgeVehicleCard extends DodgeButton
 
     public function getVehicleName() : string
     {
-        WLogger::logDebug($this . " -> получаем название авто");
+        WLogger::logDebug($this, "получаем название авто");
 
         $name = $this->nameLabel->getCurrentValueString();
 
-        WLogger::logDebug($this . " -> имеет название: $name");
+        WLogger::logDebug($this, "имеет название: $name");
 
         return $name;
     }
 
     public function hasPrice() : bool
     {
-        WLogger::logDebug($this . " -> имеет цену?");
+        WLogger::logDebug($this, "имеет цену?");
 
         return $this->_priceLabel->isExist();
     }
 
     public function _getPrice() : int
     {
-        WLogger::logDebug($this . " -> получаем начальную цену авто");
+        WLogger::logDebug($this, "получаем начальную цену авто");
 
         $price = $this->_priceLabel->getAllText();
 
@@ -56,7 +56,7 @@ class DodgeVehicleCard extends DodgeButton
             throw new FrameworkStaledException('Не получилось распарсить цену авто: ' . $price);
         }
 
-        WLogger::logDebug($this . " -> авто стоит: $parsedPrice долларов");
+        WLogger::logDebug($this, "авто стоит: $parsedPrice долларов");
 
         return $parsedPrice;
     }

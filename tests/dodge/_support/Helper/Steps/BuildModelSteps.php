@@ -49,7 +49,7 @@ class BuildModelSteps extends StepsGroup
 
     public function shouldBeDisplayed() : BuildModelSteps
     {
-        $this->I->logNotice('Проверяем, что страница настройки модели авто - отобразилась');
+        $this->I->logNotice($this, 'Проверяем, что страница настройки модели авто - отобразилась');
 
         $this->titleBlock->shouldBeDisplayed();
         $this->exteriorColorBlock->shouldBeDisplayed();
@@ -62,7 +62,7 @@ class BuildModelSteps extends StepsGroup
     {
         $expectedModel = TestProperties::mustGetValue('currentModel');
 
-        $this->I->logNotice("Проверяем, что отображается модель: $expectedModel");
+        $this->I->logNotice($this, "Проверяем, что отображается модель: $expectedModel");
 
         $actualModel = $this
                             ->titleBlock
@@ -77,7 +77,7 @@ class BuildModelSteps extends StepsGroup
 
     public function setModelColor(string $alias) : BuildModelSteps
     {
-        $this->I->logNotice("Выбираем цвет: $alias");
+        $this->I->logNotice($this, "Выбираем цвет: $alias");
 
         $this
             ->exteriorColorBlock
@@ -92,7 +92,7 @@ class BuildModelSteps extends StepsGroup
     {
         $decal = $this->challengerDecalsMap->getValue($alias);
 
-        $this->I->logNotice("Выбираем винил: $decal");
+        $this->I->logNotice($this, "Выбираем винил: $decal");
 
         $decals = $this
                     ->stripesAndDecalsBlock

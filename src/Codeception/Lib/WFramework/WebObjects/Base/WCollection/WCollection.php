@@ -196,7 +196,7 @@ abstract class WCollection extends Composite implements IPageObject
      */
     public function refresh()
     {
-        WLogger::logInfo($this . " -> обновляем содержимое");
+        WLogger::logAction($this, "обновляем содержимое");
 
         $this->returnSeleniumElements()->refresh();
         $this->updateFromProxyWebElements();
@@ -212,7 +212,7 @@ abstract class WCollection extends Composite implements IPageObject
      */
     public function filterSet(AbstractCondition $condition)
     {
-        WLogger::logInfo($this . " -> задаём фильтрацию по условию: " . $condition->getName());
+        WLogger::logAction($this, "задаём фильтрацию по условию: " . $condition->getName());
 
         $this->elementFilter = $condition;
 
@@ -226,7 +226,7 @@ abstract class WCollection extends Composite implements IPageObject
      */
     public function filterRemove()
     {
-        WLogger::logInfo($this . " -> удаляем все фильтры");
+        WLogger::logAction($this, "удаляем все фильтры");
 
         $this->elementFilter = null;
 
@@ -305,7 +305,7 @@ abstract class WCollection extends Composite implements IPageObject
      */
     public function getElementsArray() : Sequence
     {
-        WLogger::logInfo($this . " -> получаем массив элементов");
+        WLogger::logAction($this , "получаем массив элементов");
 
         return $this->getChildren()->values();
     }
@@ -331,7 +331,7 @@ abstract class WCollection extends Composite implements IPageObject
      */
     public function getElementsMap(string $methodOrProperty, bool $preserveDuplicates = false) : array
     {
-        WLogger::logInfo($this . " -> получаем ассоциативный массив элементов, где ключи будут получены путём вызова: $methodOrProperty - для каждого элемента коллекции");
+        WLogger::logAction($this, "получаем ассоциативный массив элементов, где ключи будут получены путём вызова: $methodOrProperty - для каждого элемента коллекции");
 
         $elements = $this->getElementsArray();
 
@@ -411,7 +411,7 @@ abstract class WCollection extends Composite implements IPageObject
      */
     public function getFirstElement() : WElement
     {
-        WLogger::logInfo($this . ' -> получаем первый элемент');
+        WLogger::logAction($this, 'получаем первый элемент');
 
         $elements = $this->getElementsArray();
 
@@ -425,7 +425,7 @@ abstract class WCollection extends Composite implements IPageObject
 
     public function getElement(int $index) : WElement
     {
-        WLogger::logInfo($this . " -> получаем элемент по индексу: $index");
+        WLogger::logAction($this, "получаем элемент по индексу: $index");
 
         $elementsArray = $this->getElementsArray();
 
@@ -439,7 +439,7 @@ abstract class WCollection extends Composite implements IPageObject
 
     public function hasElement(int $index) : bool
     {
-        WLogger::logInfo($this . " -> содержит элемент по индексу: $index?");
+        WLogger::logAction($this, "содержит элемент по индексу: $index?");
 
         return isset($elementsArray[$index]);
     }
@@ -449,7 +449,7 @@ abstract class WCollection extends Composite implements IPageObject
      */
     public function getLastElement() : WElement
     {
-        WLogger::logInfo($this . ' -> получаем последний элемент');
+        WLogger::logAction($this, 'получаем последний элемент');
 
         $elements = $this->getElementsArray();
 
@@ -491,14 +491,14 @@ abstract class WCollection extends Composite implements IPageObject
      */
     public function getVisibleTexts() : Sequence
     {
-        WLogger::logInfo($this . " -> получаем видимые тексты всех элементов коллекции");
+        WLogger::logAction($this, "получаем видимые тексты всех элементов коллекции");
 
         /** @var Sequence $result */
         $result = $this->accept(new GetText());
 
         $texts = implode(', ', $result->toArray());
 
-        WLogger::logInfo($this . " -> имеет видимые тексты: '$texts'");
+        WLogger::logDebug($this, "имеет видимые тексты: '$texts'");
 
         return $result;
     }
@@ -510,28 +510,28 @@ abstract class WCollection extends Composite implements IPageObject
      */
     public function getAllTexts() : Sequence
     {
-        WLogger::logInfo($this . " -> получаем все тексты (включая невидимые) всех элементов коллекции");
+        WLogger::logAction($this, "получаем все тексты (включая невидимые) всех элементов коллекции");
 
         /** @var Sequence $result */
         $result = $this->accept(new GetTextRaw());
 
         $texts = implode(', ', $result->toArray());
 
-        WLogger::logInfo($this . " -> имеет все тексты: '$texts'");
+        WLogger::logDebug($this, "имеет все тексты: '$texts'");
 
         return $result;
     }
 
     public function getValues() : Sequence
     {
-        WLogger::logInfo($this . " -> получаем значение атрибута value всех элементов коллекции");
+        WLogger::logAction($this, "получаем значение атрибута value всех элементов коллекции");
 
         /** @var Sequence $result */
         $result = $this->accept(new GetValue());
 
         $values = implode(', ', $result->toArray());
 
-        WLogger::logInfo($this . " -> имеет значения: '$values'");
+        WLogger::logDebug($this, "имеет значения: '$values'");
 
         return $result;
     }

@@ -15,7 +15,7 @@ class TabSelected extends AbstractCondition
 
     public function acceptDodgeTab(DodgeTab $tab) : bool
     {
-        $class = $tab->returnOperations()->get()->attribute('class') ?? '';
+        $class = $tab->returnOperations()->get()->attributeValue('class') ?? '';
 
         return stripos($class, 'active') !== false;
     }

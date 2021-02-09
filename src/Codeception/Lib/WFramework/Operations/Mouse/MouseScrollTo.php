@@ -49,7 +49,7 @@ class MouseScrollTo extends AbstractOperation
 
         if ($forceScrollToOff)
         {
-            WLogger::logDebug('Скроллинг к элементу запрещён (forceScrollToOff: true)');
+            WLogger::logDebug($this, 'Скроллинг к элементу запрещён (forceScrollToOff: true)');
             return;
         }
 

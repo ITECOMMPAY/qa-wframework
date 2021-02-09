@@ -65,18 +65,18 @@ class GetTextFiltered extends AbstractOperation
 
         if (!preg_match($this->regex, $text, $matches))
         {
-            WLogger::logWarning("Не найдено ни одного совпадения в тексте '$text' по заданной регулярке '$this->regex'!");
+            WLogger::logWarning($this, "Не найдено ни одного совпадения в тексте '$text' по заданной регулярке '$this->regex'!");
             return '';
         }
 
         if (!empty($this->groupName) && !isset($matches[$this->groupName]))
         {
-            throw new UsageException("В результатах заданной регулярки '$this->regex' нет группы '$this->groupName'");
+            throw new UsageException($this, "В результатах заданной регулярки '$this->regex' нет группы '$this->groupName'");
         }
 
         $index = empty($this->groupName) ? 1 : $this->groupName;
 
-        WLogger::logDebug('Получили отфильтрованный текст: ' . $matches[$index]);
+        WLogger::logDebug($this, 'Получили отфильтрованный текст: ' . $matches[$index]);
 
         return $matches[$index];
     }

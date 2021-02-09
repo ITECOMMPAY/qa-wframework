@@ -62,7 +62,7 @@ class GetCssValues extends AbstractOperation
             $result[] = $pageObject->accept(new GetCssValue($property));
         }
 
-        WLogger::logDebug('CSS-свойства имеют значения: ' . implode(', ', $result));
+        WLogger::logDebug($this, 'CSS-свойства имеют значения: ' . implode(', ', $result));
 
         return $result;
     }

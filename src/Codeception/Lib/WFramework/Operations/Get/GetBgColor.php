@@ -50,7 +50,7 @@ class GetBgColor extends AbstractOperation
 
         $result = Color::fromString($bgColor);
 
-        WLogger::logDebug('Получили цвет фона: ' . $result);
+        WLogger::logDebug($this, 'Получили цвет фона: ' . $result);
 
         return $result;
     }

@@ -64,13 +64,13 @@ class MouseClick extends AbstractOperation
                 $otherElement = $matches['element'];
             }
 
-            WLogger::logWarning('Не получается кликнуть на элементе - он перекрыт другим элементом: ' . $otherElement);
+            WLogger::logWarning($this, 'Не получается кликнуть на элементе - он перекрыт другим элементом: ' . $otherElement);
 
             $autoClickViaJS = (bool) TestProperties::getValue('autoClickViaJS', False);
 
             if ($autoClickViaJS)
             {
-                WLogger::logDebug('autoClickViaJS = true -> пробуем кликнуть с помощью JS');
+                WLogger::logDebug($this, 'autoClickViaJS = true -> пробуем кликнуть с помощью JS');
 
                 $pageObject->accept(new MouseClickViaJS());
                 return;

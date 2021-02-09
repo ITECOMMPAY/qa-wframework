@@ -32,7 +32,7 @@ class {{checkbox_class_short}} extends {{element_class_short}} implements IHaveC
 
     public function check() : {{checkbox_class_short}}
     {
-        WLogger::logInfo($this . " -> ставим");
+        WLogger::logAction($this, "ставим");
 
         if ($this->isUnchecked())
         {
@@ -48,7 +48,7 @@ class {{checkbox_class_short}} extends {{element_class_short}} implements IHaveC
 
     public function uncheck() : {{checkbox_class_short}}
     {
-        WLogger::logInfo($this . " -> снимаем");
+        WLogger::logAction($this, "снимаем");
 
         if ($this->isChecked())
         {

@@ -48,7 +48,7 @@ class GetElementViewportRect extends AbstractOperation
     {
         $rect = Rect::fromDOMRect($pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_GET_ELEMENT_VIEWPORT_SIZE));
 
-        WLogger::logDebug('Viewport для элемента имеет размер: ' . $rect);
+        WLogger::logDebug($this, 'Viewport для элемента имеет размер: ' . $rect);
 
         return $rect;
     }

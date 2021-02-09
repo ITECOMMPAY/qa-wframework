@@ -19,7 +19,7 @@ class DodgeCheckbox extends DodgeElement implements IHaveCurrentValue
 
     public function check() : DodgeCheckbox
     {
-        WLogger::logInfo($this . " -> ставим");
+        WLogger::logInfo($this, "ставим");
 
         if ($this->isUnchecked())
         {
@@ -35,7 +35,7 @@ class DodgeCheckbox extends DodgeElement implements IHaveCurrentValue
 
     public function uncheck() : DodgeCheckbox
     {
-        WLogger::logInfo($this . " -> снимаем");
+        WLogger::logInfo($this, "снимаем");
 
         if ($this->isChecked())
         {

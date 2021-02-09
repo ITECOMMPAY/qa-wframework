@@ -59,7 +59,7 @@ class GetFile extends AbstractOperation
 
         if (preg_match('%<a\s+\X*\s+href=\X*<\/a>%iUu', $innerHtml, $matches))
         {
-            WLogger::logDebug('Элемент не является <a> - ищем <a> внутри него');
+            WLogger::logDebug($this, 'Элемент не является <a> - ищем <a> внутри него');
 
             /** @var WPageObject $poClass */
             $poClass = get_class($pageObject);

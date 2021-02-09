@@ -35,7 +35,7 @@ class VehiclesMenuSteps extends StepsGroup
 
     public function shouldBeDisplayed() : VehiclesMenuSteps
     {
-        $this->I->logNotice('Проверяем, что меню Vehicles - отобразилось');
+        $this->I->logNotice($this, 'Проверяем, что меню Vehicles - отобразилось');
 
         $this->vehiclesMenuBlock->shouldBeDisplayed();
 
@@ -44,7 +44,7 @@ class VehiclesMenuSteps extends StepsGroup
 
     public function checkPrices() : VehiclesMenuSteps
     {
-        $this->I->logNotice('Проверяем, что цены авто находятся в заданном диапазоне');
+        $this->I->logNotice($this, 'Проверяем, что цены авто находятся в заданном диапазоне');
 
         $vehicles = $this
                         ->vehiclesMenuBlock
@@ -98,7 +98,7 @@ class VehiclesMenuSteps extends StepsGroup
     {
         $name = $this->vehiclesNamesMap->getValue($alias);
 
-        $this->I->logNotice('Выбираем авто: ' . $name);
+        $this->I->logNotice($this, 'Выбираем авто: ' . $name);
 
         $vehicles = $this
                         ->vehiclesMenuBlock

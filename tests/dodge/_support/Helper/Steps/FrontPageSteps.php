@@ -33,7 +33,7 @@ class FrontPageSteps extends StepsGroup
 
     public function openSite() : FrontPageSteps
     {
-        $this->I->logNotice('Открываем главную страницу сайта');
+        $this->I->logNotice($this, 'Открываем главную страницу сайта');
 
         $this->I->amOnPage('/');
 
@@ -57,7 +57,7 @@ class FrontPageSteps extends StepsGroup
 
     public function shouldBeDisplayed() : FrontPageSteps
     {
-        $this->I->logNotice('Проверяем, что главная страница отобразилась');
+        $this->I->logNotice($this, 'Проверяем, что главная страница отобразилась');
 
         $this->headerBlock->shouldBeDisplayed();
 
@@ -66,7 +66,7 @@ class FrontPageSteps extends StepsGroup
 
     public function closePopup() : FrontPageSteps
     {
-        $this->I->logNotice('Ожидаем всплывающее окно Choose Your Site и закрываем его');
+        $this->I->logNotice($this, 'Ожидаем всплывающее окно Choose Your Site и закрываем его');
 
         if ($this
                 ->chooseYourSiteBlock
@@ -89,7 +89,7 @@ class FrontPageSteps extends StepsGroup
 
     public function openVehiclesMenu() : VehiclesMenuSteps
     {
-        $this->I->logNotice('Открываем меню Vehicles');
+        $this->I->logNotice($this, 'Открываем меню Vehicles');
 
         $this
             ->headerBlock

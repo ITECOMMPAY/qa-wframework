@@ -21,17 +21,26 @@ class DodgeModelCard extends DodgeButton
     {
         $this->title = DodgeLabel::fromXpath('Название модели', ".//div[contains(@class, 'vehicle-title')]");
 
+        $this->buildButton = DodgeButton::fromXpath('Build', ".//div[text()='Build']");
+
         parent::__construct($importer);
     }
 
     public function getModelName() : string
     {
-        WLogger::logDebug($this . " -> получаем название модели");
+        WLogger::logDebug($this, "получаем название модели");
 
         $name = $this->title->getCurrentValueString();
 
-        WLogger::logDebug($this . " -> имеет название: $name");
+        WLogger::logDebug($this, "имеет название: $name");
 
         return $name;
+    }
+
+    public function build()
+    {
+        WLogger::logDebug($this, "Начинаем конфигурацию");
+
+        $this->buildButton->click();
     }
 }

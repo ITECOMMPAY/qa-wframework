@@ -19,6 +19,7 @@ namespace {{namespace}};
 
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IHaveCurrentValue;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IHaveReadableText;
+use Codeception\Lib\WFramework\Logger\WLogger;
 use {{element_class_full}};
 
 class {{label_class_short}} extends {{element_class_short}} implements IHaveReadableText, IHaveCurrentValue
@@ -30,6 +31,8 @@ class {{label_class_short}} extends {{element_class_short}} implements IHaveRead
 
     public function getFilteredText(string $regex) : string
     {
+        WLogger::logAction($this, "получаем надпись отфильтрованную по регулярке: $regex");
+    
         return $this
                     ->returnOperations()
                     ->get()

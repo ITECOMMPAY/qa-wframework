@@ -11,6 +11,6 @@ abstract class AbstractExplanationResultVisitor
 
     public function __call($name, $arguments)
     {
-        WLogger::logWarning(static::class . " -> не содержит метод $name, и поэтому не может распечатать соответствующий результат проверки");
+        WLogger::logWarning($this, "не содержит метод $name, и поэтому не может распечатать соответствующий результат проверки");
     }
 }

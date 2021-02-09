@@ -25,7 +25,7 @@ class WFromLocator extends WFrom
 
         if ($relative === true && $locator->getMechanism() === 'xpath' && $locator->getValue()[0] !== '.')
         {
-            WLogger::logWarning('!!!' . $name . ' [' . $locator->getValue() . '] : XPath-локаторы для относительных элементов, должны начинаться с точки');
+            WLogger::logWarning($this, '!!!' . $name . ' [' . $locator->getValue() . '] : XPath-локаторы для относительных элементов, должны начинаться с точки');
 
             $relativeLocator = WLocator::xpath('.' . $locator->getValue());
             $this->locator = $relativeLocator;

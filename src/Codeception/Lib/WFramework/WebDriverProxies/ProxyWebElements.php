@@ -84,7 +84,7 @@ class ProxyWebElements implements Iterator, Countable
             throw new UsageException('Коллекции элементов (WCollection, WArray и т.п.) работают только с XPath!');
         }
 
-        WLogger::logDebug("Обновляем коллекцию элементов, с $locatorMechanism: '$locatorValue'");
+        WLogger::logDebug($this, "Обновляем коллекцию элементов, с $locatorMechanism: '$locatorValue'");
 
         $elements = $this->findThis();
 

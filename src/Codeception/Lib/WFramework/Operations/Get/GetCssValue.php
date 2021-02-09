@@ -60,7 +60,7 @@ class GetCssValue extends AbstractOperation
                         ->getCSSValue($this->property)
                         ;
 
-        WLogger::logDebug('CSS-свойство имеет значение: ' . $result);
+        WLogger::logDebug($this, 'CSS-свойство имеет значение: ' . $result);
 
         return $result;
     }

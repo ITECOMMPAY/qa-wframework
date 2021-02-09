@@ -30,25 +30,25 @@ class DodgeOption extends DodgeElement
 
     public function getOptionName() : string
     {
-        WLogger::logInfo($this . " -> получаем название опции");
+        WLogger::logInfo($this, "получаем название опции");
 
         return $this
                     ->nameLabel
                     ->returnOperations()
                     ->get()
-                    ->attribute('data-lid')
+                    ->attributeValue('data-lid')
                     ;
     }
 
     public function getOptionPrice() : int
     {
-        WLogger::logInfo($this . " -> получаем цену опции");
+        WLogger::logInfo($this, "получаем цену опции");
 
         $priceText = $this
                         ->nameLabel
                         ->returnOperations()
                         ->get()
-                        ->attribute('title')
+                        ->attributeValue('title')
                         ;
 
         if (preg_match('%Price:\s+\$(?\'price\'\d+)%m', $priceText, $matches) !== 1)
@@ -61,14 +61,14 @@ class DodgeOption extends DodgeElement
 
     public function selected() : bool
     {
-        WLogger::logInfo($this . " -> выбрана?");
+        WLogger::logInfo($this, "выбрана?");
 
         return $this->_checkbox->isChecked();
     }
 
     public function select() : DodgeOption
     {
-        WLogger::logInfo($this . " -> выбираем?");
+        WLogger::logInfo($this, "выбираем?");
 
         if ($this->selected())
         {

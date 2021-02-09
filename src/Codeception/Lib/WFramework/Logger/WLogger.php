@@ -17,118 +17,49 @@ namespace Codeception\Lib\WFramework\Logger;
  */
 class WLogger
 {
-    /**
-     * System is unusable.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public static function logEmergency($message, array $context = array())
+    public static function logNotice($object, $message, array $context = [])
     {
-        Log::get()->addEmergency($message, $context);
+        Log::get()->addNotice($object, $message, $context);
     }
 
-    /**
-     * Action must be taken immediately.
-     *
-     * Example: Entire website down, database unavailable, etc. This should
-     * trigger the SMS alerts and wake you up.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public static function logAlert($message, array $context = array())
+    public static function logInfo($object, $message, array $context = [])
     {
-        Log::get()->addAlert($message, $context);
+        Log::get()->addInfo($object, $message, $context);
     }
 
-    /**
-     * Critical conditions.
-     *
-     * Example: Application component unavailable, unexpected exception.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public static function logCritical($message, array $context = array())
+    public static function logDebug($object, $message, array $context = [])
     {
-        Log::get()->addCritical($message, $context);
+        Log::get()->addDebug($object, $message, $context);
     }
 
-    /**
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public static function logError($message, array $context = array())
+
+
+    public static function logError($object, string $message, array $context = [])
     {
-        Log::get()->addError($message, $context);
+        Log::get()->addError($object, $message, $context);
     }
 
-    /**
-     * Exceptional occurrences that are not errors.
-     *
-     * Example: Use of deprecated APIs, poor use of an API, undesirable things
-     * that are not necessarily wrong.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public static function logWarning($message, array $context = array())
+    public static function logWarning($object, string $message, array $context = [])
     {
-        Log::get()->addWarning($message, $context);
+        Log::get()->addWarning($object, $message, $context);
     }
 
-    /**
-     * Normal but significant events.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public static function logNotice($message, array $context = array())
+
+
+    public static function logAssertSoft(string $message, array $context = [])
     {
-        Log::get()->addNotice($message, $context);
+        Log::get()->addAssertSoft($message, $context);
     }
 
-    /**
-     * Interesting events.
-     *
-     * Example: User logs in, SQL logs.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public static function logInfo($message, array $context = array())
+    public static function logAssertHard(string $message, array $context = [])
     {
-        Log::get()->addInfo($message, $context);
+        Log::get()->addAssertHard($message, $context);
     }
 
-    /**
-     * Detailed debug information.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public static function logDebug($message, array $context = array())
+
+
+    public static function logAction($object, string $message, array $context = [])
     {
-        Log::get()->addDebug($message, $context);
+        Log::get()->addSmart($object, $message, $context);
     }
 }

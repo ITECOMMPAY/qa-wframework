@@ -25,13 +25,13 @@ class DodgeColorButton extends DodgeButton
 
     public function getColorName() : string
     {
-        WLogger::logInfo($this . " -> получаем название цвета");
+        WLogger::logInfo($this, "получаем название цвета");
 
         return $this
                     ->colorLabel
                     ->returnOperations()
                     ->get()
-                    ->attribute('data-lid')
+                    ->attributeValue('data-lid')
                     ;
     }
 }

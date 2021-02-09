@@ -234,7 +234,7 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function accept($visitor)
     {
-        WLogger::logDebug($this . ' -> ' . $visitor->getName());
+        WLogger::logDebug($this, $visitor->getName());
 
         return parent::accept($visitor);
     }
@@ -275,9 +275,11 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function getVisibleText() : string
     {
+        WLogger::logAction($this, "получаем видимый текст");
+
         $result = $this->accept(new GetText());
 
-        WLogger::logInfo($this . " -> имеет видимый текст: '$result'");
+        WLogger::logDebug($this, "имеет видимый текст: '$result'");
 
         return $result;
     }
@@ -294,18 +296,22 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function getAllText() : string
     {
+        WLogger::logAction($this, "получаем весь текст (включая невидимый)");
+
         $result = $this->accept(new GetTextRaw());
 
-        WLogger::logInfo($this . " -> имеет весь текст: '$result'");
+        WLogger::logDebug($this, "имеет весь текст: '$result'");
 
         return $result;
     }
 
     public function getValue() : string
     {
+        WLogger::logAction($this, "получаем значение атрибута value");
+
         $result = $this->accept(new GetValue());
 
-        WLogger::logInfo($this . " -> имеет значение: '$result'");
+        WLogger::logDebug($this, "имеет значение: '$result'");
 
         return $result;
     }
@@ -342,7 +348,7 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function shouldBeLikeBefore(string $suffix = 'default', int $defaultDelay = 250000, $waitClosure = null)
     {
-        WLogger::logInfo($this . ' -> должен выглядеть, как сохранённый эталон: ' . $suffix);
+        WLogger::logAction($this, 'должен выглядеть, как сохранённый эталон: ' . $suffix);
 
         $shotRun = (bool) TestProperties::getValue('shotRun');
 
@@ -350,7 +356,7 @@ abstract class WPageObject extends Composite implements IPageObject
 
         if ($shotRun)
         {
-            WLogger::logInfo($this . ' -> сохраняем эталон: ' . $suffix);
+            WLogger::logDebug($this, 'сохраняем эталон: ' . $suffix);
 
             $screenshot = $this->accept(new GetScreenshot('', $waitClosure));
 
@@ -394,7 +400,7 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     private function fitIntoDimensions(string $imageBlob, WebDriverDimension $dimensions) : string
     {
-        WLogger::logDebug('Подгоняем картинку под разрешение, если она в него не вмещается');
+        WLogger::logDebug($this, 'Подгоняем картинку под разрешение, если она в него не вмещается');
 
         $imagick = new \Imagick();
         $imagick->readImageBlob($imageBlob);
@@ -447,7 +453,7 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function isLikeBefore(string $suffix = 'default', bool $defaultValue = true, $waitClosure = null) : bool
     {
-        WLogger::logInfo($this . ' -> выглядит, как сохранённый образец: ' . $suffix . '?');
+        WLogger::logInfo($this, 'выглядит, как сохранённый образец: ' . $suffix . '?');
 
         $shotRun = (bool) TestProperties::getValue('shotRun');
 

@@ -43,7 +43,7 @@ class DodgeColorPicker extends DodgeElement
     {
         $color = $this->aliasMap->getValue($alias);
 
-        WLogger::logInfo($this . " -> выбираем цвет: $color");
+        WLogger::logInfo($this, "выбираем цвет: $color");
 
         $colorsMap = $this
                         ->colors

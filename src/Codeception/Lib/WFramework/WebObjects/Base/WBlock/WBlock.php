@@ -87,7 +87,7 @@ abstract class WBlock extends WPageObject
      */
     public function display()
     {
-        WLogger::logInfo("Открываем страницу: " . $this);
+        WLogger::logAction($this, "открываем с пустой страницы");
 
         $this->openPage();
 
@@ -153,6 +153,6 @@ abstract class WBlock extends WPageObject
 
     public function __toString() : string
     {
-        return $this->getClassShort() . ' (' . $this->getName() . ')';
+        return '/ ' . $this->getClassShort() . ' (' . $this->getName() . ')';
     }
 }

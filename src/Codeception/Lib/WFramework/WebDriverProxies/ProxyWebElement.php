@@ -128,7 +128,7 @@ class ProxyWebElement extends RemoteWebElement
         $locatorMechanism = $this->locator->getMechanism();
         $locatorValue = $this->locator->getValue();
 
-        WLogger::logDebug("Ищем элемент с $locatorMechanism: '$locatorValue'");
+        WLogger::logDebug($this, "Ищем элемент с $locatorMechanism: '$locatorValue'");
 
         try
         {

@@ -59,7 +59,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     public function _initialize()
     {
-        WLogger::logInfo('Инициализируем хранилище скриншотов');
+        WLogger::logNotice($this, 'Инициализируем хранилище скриншотов');
 
         $this->shotsDir = codecept_data_dir() . '/shots/';
 
@@ -101,7 +101,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     protected function initializeS3Client()
     {
-        WLogger::logDebug('Инициализируем клиент S3');
+        WLogger::logDebug($this, 'Инициализируем клиент S3');
 
         $this->s3Client = new AwsS3MultiRegionClient(
             [
@@ -154,7 +154,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     protected function fillLocalFilemap()
     {
-        WLogger::logDebug('Читаем имена локальных скриншотов');
+        WLogger::logDebug($this, 'Читаем имена локальных скриншотов');
 
         foreach (glob($this->shotsDir . '*.png', GLOB_NOSORT) as $filename)
         {
@@ -173,7 +173,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     protected function fillRemoteFilemap()
     {
-        WLogger::logDebug('Читаем имена удалённых скриншотов');
+        WLogger::logDebug($this, 'Читаем имена удалённых скриншотов');
 
         $truncated = false;
         $continuationToken = '';
@@ -217,7 +217,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     public function putShot(string $name, string $rawPNG)
     {
-        WLogger::logDebug('Сохраняем скриншот локально: ' . $name);
+        WLogger::logDebug($this, 'Сохраняем скриншот локально: ' . $name);
 
         $shortName = $this->getShortName($name);
         $contentMD5 = md5($rawPNG);
@@ -236,7 +236,7 @@ class ShotsStorageModule extends CodeceptionModule
             return;
         }
 
-        WLogger::logDebug('Удаляем локальный скриншот: ' . $shortName);
+        WLogger::logDebug($this, 'Удаляем локальный скриншот: ' . $shortName);
 
         $filename = $this->shotsDir . $shortName . '_' . $this->localFilemap[$shortName] . '.png';
 
@@ -252,7 +252,7 @@ class ShotsStorageModule extends CodeceptionModule
             return;
         }
 
-        WLogger::logDebug('Удаляем удалённый скриншот: ' . $shortName);
+        WLogger::logDebug($this, 'Удаляем удалённый скриншот: ' . $shortName);
 
         $filename = $shortName . '_' . $this->remoteFilemap[$shortName] . '.png';
 
@@ -280,7 +280,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     protected function getLocalShot(string $name) : string
     {
-        WLogger::logDebug('Получаем локальный скриншот: ' . $name);
+        WLogger::logDebug($this, 'Получаем локальный скриншот: ' . $name);
 
         $shortName = $this->getShortName($name);
 
@@ -296,7 +296,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     protected function getRemoteShot(string $name) : string
     {
-        WLogger::logDebug('Получаем удалённый скриншот: ' . $name);
+        WLogger::logDebug($this, 'Получаем удалённый скриншот: ' . $name);
 
         $shortName = $this->getShortName($name);
 
@@ -326,7 +326,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     public function uploadShots()
     {
-        WLogger::logDebug('Загружаем скриншоты в S3');
+        WLogger::logDebug($this, 'Загружаем скриншоты в S3');
 
         if ($this->config['source'] === 'local')
         {
@@ -356,7 +356,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     protected function fillLocalTempFilemap()
     {
-        WLogger::logDebug('Читаем имена временных скриншотов');
+        WLogger::logDebug($this, 'Читаем имена временных скриншотов');
 
         foreach (glob($this->tempDir . '*.png', GLOB_NOSORT) as $filename)
         {
@@ -375,7 +375,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     public function putTempShot(string $name, string $rawPNG)
     {
-        WLogger::logDebug('Сохраняем временный скриншот: ' . $name);
+        WLogger::logDebug($this, 'Сохраняем временный скриншот: ' . $name);
 
         $shortName = $this->getShortName($name);
         $contentMD5 = md5($rawPNG);
@@ -394,7 +394,7 @@ class ShotsStorageModule extends CodeceptionModule
             return;
         }
 
-        WLogger::logDebug('Удаляем временный скриншот: ' . $shortName);
+        WLogger::logDebug($this, 'Удаляем временный скриншот: ' . $shortName);
 
         $filename = $this->tempDir . $shortName . '_' . $this->tempFilemap[$shortName] . '.png';
 
@@ -405,7 +405,7 @@ class ShotsStorageModule extends CodeceptionModule
 
     public function acceptTempShots()
     {
-        WLogger::logDebug('Перемещаем временные скриншоты в локальные');
+        WLogger::logDebug($this, 'Перемещаем временные скриншоты в локальные');
 
         foreach ($this->tempFilemap as $shortName => $contentMD5)
         {

@@ -40,7 +40,7 @@ class VehiclePageSteps extends StepsGroup
 
     public function shouldBeDisplayed() : VehiclePageSteps
     {
-        $this->I->logNotice('Проверяем, что страница авто отобразилась');
+        $this->I->logNotice($this, 'Проверяем, что страница авто отобразилась');
 
         $this->headerBlock->shouldBeDisplayed();
 
@@ -49,7 +49,7 @@ class VehiclePageSteps extends StepsGroup
 
     public function setZip(string $zip = '85009') : VehiclePageSteps
     {
-        $this->I->logNotice('Ожидаем всплывающее окно для ввода ZIP-кода и вводим в него: ' . $zip);
+        $this->I->logNotice($this, 'Ожидаем всплывающее окно для ввода ZIP-кода и вводим в него: ' . $zip);
 
         $this
             ->enterYourZipBlock
@@ -83,7 +83,7 @@ class VehiclePageSteps extends StepsGroup
     {
         $expectedZip = TestProperties::mustGetValue('currentZip');
 
-        $this->I->logNotice("Проверяем, что ZIP: $expectedZip - был успешно задан");
+        $this->I->logNotice($this, "Проверяем, что ZIP: $expectedZip - был успешно задан");
 
         $actualZip = $this
                         ->pricingBlock
@@ -98,7 +98,7 @@ class VehiclePageSteps extends StepsGroup
 
     public function startBuildingModel() : SelectModelSteps
     {
-        $this->I->logNotice("Начинаем собирать авто");
+        $this->I->logNotice($this, "Начинаем собирать авто");
 
         $this
             ->pricingBlock

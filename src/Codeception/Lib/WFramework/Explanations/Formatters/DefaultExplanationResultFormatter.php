@@ -25,7 +25,7 @@ class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
 
     public function acceptExplanationResultAggregate(ExplanationResultAggregate $explanationResult) : void
     {
-        $this->header = static::EXPLANATIONS_DELIMITER;
+        $this->header = PHP_EOL . PHP_EOL . static::EXPLANATIONS_DELIMITER;
         $this->header .= 'ДИАГНОСТИРУЕМ ЭЛЕМЕНТ:' . PHP_EOL;
         $this->header .= static::EXPLANATIONS_TAB . $explanationResult->getPageObject() . PHP_EOL;
         $this->header .= 'ПРОБЛЕМА:' . PHP_EOL;
@@ -119,6 +119,8 @@ class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
         $this->message .= $this->traverseFromRootResult;
 
         $this->message .= $this->defaultResult;
+
+        $this->message .= PHP_EOL;
 
         return $this->message;
     }

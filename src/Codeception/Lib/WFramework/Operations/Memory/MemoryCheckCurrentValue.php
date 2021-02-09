@@ -70,7 +70,7 @@ class MemoryCheckCurrentValue extends AbstractOperation
 
         $actualValue = $pageObject->getCurrentValueString();
 
-        WLogger::logDebug('Ожидаемое значение: ' . $expectedValue . PHP_EOL . ' - актуальное значение: ' . $actualValue);
+        WLogger::logDebug($this, 'Ожидаемое значение: ' . $expectedValue . PHP_EOL . ' - актуальное значение: ' . $actualValue);
 
         return $expectedValue === $actualValue;
     }

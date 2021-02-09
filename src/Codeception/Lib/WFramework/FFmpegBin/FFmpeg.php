@@ -42,11 +42,11 @@ class FFmpeg
 
     public function videoFromPNGs(string $inputDir, string $outputFile) : bool
     {
-        WLogger::logDebug('Преобразуем скриншоты в видео');
+        WLogger::logNotice($this, 'Преобразуем скриншоты в видео');
 
         $cmd = "$this->binPath -framerate 1 -i $inputDir/%08d.png -c:v libx264 -tune stillimage -movflags +faststart -vf fps=1 -pix_fmt yuv422p $outputFile.mp4";
 
-        WLogger::logDebug('Команда для запуска: ' . $cmd);
+        WLogger::logDebug($this, 'Команда для запуска: ' . $cmd);
 
         $process = Process::fromShellCommandline($cmd);
         $process->setTimeout(null);

@@ -19,6 +19,7 @@ namespace {{namespace}};
 
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IClickable;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IHaveReadableText;
+use Codeception\Lib\WFramework\Logger\WLogger;
 use {{element_class_full}};
 
 class {{button_class_short}} extends {{element_class_short}} implements IClickable, IHaveReadableText
@@ -30,6 +31,8 @@ class {{button_class_short}} extends {{element_class_short}} implements IClickab
 
     public function click() : {{button_class_short}}
     {
+        WLogger::logAction($this, "кликаем");
+    
         $this
             ->returnOperations()
             ->mouse()
@@ -41,6 +44,8 @@ class {{button_class_short}} extends {{element_class_short}} implements IClickab
 
     public function clickMouseDown() : {{button_class_short}}
     {
+        WLogger::logAction($this, "кликаем (Mouse Down)");
+    
         $this
             ->returnOperations()
             ->mouse()
@@ -52,6 +57,8 @@ class {{button_class_short}} extends {{element_class_short}} implements IClickab
 
     public function getFilteredText(string $regex) : string
     {
+        WLogger::logAction($this, "получаем надпись отфильтрованную по регулярке: $regex");
+    
         return $this
                     ->returnOperations()
                     ->get()

@@ -85,7 +85,7 @@ class GetScreenshotRaw extends AbstractOperation
 
         $getColumnShot = function (Rect $elementRect, Rect $viewportRect) use ($pageObject, $shotToCanvas, $waitClosure)
         {
-            WLogger::logDebug('Делаем скриншот колонки');
+            WLogger::logDebug($this, 'Делаем скриншот колонки');
 
             $column = new Imagick();
 
@@ -101,7 +101,7 @@ class GetScreenshotRaw extends AbstractOperation
              * В конце метода мы сшиваем скриншоты полученные на этих этапах (30x30 + 30x60 + 30x10 = 30x100)
              */
 
-            WLogger::logDebug('Делаем скриншот видимой части колонки');
+            WLogger::logDebug($this, 'Делаем скриншот видимой части колонки');
 
             $shotToCanvas($column, $viewportRect);
 
@@ -109,11 +109,11 @@ class GetScreenshotRaw extends AbstractOperation
 
             $timesY = (int) floor($elementRect->getHeight() / $viewportRect->getHeight());
 
-            WLogger::logDebug("Для создания полного скриншота колонки, viewport будет прокручен по вертикали " . max($timesY - 1, 0) . " раз");
+            WLogger::logDebug($this, "Для создания полного скриншота колонки, viewport будет прокручен по вертикали " . max($timesY - 1, 0) . " раз");
 
             for ($i = 1; $i < $timesY; $i++) //С 1 т.к. первый кусок элемента мы уже сфоткали
             {
-                WLogger::logDebug('Прокручиваем viewport на его высоту и делаем скриншот');
+                WLogger::logDebug($this, 'Прокручиваем viewport на его высоту и делаем скриншот');
 
                 $pageObject->accept(new MouseScrollBy(0, $viewportRect->getHeight()));
 
@@ -128,7 +128,7 @@ class GetScreenshotRaw extends AbstractOperation
 
             if ($danglingHeight > 0)
             {
-                WLogger::logDebug('Делаем скриншот последнего вертикального кусочка колонки');
+                WLogger::logDebug($this, 'Делаем скриншот последнего вертикального кусочка колонки');
 
                 $pageObject->accept(new MouseScrollBy(0, $danglingHeight));
 
@@ -147,13 +147,13 @@ class GetScreenshotRaw extends AbstractOperation
 
             $column->resetIterator();
 
-            WLogger::logDebug('Сшиваем скриншоты колонки по вертикали');
+            WLogger::logDebug($this, 'Сшиваем скриншоты колонки по вертикали');
 
             $wholeColumn = $column->appendImages(true);
             $wholeColumn->setImagePage($wholeColumn->getImageWidth(), $wholeColumn->getImageHeight(), 0, 0);
             $wholeColumn->setImageUnits(imagick::PATHUNITS_OBJECTBOUNDINGBOX);
 
-            WLogger::logDebug('Обрезаем финальный скриншот колонки до размеров элемента');
+            WLogger::logDebug($this, 'Обрезаем финальный скриншот колонки до размеров элемента');
 
             $wholeColumn->cropImage(
                 min($viewportRect->getWidth(), $elementRect->getWidth()), $elementRect->getHeight(), $elementRect->getX() -
@@ -173,13 +173,13 @@ class GetScreenshotRaw extends AbstractOperation
 
         $getColumnsShot = function (Rect $elementRect, Rect $viewportRect) use ($pageObject, $getColumnShot, $waitClosure)
         {
-            WLogger::logDebug('Делаем скриншоты колонок');
+            WLogger::logDebug($this, 'Делаем скриншоты колонок');
 
             $columns = new Imagick();
 
             $startingX = $elementRect->getX();
 
-            WLogger::logDebug('Делаем скриншот видимой колонки');
+            WLogger::logDebug($this, 'Делаем скриншот видимой колонки');
 
             $columns->addImage($getColumnShot($elementRect, $viewportRect));
 
@@ -187,11 +187,11 @@ class GetScreenshotRaw extends AbstractOperation
 
             $timesX = (int) floor($elementRect->getWidth() / $viewportRect->getWidth());
 
-            WLogger::logDebug("Для создания полного скриншота элемента, viewport будет прокручен по горизонтали " . max($timesX - 1, 0) . " раз");
+            WLogger::logDebug($this, "Для создания полного скриншота элемента, viewport будет прокручен по горизонтали " . max($timesX - 1, 0) . " раз");
 
             for ($j = 1; $j < $timesX; $j++)
             {
-                WLogger::logDebug('Прокручиваем viewport на его ширину и делаем скриншот вертикальной колонки элемента');
+                WLogger::logDebug($this, 'Прокручиваем viewport на его ширину и делаем скриншот вертикальной колонки элемента');
 
                 $pageObject->accept(new MouseScrollBy($viewportRect->getWidth(), 0));
 
@@ -206,7 +206,7 @@ class GetScreenshotRaw extends AbstractOperation
 
             if ($danglingWidth > 0)
             {
-                WLogger::logDebug('Делаем скриншот последнего горизонтального кусочка элемента');
+                WLogger::logDebug($this, 'Делаем скриншот последнего горизонтального кусочка элемента');
 
                 $pageObject->accept(new MouseScrollBy($danglingWidth, 0));
 
@@ -223,7 +223,7 @@ class GetScreenshotRaw extends AbstractOperation
 
             $columns->resetIterator();
 
-            WLogger::logDebug('Сшиваем скриншоты колонок по горизонтали');
+            WLogger::logDebug($this, 'Сшиваем скриншоты колонок по горизонтали');
 
             $wholeElement = $columns->appendImages(false);
             $wholeElement->setImagePage($wholeElement->getImageWidth(), $wholeElement->getImageHeight(), 0, 0);
@@ -274,11 +274,11 @@ class GetScreenshotRaw extends AbstractOperation
 
     protected function inSticky(WPageObject $pageObject) : bool
     {
-        WLogger::logDebug('Элемент находится внутри плавающего блока?');
+        WLogger::logDebug($this, 'Элемент находится внутри плавающего блока?');
 
         $result = $pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_ELEMENT_IN_STICKY);
 
-        WLogger::logDebug(json_encode($result));
+        WLogger::logDebug($this, json_encode($result));
 
         return $result;
     }

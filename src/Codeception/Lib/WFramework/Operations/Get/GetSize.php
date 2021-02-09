@@ -51,7 +51,7 @@ class GetSize extends AbstractOperation
                         ->getSize()
                         ;
 
-        WLogger::logDebug('Элемент имеет размер: ' . $result->getWidth() . 'x' . $result->getHeight());
+        WLogger::logDebug($this, 'Элемент имеет размер: ' . $result->getWidth() . 'x' . $result->getHeight());
 
         return $result;
     }

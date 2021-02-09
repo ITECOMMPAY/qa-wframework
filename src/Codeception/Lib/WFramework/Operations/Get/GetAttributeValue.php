@@ -65,7 +65,7 @@ class GetAttributeValue extends AbstractOperation
             $resultText = substr($resultText, 0, 64) . ' ...';
         }
 
-        WLogger::logDebug('Атрибут имеет значение: ' . $resultText);
+        WLogger::logDebug($this, 'Атрибут имеет значение: ' . $resultText);
 
         return $result;
     }

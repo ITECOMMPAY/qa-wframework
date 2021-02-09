@@ -53,7 +53,7 @@ class GetBorderColor extends AbstractOperation
 
         $result = Color::fromString($borderColor);
 
-        WLogger::logDebug('Получили цвет обводки: ' . $result);
+        WLogger::logDebug($this, 'Получили цвет обводки: ' . $result);
 
         return $result;
     }
