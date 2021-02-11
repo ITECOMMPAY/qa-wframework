@@ -68,7 +68,6 @@ class WebTestingModule extends WebDriver implements DependsOnModule
         'holdBrowserOpen'         => false,
         'autostartSeleniumServer' => true,
         'restartBeforeEachTest'   => true,
-        'autoUpdateDrivers'       => true,
         'debug'                   => true,
         'takeScreenshots'         => true,
         'screenshotsToVideo'      => true,
@@ -104,8 +103,8 @@ EOF;
 
     public function _inject(SeleniumServerModule $seleniumServer)
     {
-        $this->proxyWebDriver = new ProxyWebDriver();
         $this->seleniumServer = $seleniumServer;
+        $this->proxyWebDriver = new ProxyWebDriver();
         $this->initializeLogging();
     }
 
@@ -121,7 +120,7 @@ EOF;
             }
             elseif ($this->config['autostartSeleniumServer'])
             {
-                $this->seleniumServer->startSeleniumServer($this->config['autoUpdateDrivers']);
+                $this->seleniumServer->startSeleniumServer();
             }
 
             $this->setRunUniqueId();

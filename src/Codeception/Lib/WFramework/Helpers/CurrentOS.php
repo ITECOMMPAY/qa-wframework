@@ -14,10 +14,10 @@ use function substr;
 
 class CurrentOS
 {
-    const WINDOWS = 'WINDOWS';
-    const MAC = 'MAC';
-    const LINUX = 'LINUX';
-    const UNKNOWN = 'UNKNOWN';
+    const WINDOWS = 'windows';
+    const MAC = 'mac';
+    const LINUX = 'linux';
+    const UNKNOWN = 'unknown';
 
     protected static $os = null;
 

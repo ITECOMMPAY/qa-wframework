@@ -8,27 +8,19 @@
 
 namespace Codeception\Module;
 
+
+use Codeception\Lib\WFramework\Exceptions\GeneralException;
+use Codeception\Lib\WFramework\Selenium\Managers\ChromeDriverManager;
+use Codeception\Lib\WFramework\Selenium\Managers\GeckoDriverManager;
+use Codeception\Lib\WFramework\Selenium\Managers\SeleniumServerManager;
 use Codeception\Module as CodeceptionModule;
 use Codeception\Lib\WFramework\Exceptions\PortAlreadyInUseException;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
-use Codeception\Lib\WFramework\Helpers\CurrentOS;
 use Codeception\Lib\WFramework\Helpers\UnixProcess;
 use Codeception\Lib\WFramework\Logger\WLogger;
-use PharData;
 use Symfony\Component\Process\Process;
-use function chmod;
-use function codecept_output_dir;
-use function copy;
-use function file_exists;
-use function file_put_contents;
-use function fopen;
-use function json_decode;
-use function preg_match;
 use function realpath;
 use function stripos;
-use function strlen;
-use function substr;
-use function unlink;
 
 /**
  * Этот модуль служит для автозапуска Селениум Сервера перед прогоном тестов,
@@ -43,9 +35,16 @@ class SeleniumServerModule extends CodeceptionModule
     /** @var UnixProcess */
     protected $process;
 
-    const SELENIUM_BIN_PATH = '/../Lib/WFramework/SeleniumBin';
-    const SELENIUM_SERVER_PATH = self::SELENIUM_BIN_PATH . '/selenium-server-standalone.jar';
-    const SELENIUM_STATUS_URL = 'http://localhost:4444/wd/hub/status';
+    protected $config = [
+        'autoUpdateDrivers'           => true,
+        'outputFolder'                => '.wselenium',
+        'chromeDriverUrl'             => "https://chromedriver.storage.googleapis.com",
+        'geckoDriverUrl'              => "https://api.github.com/repos/mozilla/geckodriver/releases",
+        'seleniumServerStandaloneUrl' => "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar",
+        'sessionTimeout'              => 3600,
+        'port'                        => 4444,
+        'lock'                        => 25439
+    ];
 
     /**
      * @var false|resource
@@ -55,12 +54,10 @@ class SeleniumServerModule extends CodeceptionModule
     /**
      * Запускает Селениум Сервер если он ещё не запущен.
      *
-     * @param bool $autoUpdateDrivers - если в true, то перед запуском Селениум Сервера будут скачаны необходимые версии
-     *                                  драйвера
      * @throws PortAlreadyInUseException
      * @throws UsageException
      */
-    public function startSeleniumServer(bool $autoUpdateDrivers = false)
+    public function startSeleniumServer()
     {
         WLogger::logNotice($this, 'Начинаем настройку и запуск Selenium Server.');
 
@@ -73,18 +70,16 @@ class SeleniumServerModule extends CodeceptionModule
             return;
         }
 
-        $paths = $this->getDefaultDriverPaths();
-
-        if ($autoUpdateDrivers === true)
+        if (!$this->javaInstalled())
         {
-            $this->updateDrivers($paths);
+            throw new UsageException('Не удалось найти Java. Установите java-runtime.');
         }
 
-        $chromedriverPath = $paths['chromedriver'];
-        $geckodriverPath = $paths['geckodriver'];
-        $seleniumServerPath = realpath(__DIR__ . static::SELENIUM_SERVER_PATH);
+        $this->createOutputDir();
 
-        $cmd = "java -Dwebdriver.chrome.driver=$chromedriverPath -Dwebdriver.gecko.driver=$geckodriverPath -jar $seleniumServerPath -sessionTimeout 7200";
+        $pathParams = $this->getPathParams();
+
+        $cmd = "java $pathParams -port {$this->config['port']} -sessionTimeout {$this->config['sessionTimeout']}";
 
         WLogger::logDebug($this, 'Команда для запуска: ' . $cmd);
 
@@ -100,42 +95,8 @@ class SeleniumServerModule extends CodeceptionModule
 
         if (!$seleniumIsStarted)
         {
-            throw new PortAlreadyInUseException('Не удалось поднять Selenium Server на порте 4444 (возможно порт занят другим приложением или вообще Java не стоит).');
+            throw new PortAlreadyInUseException('Не удалось поднять Selenium Server на порту ' . $this->config['port'] . ' (возможно порт занят другим приложением или с Java что-то не так).');
         }
-    }
-
-    protected function getDefaultDriverPaths() : array
-    {
-        $os = CurrentOS::get();
-
-        $chromepath = static::SELENIUM_BIN_PATH;
-        $geckopath = static::SELENIUM_BIN_PATH;
-
-        switch ($os)
-        {
-            case CurrentOS::LINUX:
-                $chromepath .= '/chromedriver_linux64_default';
-                $geckopath  .= '/geckodriver_linux64_default';
-                break;
-
-            case CurrentOS::MAC:
-                $chromepath .= '/chromedriver_mac64_default';
-                $geckopath  .= '/geckodriver_mac64_default';
-                break;
-
-            default:
-                throw new UsageException('Данный модуль работает только под GNU/Linux и Mac. Текущая ОС: ' . $os);
-        }
-
-        $chromepath = realpath(__DIR__ . $chromepath);
-        $geckopath = realpath(__DIR__ . $geckopath);
-
-        $paths = [
-            'chromedriver' => $chromepath,
-            'geckodriver'  => $geckopath
-        ];
-
-        return $paths;
     }
 
     protected function seleniumIsStarted(int $maxTry = 1) : bool
@@ -154,14 +115,24 @@ class SeleniumServerModule extends CodeceptionModule
             sleep(1);
         }
 
-        $status = @file_get_contents(static::SELENIUM_STATUS_URL);
+        while (stripos(@file_get_contents("http://localhost:{$this->config['port']}/wd/hub/status"), 'Server is running') === false)
+        {
+            $try++;
 
-        return stripos($status, 'Server is running') !== false;
+            if ($try === $maxTry)
+            {
+                return false;
+            }
+
+            sleep(1);
+        }
+
+        return true;
     }
 
     protected function seleniumPortIsOpen() : bool
     {
-        $socket = @fsockopen('localhost', 4444, $errno, $errstr, 2);
+        $socket = @fsockopen('localhost', $this->config['port'], $errno, $errstr, 2);
 
         if (is_resource($socket))
         {
@@ -172,18 +143,6 @@ class SeleniumServerModule extends CodeceptionModule
         return false;
     }
 
-    public function stopSeleniumServer()
-    {
-        if (!$this->process->isRunning())
-        {
-            return;
-        }
-
-        WLogger::logDebug($this, 'Останавливаем Selenium Server.');
-
-        $this->process->stop();
-    }
-
     protected function lock()
     {
         $this->stream = false;
@@ -191,7 +150,7 @@ class SeleniumServerModule extends CodeceptionModule
 
         while (!$this->stream && time() < $timeout)
         {
-            $this->stream = @stream_socket_server('tcp://127.0.0.1:25439', $errno, $errmg);
+            $this->stream = @stream_socket_server("tcp://127.0.0.1:{$this->config['lock']}", $errno, $errmg);
 
             if ($this->stream !== false)
             {
@@ -209,7 +168,7 @@ class SeleniumServerModule extends CodeceptionModule
 
         if (!$this->stream)
         {
-            throw new PortAlreadyInUseException('Другой процесс висит на порту 25439. Нужно его убить.');
+            throw new PortAlreadyInUseException("Другой процесс висит на порту {$this->config['lock']}. Нужно его убить.");
         }
     }
 
@@ -223,241 +182,89 @@ class SeleniumServerModule extends CodeceptionModule
         fclose($this->stream);
     }
 
-    protected function updateDrivers(array &$paths)
+    protected function javaInstalled() : bool
     {
-        $chromedriverPath = $this->updateChromeDriver($paths['chromedriver']);
-        $paths['chromedriver'] = $chromedriverPath;
-
-        $geckodriverPath = $this->updateFirefoxDriver($paths['geckodriver']);
-        $paths['geckodriver'] = $geckodriverPath;
-    }
-
-    protected function updateChromeDriver(string $defaultLocalChromedriver) : string
-    {
-        WLogger::logDebug($this, 'Получаем версию Google Chrome');
-
-        if ($this->chromiumIsFromSnap())
-        {
-            throw new UsageException('Chromium установлен из Snap. Selenium пока не умеет с ним работать: 
-            https://github.com/SeleniumHQ/selenium/issues/7788 Удалите пакет с компьютера: sudo snap remove chromium - 
-            и поставьте Хром с сайта Гугла.');
-        }
-
-        $chromeVersion = $this->getBrowserVersion(['google-chrome', 'chromium-browser', 'chrome', 'chromium'], '--version', '%\s+(\d+).\d+.\d+.\d+%m');
-
-        if (empty($chromeVersion))
-        {
-            WLogger::logDebug($this, 'Не удалось установить версию Google Chrome - используем дефолтный chromedriver');
-            return $defaultLocalChromedriver;
-        }
-
-        WLogger::logDebug($this, "Версия Google Chrome: $chromeVersion");
-
-        $currentLocalChromedriver = substr($defaultLocalChromedriver, 0, strlen($defaultLocalChromedriver) - strlen('default')) . $chromeVersion;
-
-        if (file_exists($currentLocalChromedriver))
-        {
-            WLogger::logDebug($this, 'chromedriver уже скачан - используем его');
-            return $currentLocalChromedriver;
-        }
-
-        WLogger::logDebug($this, "Скачиваем chromedriver под Google Chrome $chromeVersion");
-
-        $chromedriverVersion = @file_get_contents("https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$chromeVersion");
-
-        if ($chromedriverVersion === false)
-        {
-            WLogger::logDebug($this, "Не удалось установить версию chromedriver для Google Chrome $chromeVersion - используем дефолтный");
-            return $defaultLocalChromedriver;
-        }
-
-        if (stripos($currentLocalChromedriver, 'linux64') !== false)
-        {
-            $url = "https://chromedriver.storage.googleapis.com/$chromedriverVersion/chromedriver_linux64.zip";
-        }
-
-        if (stripos($currentLocalChromedriver, 'mac64') !== false)
-        {
-            $url = "https://chromedriver.storage.googleapis.com/$chromedriverVersion/chromedriver_mac64.zip";
-        }
-
-        $zipfile = codecept_output_dir() . '/chromedriver_temp.zip';
-
-        if (!@file_put_contents($zipfile, fopen($url, 'rb')))
-        {
-            WLogger::logDebug($this, "Не удалось скачать $url - используем дефолтный chromedriver");
-            return $defaultLocalChromedriver;
-        }
-
-        if (!copy('zip://' . $zipfile . '#chromedriver', $currentLocalChromedriver))
-        {
-            WLogger::logDebug($this, 'Не удалось распаковать скачанный chromedriver - используем дефолтный');
-            return $defaultLocalChromedriver;
-        }
-
-        unlink($zipfile);
-
-        chmod($currentLocalChromedriver, 0775);
-
-        return $currentLocalChromedriver;
-    }
-
-    protected function chromiumIsFromSnap() : bool
-    {
-        $proc = new Process(['which', 'chromium']);
+        $proc = new Process(['which', 'java']);
         $proc->run();
         $output = $proc->getOutput();
 
-        if (empty($output) || stripos($output, 'snap') === false)
-        {
-            return false;
-        }
-
-        if (!file_exists('/snap/bin/chromium.chromedriver'))
-        {
-            return false;
-        }
-
-        return true;
+        return !empty($output);
     }
 
-    protected function updateFirefoxDriver(string $defaultLocalGeckodriver) : string
+    protected function createOutputDir()
     {
-        WLogger::logDebug($this, 'Получаем версию Firefox');
+        $homeDir = $this->getHomeDir();
 
-        $firefoxVersion = $this->getBrowserVersion(['firefox', 'iceweasel'], '--version', '%\s+(\d+).\d+%m');
-
-        if (empty($firefoxVersion))
+        if ($homeDir === null)
         {
-            WLogger::logDebug($this, 'Не удалось установить версию Firefox - используем дефолтный geckodriver');
-            return $defaultLocalGeckodriver;
+            throw new GeneralException('Не удалось получить домашнюю директорию');
         }
 
-        WLogger::logDebug($this, "Версия Firefox: $firefoxVersion");
+        $outputDir = $this->getHomeDir() . '/' . $this->config['outputFolder'];
 
-        $currentLocalGeckodriver = substr($defaultLocalGeckodriver, 0, strlen($defaultLocalGeckodriver) - strlen('default')) . $firefoxVersion;
-
-        if (file_exists($currentLocalGeckodriver))
+        if (!is_dir($outputDir))
         {
-            WLogger::logDebug($this, 'geckodriver уже скачан - используем его');
-            return $currentLocalGeckodriver;
+            mkdir($outputDir, 0777, true);
         }
 
-        WLogger::logDebug($this, 'Скачиваем последний geckodriver');
+        $dir = realpath($outputDir);
 
-        $seleniumBinDir = pathinfo($defaultLocalGeckodriver, PATHINFO_DIRNAME);
-
-        $arrContextOptions = [
-            'http' => [
-                'user_agent' => 'Some/1.0 downloader'
-            ]
-        ];
-
-        $latestReleaseInfo = @file_get_contents('https://api.github.com/repos/mozilla/geckodriver/releases/latest', false, stream_context_create($arrContextOptions));
-
-        if ($latestReleaseInfo === false)
+        if ($dir === false)
         {
-            WLogger::logDebug($this, 'Не удалось установить версию последнего geckodriver с github - используем дефолтный');
-            return $defaultLocalGeckodriver;
+            throw new GeneralException("Не получилось создать директорию: $outputDir");
         }
 
-        $info = json_decode($latestReleaseInfo, true);
-
-        if (!isset($info['assets'][0]['browser_download_url']))
-        {
-            WLogger::logDebug($this, 'Формат ответа от github изменился - используем дефолтный geckodriver');
-            return $defaultLocalGeckodriver;
-        }
-
-        if (stripos($currentLocalGeckodriver, 'linux64') !== false)
-        {
-            $needle = 'linux64';
-        }
-
-        if (stripos($currentLocalGeckodriver, 'mac64') !== false)
-        {
-            $needle = 'macos';
-        }
-
-        $url = '';
-
-        foreach ($info['assets'] as $asset)
-        {
-            $browserDownloadUrl = $asset['browser_download_url'];
-
-            if (stripos($browserDownloadUrl, $needle) !== false)
-            {
-                $url = $browserDownloadUrl;
-                break;
-            }
-        }
-
-        if (empty($url))
-        {
-            WLogger::logDebug($this, "Не удалось найти последний geckodriver для $needle на github - используем дефолтный");
-            return $defaultLocalGeckodriver;
-        }
-
-        $tarFile = codecept_output_dir() . '/geckodriver_temp.tar';
-        @unlink($tarFile);
-
-        $gzFile = $tarFile . '.gz';
-
-        if (!@file_put_contents($gzFile, fopen($url, 'rb')))
-        {
-            WLogger::logDebug($this, "Не удалось скачать $url - используем дефолтный geckodriver");
-            return $defaultLocalGeckodriver;
-        }
-
-        $gz = new PharData($gzFile);
-        $gz->decompress();
-
-        $tar = new PharData($tarFile);
-        if (!$tar->extractTo($seleniumBinDir, 'geckodriver', true))
-        {
-            WLogger::logDebug($this, 'Не удалось распаковать скачанный geckodriver - используем дефолтный');
-            return $defaultLocalGeckodriver;
-        }
-
-        $temp = realpath($seleniumBinDir . '/geckodriver');
-
-        if (!$temp)
-        {
-            WLogger::logDebug($this, 'Не удалось распаковать скачанный geckodriver - используем дефолтный');
-            return $defaultLocalGeckodriver;
-        }
-
-        rename($temp, $currentLocalGeckodriver);
-
-        unlink($gzFile);
-        unlink($tarFile);
-
-        chmod($currentLocalGeckodriver, 0775);
-
-        return $currentLocalGeckodriver;
+        $this->config['outputDir'] = $dir;
     }
 
-    protected function getBrowserVersion(array $binaryNames, string $versionFlag, string $regex) : string
+    protected function getHomeDir() :?string
     {
-        foreach ($binaryNames as $binaryName)
+        // getenv('HOME') isn't set on Windows and generates a Notice.
+        $home = getenv('HOME');
+
+        if (!empty($home))
         {
-            $proc = new Process([$binaryName, $versionFlag]);
-            $proc->run();
-            $output = $proc->getOutput();
-
-            if (empty($output))
-            {
-                continue;
-            }
-
-            preg_match($regex, $output, $matches);
-
-            if (isset($matches[1]))
-            {
-                return $matches[1];
-            }
+            // home should never end with a trailing slash.
+            return rtrim($home, '/');
         }
 
-        return '';
+        if (!empty($_SERVER['HOMEDRIVE']) && !empty($_SERVER['HOMEPATH']))
+        {
+            // home on windows
+            $home = $_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'];
+            // If HOMEPATH is a root directory the path can end with a slash. Make sure
+            // that doesn't happen.
+            $home = rtrim($home, '\\/');
+        }
+
+        return empty($home) ? null : $home;
+    }
+
+    protected function getPathParams() : string
+    {
+        $result = [];
+
+        $chromeDriverParam = (new ChromeDriverManager($this->config))->get();
+
+        if (!empty($chromeDriverParam))
+        {
+            $result[] = $chromeDriverParam;
+        }
+
+        $firefoxDriverParam = (new GeckoDriverManager($this->config))->get();
+
+        if (!empty($firefoxDriverParam))
+        {
+            $result[] = $firefoxDriverParam;
+        }
+
+        $seleniumJarParam = (new SeleniumServerManager($this->config))->get();
+
+        if (!empty($seleniumJarParam))
+        {
+            $result[] = $seleniumJarParam;
+        }
+
+        return implode(' ', $result);
     }
 }
