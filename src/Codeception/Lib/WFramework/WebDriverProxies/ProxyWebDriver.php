@@ -147,19 +147,9 @@ class ProxyWebDriver extends RemoteWebDriver
         return $this->remoteWebDriver->action(); 
     }
 
-    public function setCommandExecutor(WebDriverCommandExecutor $executor)
-    {
-        return $this->remoteWebDriver->setCommandExecutor($executor); 
-    }
-
     public function getCommandExecutor()
     {
         return $this->remoteWebDriver->getCommandExecutor(); 
-    }
-
-    public function setSessionID($session_id)
-    {
-        return $this->remoteWebDriver->setSessionID($session_id); 
     }
 
     public function getSessionID()

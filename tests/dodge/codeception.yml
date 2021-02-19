@@ -3,37 +3,48 @@ namespace: dodge
 suites:
     webui:
         actor: DodgeTester
-        path: .
+        path:  .
 
 modules:
     enabled:
+        -   Codeception\Module\WebTestingModule:
+                elementTimeout:          16      # Таймаут умных ожиданий для PageObject'ов (наследников WBlock, WElement)
+                collectionTimeout:       32      # Таймаут умных ожиданий для коллекций PageObject'ов (наследников WCollection)
+                autostartSeleniumServer: true    # Автоматически запускать SeleniumServer при старте тестов
+                topBarHeight:            100     # При прокрутке viewport к элементу, будет сохранён отступ от верхней границы viewport равный этому числу в пикселях
+                holdBrowserOpen:         false   # Оставлять браузер запущенным после завершения теста (помогает в дебаге, но забивает память множеством копий веб-драйвера)
+                restartBeforeEachTest:   true    # Запускать чистую сессию браузера Перед каждым тестом
+                capabilities:
+                    build:   'Build XXX'
+                    project: 'DODGE'
+                    name:    'Test Run'
+                shotRun:                 false
+                maxDeviation:            10
+        - Codeception\Module\FFmpegManagerModule
+        -   Codeception\Module\HtmlLoggerModule:
+                depends:
+                    - Codeception\Module\WebTestingModule
+                    - Codeception\Module\FFmpegManagerModule
+
+                debug:                   true    # (!!! сильно замедляет прогон тестов !!!) Выводить в консоль полный лог прогона теста, а в HTML-лог добавить больше скриншотов прогона
+                takeScreenshots:         true    # Делать скриншоты прогона для HTML-лога
+                screenshotsToVideo:      true    # Преобразовывать скриншоты HTML-лога в видео
+        -   Codeception\Module\SeleniumServerModule:
+                depends:
+                    - Codeception\Module\WebTestingModule
+
+                autoUpdateDrivers:       true    # Автоматически скачивать новые драйвера
+                sessionTimeout:          3600    # Максимальное время на одну тестовую сессию
+                port:                    4444    # По-дефолту сервер Селениума стартует на 4444 порту
         - Codeception\Module\WebAssertsModule
-        - Codeception\Module\SeleniumServerModule
-        - Codeception\Module\ShotsStorageModule:
-              source:    'local'
-              accessKey: '***accessKey***'
-              secretKey: '***secretKey***'
-              bucket:    '***bucket***'
-        - Codeception\Module\WebTestingModule:
-              depends:
-                  - Codeception\Module\SeleniumServerModule
-                  - Codeception\Module\WebAssertsModule
-                  - Codeception\Module\ShotsStorageModule
-              elementTimeout: 16               # Таймаут умных ожиданий для PageObject'ов (наследников WBlock, WElement)
-              collectionTimeout: 32            # Таймаут умных ожиданий для коллекций PageObject'ов (наследников WCollection)
-              autostartSeleniumServer: true    # Автоматически запускать SeleniumServer при старте тестов
-              topBarHeight: 100                # При прокрутке viewport к элементу, будет сохранён отступ от верхней границы viewport равный этому числу в пикселях
-              holdBrowserOpen: false           # Оставлять браузер запущенным после завершения теста (помогает в дебаге, но забивает память множеством копий веб-драйвера)
-              restartBeforeEachTest: true      # Запускать чистую сессию браузера Перед каждым тестом
-              debug: true                      # (!!! сильно замедляет прогон тестов !!!) Выводить в консоль полный лог прогона теста, а в HTML-лог добавить больше скриншотов прогона
-              takeScreenshots: true            # Делать скриншоты прогона для HTML-лога
-              screenshotsToVideo: true         # Преобразовывать скриншоты HTML-лога в видео
-              capabilities:
-                  build: 'Build XXX'
-                  project: 'DODGE'
-                  name: 'Test Run'
-              shotRun: false
-              maxDeviation: 10
+        -   Codeception\Module\ShotsStorageModule:
+                source:                  'local'
+                accessKey:               '***accessKey***'
+                secretKey:               '***secretKey***'
+                bucket:                  '***bucket***'
+
+
+
 
 extensions:
     enabled:
@@ -42,11 +53,11 @@ extensions:
         - Codeception\Command\WBuild
 
 paths:
-    tests: Tests
-    output: ../../output/dodge/
-    data: _data
+    tests:   Tests
+    output:  ../../output/dodge/
+    data:    _data
     support: _support
-    envs: _envs
+    envs:    _envs
 
 settings:
     memory_limit: 4096M

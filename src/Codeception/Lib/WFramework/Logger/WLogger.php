@@ -17,49 +17,94 @@ namespace Codeception\Lib\WFramework\Logger;
  */
 class WLogger
 {
+    /** @var ILoggerModule */
+    protected static $loggerModule;
+
+    public static function setLoggerModule(ILoggerModule $module)
+    {
+        static::$loggerModule = $module;
+    }
+
+    protected static function log(string $function, $object, $message, array $context = [])
+    {
+        if (static::$loggerModule !== null)
+        {
+            static::$loggerModule->$function($object, $message, $context);
+            return;
+        }
+
+        if ($function === 'logInfo')
+        {
+            echo  '        ' . $message . PHP_EOL;
+            return;
+        }
+
+        if ($function === 'logDebug')
+        {
+            echo '                ' . $message . PHP_EOL;
+            return;
+        }
+
+        echo $message . PHP_EOL;
+    }
+
+    public static function logAction($object, string $message, array $context = [])
+    {
+        static::log(__FUNCTION__, $object, $message, $context);
+    }
+
     public static function logNotice($object, $message, array $context = [])
     {
-        Log::get()->addNotice($object, $message, $context);
+        static::log(__FUNCTION__, $object, $message, $context);
     }
 
     public static function logInfo($object, $message, array $context = [])
     {
-        Log::get()->addInfo($object, $message, $context);
+        static::log(__FUNCTION__, $object, $message, $context);
     }
 
     public static function logDebug($object, $message, array $context = [])
     {
-        Log::get()->addDebug($object, $message, $context);
+        static::log(__FUNCTION__, $object, $message, $context);
     }
+
+
 
 
 
     public static function logError($object, string $message, array $context = [])
     {
-        Log::get()->addError($object, $message, $context);
+        static::log(__FUNCTION__, $object, $message, $context);
     }
 
     public static function logWarning($object, string $message, array $context = [])
     {
-        Log::get()->addWarning($object, $message, $context);
+        static::log(__FUNCTION__, $object, $message, $context);
     }
 
 
 
-    public static function logAssertSoft(string $message, array $context = [])
-    {
-        Log::get()->addAssertSoft($message, $context);
-    }
+
 
     public static function logAssertHard(string $message, array $context = [])
     {
-        Log::get()->addAssertHard($message, $context);
+        if (static::$loggerModule !== null)
+        {
+            static::$loggerModule->logAssertHard($message, $context);
+            return;
+        }
+
+        echo $message . PHP_EOL;
     }
 
-
-
-    public static function logAction($object, string $message, array $context = [])
+    public static function logAssertSoft(string $message, array $context = [])
     {
-        Log::get()->addSmart($object, $message, $context);
+        if (static::$loggerModule !== null)
+        {
+            static::$loggerModule->logAssertSoft($message, $context);
+            return;
+        }
+
+        echo $message . PHP_EOL;
     }
 }

@@ -7,7 +7,7 @@ namespace Codeception\Lib\WFramework\Selenium\Managers;
 use Codeception\Lib\WFramework\Exceptions\GeneralException;
 use Codeception\Lib\WFramework\Exceptions\NotImplementedException;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
-use Codeception\Lib\WFramework\Helpers\CurrentOS;
+use Codeception\Lib\WFramework\Helpers\System;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Selenium\AbstractDriverManager;
 use Symfony\Component\Process\Process;
@@ -108,12 +108,12 @@ class ChromeDriverManager extends AbstractDriverManager
             throw new GeneralException("Не удалось получить версию chromedriver для Google Chrome $chromeVersion");
         }
 
-        if ($os === CurrentOS::LINUX)
+        if ($os === System::LINUX)
         {
             $url = $this->url . "/$chromedriverVersion/chromedriver_linux64.zip";
         }
 
-        if ($os === CurrentOS::MAC)
+        if ($os === System::MAC)
         {
             $url = $this->url . "/$chromedriverVersion/chromedriver_mac64.zip";
         }

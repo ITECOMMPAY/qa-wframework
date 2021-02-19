@@ -9,8 +9,7 @@
 namespace Codeception\Module;
 
 
-use Codeception\Lib\Interfaces\DependsOnModule;
-use Codeception\Lib\WFramework\Logger\Log;
+use Codeception\Lib\ModuleContainer;
 use Codeception\TestInterface;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Properties\GlobalProperties;
@@ -28,11 +27,8 @@ use function strtoupper;
  *
  * @package Common\Module\WFramework\Modules
  */
-class WebTestingModule extends WebDriver implements DependsOnModule
+class WebTestingModule extends WebDriver
 {
-    /**  @var SeleniumServerModule */
-    protected $seleniumServer;
-
     /** @var ProxyWebDriver */
     protected $proxyWebDriver;
 
@@ -69,43 +65,19 @@ class WebTestingModule extends WebDriver implements DependsOnModule
         'autostartSeleniumServer' => true,
         'restartBeforeEachTest'   => true,
         'debug'                   => true,
-        'takeScreenshots'         => true,
-        'screenshotsToVideo'      => true,
         'shotRun'                 => true,
         'maxDeviation'            => 10,
         'useBrowserStack'         => false
     ];
 
-    protected $requiredFields = [];
-
-    protected $dependencyMessage = <<<EOF
-Example configuring PhpBrowser as backend for WebModule module.
---
-modules:
-    enabled:
-        - Common\Module\WFramework\Modules\SeleniumServerModule
-        - Common\Module\WFramework\Modules\WebAssertsModule
-        - Common\Module\WFramework\Modules\ShotsStorageModule
-        - Common\Module\WFramework\Modules\WebTestingModule:
-            depends:
-                - Common\Module\WFramework\Modules\SeleniumServerModule
-                - Common\Module\WFramework\Modules\WebAssertsModule
-                - Common\Module\WFramework\Modules\ShotsStorageModule
-            browser: 'chrome'
-            autostartSeleniumServer: true
-            clickViaJS: false
-            autoClickViaJS: true
-            topBarHeight: 65
-            window_size: '1366x768'
-            holdBrowserOpen: true
---
-EOF;
-
-    public function _inject(SeleniumServerModule $seleniumServer)
+    public function __construct(
+        ModuleContainer $moduleContainer,
+        $config = null
+    )
     {
-        $this->seleniumServer = $seleniumServer;
+        parent::__construct($moduleContainer, $config);
+
         $this->proxyWebDriver = new ProxyWebDriver();
-        $this->initializeLogging();
     }
 
     public function _initialize()
@@ -117,10 +89,6 @@ EOF;
             if ($this->config['useBrowserStack'])
             {
                 $this->configureBrowserStack();
-            }
-            elseif ($this->config['autostartSeleniumServer'])
-            {
-                $this->seleniumServer->startSeleniumServer();
             }
 
             $this->setRunUniqueId();
@@ -174,21 +142,6 @@ EOF;
     }
 
     /**
-     * Specifies class or module which is required for current one.
-     *
-     * THis method should return array with key as class name and value as error message
-     * [className => errorMessage
-     * ]
-     * @return mixed
-     */
-    public function _depends()
-    {
-        return [SeleniumServerModule::class => $this->dependencyMessage,
-                WebAssertsModule::class => $this->dependencyMessage,
-                ShotsStorageModule::class => $this->dependencyMessage];
-    }
-
-    /**
      * WBlock дёргает этот метод в своём конструкторе у актора, чтобы получить ссылку на RemoteWebDriver для своей работы.
      * WElement получает ссылку на RemoteWebDriver от WBlock на котором расположен.
      *
@@ -202,6 +155,16 @@ EOF;
         return $this->proxyWebDriver;
     }
 
+    public function _doINeedAutostartSeleniumServer() : bool
+    {
+        if ($this->config['useBrowserStack'])
+        {
+            return false;
+        }
+
+        return $this->config['autostartSeleniumServer'];
+    }
+
     public function _initializeSession()
     {
         parent::_initializeSession();
@@ -210,17 +173,12 @@ EOF;
         // Но т.к. эта ссылка была обёрнута в ProxyWebDriver, то достаточно передать в него свежий
         // экземпляр RemoteWebDriver, чтобы актуализировать ссылки всех PageObject'ов.
 
-        if (!isset($this->proxyWebDriver))
-        {
-            $this->proxyWebDriver = new ProxyWebDriver();
-        }
-
         $this->proxyWebDriver->setRemoteWebDriver($this->webDriver);
     }
 
     public function _closeSession($webDriver = null)
     {
-        if ($this->config['holdBrowserOpen'] === true)
+        if ($this->config['holdBrowserOpen'])
         {
             return;
         }
@@ -235,8 +193,6 @@ EOF;
 
     public function _before(TestInterface $test)
     {
-        $this->beginLog($test);
-
         if ($this->config['useBrowserStack'])
         {
             $name = $test->getMetadata()->getName();
@@ -250,7 +206,7 @@ EOF;
             );
         }
 
-        if (isset($this->webDriver) && $this->config['restartBeforeEachTest'] === true)
+        if (isset($this->webDriver) && $this->config['restartBeforeEachTest'])
         {
             $this->restartWebDriver();
         }
@@ -258,13 +214,6 @@ EOF;
         TestProperties::clear();
 
         parent::_before($test);
-    }
-
-    public function _after(TestInterface $test)
-    {
-        parent::_after($test);
-
-        $this->endLog();
     }
 
     public function _beforeSuite($settings = [])
@@ -297,145 +246,5 @@ EOF;
 
             }
         }
-    }
-
-    protected function initializeLogging()
-    {
-        Log::get()->setWebDriver($this->proxyWebDriver);
-        Log::get()->setDebug($this->config['debug']);
-        Log::get()->setTakeScreenshots($this->config['takeScreenshots']);
-        Log::get()->setScreenshotsToVideo($this->config['screenshotsToVideo']);
-    }
-
-    protected function setLogFile(string $filename = '')
-    {
-        if (empty($filename))
-        {
-            $time = (new \DateTime())->format('Y-m-d');
-            $filename = 'defaultWebLog' . '__' . $time;
-        }
-
-        $logDir = codecept_output_dir() . "/$filename";
-
-        $logFilename = $logDir . "/$filename.html";
-
-        $screenshotsDir = $logDir . '/screenshots';
-
-        Log::get()->setOutputFile($logDir, $logFilename, $screenshotsDir);
-    }
-
-    protected function beginLog($test)
-    {
-        $cestName = pathinfo($test->getMetadata()->getFilename(), PATHINFO_FILENAME);
-        $testName = $test->getMetadata()->getName();
-        $time = (new \DateTime())->format('Y-m-d\TH-i-s');
-
-        $this->setLogFile($time . '__' . $cestName . '__' . $testName);
-    }
-
-    protected function endLog()
-    {
-        Log::get()->finalizeLog();
-
-        $this->setLogFile();
-    }
-
-    /**
-     * Этот метод должен использоваться в начале тестовых шагов
-     *
-     * @param $object
-     * @param $message
-     * @param array $context
-     */
-    public function logNotice($object, $message, array $context = [])
-    {
-        Log::get()->addNotice($object, $message, $context);
-    }
-
-    /**
-     * Этот метод должен использоваться в начале методов PageObject'ов
-     *
-     * @param $object
-     * @param $message
-     * @param array $context
-     */
-    public function logInfo($object, $message, array $context = [])
-    {
-        Log::get()->addInfo($object, $message, $context);
-    }
-
-    /**
-     * Этот метод можно использовать повсюду для логирования дебажной инфы
-     *
-     * @param $object
-     * @param $message
-     * @param array $context
-     */
-    public function logDebug($object, $message, array $context = [])
-    {
-        Log::get()->addDebug($object, $message, $context);
-    }
-
-
-    /**
-     * Логирует ошибку
-     *
-     * @param $object
-     * @param string $message
-     * @param array $context
-     */
-    public function logError($object, string $message, array $context = [])
-    {
-        Log::get()->addError($object, $message, $context);
-    }
-
-    /**
-     * Логирует предупреждение
-     *
-     * @param $object
-     * @param string $message
-     * @param array $context
-     */
-    public function logWarning($object, string $message, array $context = [])
-    {
-        Log::get()->addWarning($object, $message, $context);
-    }
-
-
-
-    /**
-     * Логирует мягкий ассерт
-     *
-     * @param string $message
-     * @param array $context
-     */
-    public function logAssertSoft(string $message, array $context = [])
-    {
-        Log::get()->addAssertSoft($message, $context);
-    }
-
-    /**
-     * Логирует жёсткий ассерт
-     *
-     * @param string $message
-     * @param array $context
-     */
-    public function logAssertHard(string $message, array $context = [])
-    {
-        Log::get()->addAssertHard($message, $context);
-    }
-
-
-
-    /**
-     * Логирует начало действия (начало шага теста, начало метода PageObject'а)
-     *
-     * @param $object
-     * @param $message
-     * @param array $context
-     */
-    public function logAction($object, $message, array $context = array())
-    {
-        Log::get()->addSmart($object, $message, $context);
     }
 }

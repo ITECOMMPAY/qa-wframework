@@ -7,10 +7,10 @@ namespace Codeception\Lib\WFramework\Selenium\Managers;
 use Codeception\Lib\WFramework\Exceptions\FrameworkStaledException;
 use Codeception\Lib\WFramework\Exceptions\GeneralException;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
-use Codeception\Lib\WFramework\Helpers\CurrentOS;
+use Codeception\Lib\WFramework\Helpers\Archive;
+use Codeception\Lib\WFramework\Helpers\System;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Selenium\AbstractDriverManager;
-use PharData;
 
 class GeckoDriverManager extends AbstractDriverManager
 {
@@ -82,24 +82,15 @@ class GeckoDriverManager extends AbstractDriverManager
 
         $url = $this->getDownloadUrl($os);
 
-        $tarFile = $this->outputDir . '/geckodriver_temp.tar';
-        @unlink($tarFile);
-
-        $gzFile = $tarFile . '.gz';
+        $gzFile = $this->outputDir . '/geckodriver_temp.tar.gz';
+        @unlink($gzFile);
 
         if (!@file_put_contents($gzFile, fopen($url, 'rb')))
         {
             throw new GeneralException("Не удалось скачать geckodriver по URL: $url");
         }
 
-        $gz = new PharData($gzFile);
-        $gz->decompress();
-
-        $tar = new PharData($tarFile);
-        if (!$tar->extractTo($this->outputDir, 'geckodriver', true))
-        {
-            throw new GeneralException('Не удалось распаковать скачанный geckodriver');
-        }
+        Archive::pharExtract($gzFile);
 
         $temp = realpath($this->outputDir . '/geckodriver');
 
@@ -111,7 +102,6 @@ class GeckoDriverManager extends AbstractDriverManager
         rename($temp, $driverPath);
 
         unlink($gzFile);
-        unlink($tarFile);
 
         chmod($driverPath, 0775);
     }
@@ -138,12 +128,12 @@ class GeckoDriverManager extends AbstractDriverManager
             throw new FrameworkStaledException('Формат ответа от github изменился');
         }
 
-        if ($os === CurrentOS::LINUX)
+        if ($os === System::LINUX)
         {
             $needle = 'linux64';
         }
 
-        if ($os === CurrentOS::MAC)
+        if ($os === System::MAC)
         {
             $needle = 'macos';
         }

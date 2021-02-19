@@ -5,7 +5,7 @@ namespace Codeception\Lib\WFramework\Selenium;
 
 
 use Codeception\Lib\WFramework\Exceptions\UsageException;
-use Codeception\Lib\WFramework\Helpers\CurrentOS;
+use Codeception\Lib\WFramework\Helpers\System;
 use Symfony\Component\Process\Process;
 
 abstract class AbstractDriverManager
@@ -16,9 +16,9 @@ abstract class AbstractDriverManager
 
     protected function getOS() : string
     {
-        $os = CurrentOS::get();
+        $os = System::getOS();
 
-        if ($os !== CurrentOS::LINUX && $os !== CurrentOS::MAC)
+        if ($os !== System::LINUX && $os !== System::MAC)
         {
             throw new UsageException('Данный модуль работает только под GNU/Linux и Mac. Текущая ОС: ' . $os);
         }

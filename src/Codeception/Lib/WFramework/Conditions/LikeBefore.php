@@ -82,7 +82,7 @@ class LikeBefore extends AbstractCondition
      */
     protected function compareImages(string $referenceImage, string $newImage) : bool
     {
-        WLogger::logDebug('Сравниваем две картинки');
+        WLogger::logDebug($this, 'Сравниваем две картинки');
 
         $imagick1 = new \Imagick();
         $imagick1->readImageBlob($referenceImage);
@@ -118,12 +118,12 @@ class LikeBefore extends AbstractCondition
 
         if ($deviation <= $maxDeviation)
         {
-            WLogger::logDebug("Картинки - одинаковые ($deviation <= $maxDeviation)");
+            WLogger::logDebug($this, "Картинки - одинаковые ($deviation <= $maxDeviation)");
 
             return true;
         }
 
-        WLogger::logDebug("Картинки - разные ($deviation > $maxDeviation)");
+        WLogger::logDebug($this, "Картинки - разные ($deviation > $maxDeviation)");
 
         return false;
     }

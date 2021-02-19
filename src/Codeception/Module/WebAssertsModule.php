@@ -122,6 +122,11 @@ class WebAssertsModule extends Asserts
         $this->failedSoftAssertions = [];
     }
 
+    public function _after(TestInterface $test)
+    {
+        $this->assertAll();
+    }
+
     public function assertAll()
     {
         if (empty($this->failedSoftAssertions))

@@ -34,11 +34,6 @@ class exampleCest
         }
     }
 
-    public function _after(DodgeTester $I)
-    {
-        $I->assertAll(); // Фейлим тест если не прошли мягкие проверки ($I->assertSoft*)
-    }
-
     /**
      * При использовании PhpStorm не забываем:
      *     Ctrl+Q (не на Маке) - показывает хелпу по методу, если она есть
