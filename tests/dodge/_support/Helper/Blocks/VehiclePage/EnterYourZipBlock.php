@@ -4,11 +4,11 @@
 namespace dodge\Helper\Blocks\VehiclePage;
 
 
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
-use Common\Module\WFramework\WebObjects\Primitive\WTextBox;
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\DodgeBlock;
-use dodge\Helper\TestSteps\DodgeSteps;
+use dodge\Helper\Elements\Basic\DodgeButton;
+use dodge\Helper\Elements\Basic\DodgeTextBox;
+use dodge\Helper\Steps\DodgeSteps;
 
 class EnterYourZipBlock extends DodgeBlock
 {
@@ -34,8 +34,8 @@ class EnterYourZipBlock extends DodgeBlock
 
     public function __construct(DodgeTester $actor)
     {
-        $this->zipField      = WTextBox::fromXpath('Enter ZIP Code', ".//input");
-        $this->submitButton  = WButton::fromXpath( '>',              ".//a");
+        $this->zipField      = DodgeTextBox::fromXpath('Enter ZIP Code', ".//input");
+        $this->submitButton  = DodgeButton::fromXpath( '>',              ".//a");
 
         parent::__construct($actor);
     }
@@ -54,12 +54,12 @@ class EnterYourZipBlock extends DodgeBlock
 
 
 
-    public function getSubmitButton() : WButton
+    public function getSubmitButton() : DodgeButton
     {
         return $this->submitButton;
     }
 
-    public function getZipField() : WTextBox
+    public function getZipField() : DodgeTextBox
     {
         return $this->zipField;
     }

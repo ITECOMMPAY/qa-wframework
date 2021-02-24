@@ -4,9 +4,9 @@
 namespace dodge\Helper\Elements\DodgeTabs\Inner;
 
 
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
+use dodge\Helper\Elements\Basic\DodgeButton;
 
-class DodgeTab extends WButton
+class DodgeTab extends DodgeButton
 {
     protected function initTypeName() : string
     {
@@ -15,13 +15,16 @@ class DodgeTab extends WButton
 
     public function isSelected() : bool
     {
-        return $this->is(TabSelected::new(), 'вкладка выбрана?');
+        return $this->is(new TabSelected());
+    }
+
+    public function finallySelected() : bool
+    {
+        return $this->finally_(new TabSelected());
     }
 
     public function shouldBeSelected() : DodgeTab
     {
-        $this->should(TabSelected::new(), 'вкладка должна быть выбрана');
-
-        return $this;
+        return $this->should(new TabSelected());
     }
 }

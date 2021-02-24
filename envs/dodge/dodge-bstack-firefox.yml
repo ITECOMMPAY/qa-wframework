@@ -1,7 +1,0 @@
-# `chrome` environment config
-modules:
-    config:
-        Common\Module\WFramework\Modules\WebTestingModule:
-            browser: firefox
-            capabilities:
-                browserVersion: 'latest'

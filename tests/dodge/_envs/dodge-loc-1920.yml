@@ -1,0 +1,5 @@
+# `1920` environment config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            window_size: "1920x1080"

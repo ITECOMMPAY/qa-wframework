@@ -4,12 +4,12 @@
 namespace dodge\Helper\Blocks\Common;
 
 
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
 use dodge\DodgeTester;
 use dodge\Helper\AliasMaps\TabsHeaders\HeaderTabsMap;
 use dodge\Helper\Blocks\DodgeBlock;
+use dodge\Helper\Elements\Basic\DodgeButton;
 use dodge\Helper\Elements\DodgeTabs\DodgeTabs;
-use dodge\Helper\TestSteps\DodgeSteps;
+use dodge\Helper\Steps\DodgeSteps;
 
 class HeaderBlock extends DodgeBlock
 {
@@ -33,10 +33,10 @@ class HeaderBlock extends DodgeBlock
 
     public function __construct(DodgeTester $actor)
     {
-        $this->titleButton = WButton::fromXpath('DODGE', ".//a[@data-lid='top-nav-top-nav-dodge-logo']");
+        $this->titleButton = DodgeButton::fromXpath('DODGE', ".//a[@data-lid='top-nav-top-nav-dodge-logo']");
         $this->tabs        = DodgeTabs::fromXpath('Панель вкладок', ".//ul")
                                                     ->setHeadersAliasMap(new HeaderTabsMap());
-        $this->buildAndPriceButton = WButton::fromXpath('Build & Price', ".//a[@data-lid='top-nav-build-and-price']");
+        $this->buildAndPriceButton = DodgeButton::fromXpath('Build & Price', ".//a[@data-lid='top-nav-build-and-price']");
 
         parent::__construct($actor);
     }
@@ -60,7 +60,7 @@ class HeaderBlock extends DodgeBlock
 
 
 
-    public function getBuildAndPriceButton() : WButton
+    public function getBuildAndPriceButton() : DodgeButton
     {
         return $this->buildAndPriceButton;
     }
@@ -70,7 +70,7 @@ class HeaderBlock extends DodgeBlock
         return $this->tabs;
     }
 
-    public function getTitleButton() : WButton
+    public function getTitleButton() : DodgeButton
     {
         return $this->titleButton;
     }

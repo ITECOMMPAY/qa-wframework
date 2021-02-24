@@ -1,0 +1,7 @@
+# `chrome` environment config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            browser: firefox
+            capabilities:
+                browserVersion: 'latest'

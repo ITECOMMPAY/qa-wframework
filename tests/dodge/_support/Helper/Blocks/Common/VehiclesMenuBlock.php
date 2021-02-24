@@ -4,12 +4,12 @@
 namespace dodge\Helper\Blocks\Common;
 
 
-use Common\Module\WFramework\WebObjects\Primitive\WArray;
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\DodgeBlock;
+use dodge\Helper\Collections\DodgeCollection;
+use dodge\Helper\Elements\Basic\DodgeButton;
 use dodge\Helper\Elements\DodgeVehicleCard\DodgeVehicleCard;
-use dodge\Helper\TestSteps\DodgeSteps;
+use dodge\Helper\Steps\DodgeSteps;
 
 class VehiclesMenuBlock extends DodgeBlock
 {
@@ -34,9 +34,9 @@ class VehiclesMenuBlock extends DodgeBlock
 
     public function __construct(DodgeTester $actor)
     {
-        $this->closeButton = WButton::fromXpath('Close', ".//button[text()='close']");
+        $this->closeButton = DodgeButton::fromXpath('Close', ".//button[text()='close']");
 
-        $this->cardsArray = WArray::fromFirstElement(DodgeVehicleCard::fromXpath('Карточка авто', ".//div[@data-cats-id='navcards']/div/div[@data-cats-id='grid']/div"));
+        $this->cardsArray = DodgeCollection::fromFirstElement(DodgeVehicleCard::fromXpath('Карточка авто', ".//div[@data-cats-id='navcards']/div/div[@data-cats-id='grid']/div"));
 
         parent::__construct($actor);
     }
@@ -59,12 +59,12 @@ class VehiclesMenuBlock extends DodgeBlock
 
 
 
-    public function getCardsArray() : WArray
+    public function getCardsArray() : DodgeCollection
     {
         return $this->cardsArray;
     }
 
-    public function getCloseButton() : WButton
+    public function getCloseButton() : DodgeButton
     {
         return $this->closeButton;
     }

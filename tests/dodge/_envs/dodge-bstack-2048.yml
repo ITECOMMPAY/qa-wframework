@@ -1,0 +1,6 @@
+# `1920` environment config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            capabilities:
+                resolution: '2048x1536'

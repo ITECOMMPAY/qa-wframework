@@ -4,15 +4,15 @@
 namespace dodge\Helper\Elements\DodgeOption;
 
 
-use Common\Module\WFramework\Exceptions\Common\FrameworkStaledException;
-use Common\Module\WFramework\Logger\WLogger;
-use Common\Module\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Common\Module\WFramework\WebObjects\Base\WElement\WElement;
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
-use Common\Module\WFramework\WebObjects\Primitive\WCheckbox;
-use Common\Module\WFramework\WebObjects\Primitive\WLabel;
+use Codeception\Lib\WFramework\Exceptions\FrameworkStaledException;
+use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
+use dodge\Helper\Elements\Basic\DodgeButton;
+use dodge\Helper\Elements\Basic\DodgeCheckbox;
+use dodge\Helper\Elements\Basic\DodgeLabel;
+use dodge\Helper\Elements\DodgeElement;
 
-class DodgeOption extends WElement
+class DodgeOption extends DodgeElement
 {
     protected function initTypeName() : string
     {
@@ -21,34 +21,34 @@ class DodgeOption extends WElement
 
     public function __construct(WFrom $importer)
     {
-        $this->button    = WButton::fromXpath('Кнопка', ".");
-        $this->nameLabel = WLabel::fromXpath('Название опции', ".//label[contains(@title, 'Apply')]");
-        $this->_checkbox = WCheckbox::fromXpath('Галочка', ".//input");
+        $this->button    = DodgeButton::fromXpath('Кнопка', ".");
+        $this->nameLabel = DodgeLabel::fromXpath('Название опции', ".//label[contains(@title, 'Apply')]");
+        $this->_checkbox = DodgeCheckbox::fromXpath('Галочка', ".//input");
 
         parent::__construct($importer);
     }
 
     public function getOptionName() : string
     {
-        WLogger::logInfo($this . " -> получаем название опции");
+        WLogger::logInfo($this, "получаем название опции");
 
         return $this
                     ->nameLabel
-                    ->returnSeleniumElement()
+                    ->returnOperations()
                     ->get()
-                    ->attribute('data-lid')
+                    ->attributeValue('data-lid')
                     ;
     }
 
     public function getOptionPrice() : int
     {
-        WLogger::logInfo($this . " -> получаем цену опции");
+        WLogger::logInfo($this, "получаем цену опции");
 
         $priceText = $this
                         ->nameLabel
-                        ->returnSeleniumElement()
+                        ->returnOperations()
                         ->get()
-                        ->attribute('title')
+                        ->attributeValue('title')
                         ;
 
         if (preg_match('%Price:\s+\$(?\'price\'\d+)%m', $priceText, $matches) !== 1)
@@ -61,14 +61,14 @@ class DodgeOption extends WElement
 
     public function selected() : bool
     {
-        WLogger::logInfo($this . " -> выбрана?");
+        WLogger::logInfo($this, "выбрана?");
 
-        return $this->_checkbox->checked();
+        return $this->_checkbox->isChecked();
     }
 
     public function select() : DodgeOption
     {
-        WLogger::logInfo($this . " -> выбираем?");
+        WLogger::logInfo($this, "выбираем?");
 
         if ($this->selected())
         {

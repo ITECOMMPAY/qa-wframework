@@ -1,10 +1,6 @@
 <?php
 namespace dodge;
 
-
-use Codeception\Actor;
-use Codeception\Lib\Friend;
-
 /**
  * Inherited Methods
  * @method void wantToTest($text)
@@ -16,12 +12,15 @@ use Codeception\Lib\Friend;
  * @method void am($role)
  * @method void lookForwardTo($achieveValue)
  * @method void comment($description)
- * @method Friend haveFriend($name, $actorClass = NULL)
+ * @method void pause()
  *
  * @SuppressWarnings(PHPMD)
- */
-class DodgeTester extends Actor
+*/
+class DodgeTester extends \Codeception\Actor
 {
     use _generated\DodgeTesterActions;
 
+    /**
+     * Define custom actions here
+     */
 }

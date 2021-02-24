@@ -4,13 +4,13 @@
 namespace dodge\Helper\Elements\DodgeVehicleCard;
 
 
-use Common\Module\WFramework\Exceptions\Common\FrameworkStaledException;
-use Common\Module\WFramework\Logger\WLogger;
-use Common\Module\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
-use Common\Module\WFramework\WebObjects\Primitive\WLabel;
+use Codeception\Lib\WFramework\Exceptions\FrameworkStaledException;
+use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
+use dodge\Helper\Elements\Basic\DodgeButton;
+use dodge\Helper\Elements\Basic\DodgeLabel;
 
-class DodgeVehicleCard extends WButton
+class DodgeVehicleCard extends DodgeButton
 {
     protected function initTypeName() : string
     {
@@ -19,33 +19,33 @@ class DodgeVehicleCard extends WButton
 
     public function __construct(WFrom $importer)
     {
-        $this->nameLabel  = WLabel::fromXpath('Название авто', ".//div/span[@data-cats-id='vehicle-name']");
-        $this->_priceLabel = WLabel::fromXpath('Цена',          ".//div/span[@data-cats-id='price']/ins");
+        $this->nameLabel   = DodgeLabel::fromXpath('Название авто', ".//div/span[@data-cats-id='vehicle-name']");
+        $this->_priceLabel = DodgeLabel::fromXpath('Цена',          ".//div/span[@data-cats-id='price']/ins");
 
         parent::__construct($importer);
     }
 
     public function getVehicleName() : string
     {
-        WLogger::logDebug($this . " -> получаем название авто");
+        WLogger::logDebug($this, "получаем название авто");
 
         $name = $this->nameLabel->getCurrentValueString();
 
-        WLogger::logDebug($this . " -> имеет название: $name");
+        WLogger::logDebug($this, "имеет название: $name");
 
         return $name;
     }
 
     public function hasPrice() : bool
     {
-        WLogger::logDebug($this . " -> имеет цену?");
+        WLogger::logDebug($this, "имеет цену?");
 
         return $this->_priceLabel->isExist();
     }
 
     public function _getPrice() : int
     {
-        WLogger::logDebug($this . " -> получаем начальную цену авто");
+        WLogger::logDebug($this, "получаем начальную цену авто");
 
         $price = $this->_priceLabel->getAllText();
 
@@ -56,7 +56,7 @@ class DodgeVehicleCard extends WButton
             throw new FrameworkStaledException('Не получилось распарсить цену авто: ' . $price);
         }
 
-        WLogger::logDebug($this . " -> авто стоит: $parsedPrice долларов");
+        WLogger::logDebug($this, "авто стоит: $parsedPrice долларов");
 
         return $parsedPrice;
     }

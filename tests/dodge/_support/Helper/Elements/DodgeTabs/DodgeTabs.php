@@ -3,14 +3,14 @@
 
 namespace dodge\Helper\Elements\DodgeTabs;
 
-use Common\Module\WFramework\AliasMap\AliasMap;
-use Common\Module\WFramework\AliasMap\EmptyAliasMap;
-use Common\Module\WFramework\Exceptions\Common\UsageException;
-use Common\Module\WFramework\Logger\WLogger;
-use Common\Module\WFramework\Properties\TestProperties;
-use Common\Module\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Common\Module\WFramework\WebObjects\Base\WElement\WElement;
-use Common\Module\WFramework\WebObjects\Primitive\WArray;
+use Codeception\Lib\WFramework\AliasMaps\AliasMap;
+use Codeception\Lib\WFramework\AliasMaps\EmptyAliasMap;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
+use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Properties\TestProperties;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
+use dodge\Helper\Collections\DodgeCollection;
+use dodge\Helper\Elements\DodgeElement;
 use dodge\Helper\Elements\DodgeTabs\Inner\DodgeTab;
 
 /**
@@ -22,7 +22,7 @@ use dodge\Helper\Elements\DodgeTabs\Inner\DodgeTab;
  *
  * @package dodge\Helper\Elements\DodgeTabs
  */
-class DodgeTabs extends WElement
+class DodgeTabs extends DodgeElement
 {
     protected function initTypeName() : string
     {
@@ -36,7 +36,7 @@ class DodgeTabs extends WElement
     {
         $this->headersAliasMap = new EmptyAliasMap();
 
-        $this->tabs = WArray::fromFirstElement(DodgeTab::fromXpath('Вкладка', ".//li"));
+        $this->tabs = DodgeCollection::fromFirstElement(DodgeTab::fromXpath('Вкладка', ".//li"));
 
         parent::__construct($importer);
     }
@@ -53,7 +53,7 @@ class DodgeTabs extends WElement
     {
         $tabText = $this->headersAliasMap->getValue($alias);
 
-        WLogger::logInfo($this . " -> выбираем вкладку: $tabText");
+        WLogger::logInfo($this, "выбираем вкладку: $tabText");
 
         /** @var DodgeTab $tab */
         $tab = $this->getTab($alias);
@@ -69,7 +69,7 @@ class DodgeTabs extends WElement
     {
         $tabText = $this->headersAliasMap->getValue($alias);
 
-        WLogger::logInfo($this . " -> получаем вкладку: $tabText");
+        WLogger::logInfo($this, "получаем вкладку: $tabText");
 
         $tabs = $this
                     ->tabs

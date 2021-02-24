@@ -4,12 +4,12 @@
 namespace dodge\Helper\Elements\DodgeModelCard;
 
 
-use Common\Module\WFramework\Logger\WLogger;
-use Common\Module\WFramework\WebObjects\Base\WElement\Import\WFrom;
-use Common\Module\WFramework\WebObjects\Primitive\WButton;
-use Common\Module\WFramework\WebObjects\Primitive\WLabel;
+use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\Import\WFrom;
+use dodge\Helper\Elements\Basic\DodgeButton;
+use dodge\Helper\Elements\Basic\DodgeLabel;
 
-class DodgeModelCard extends WButton
+class DodgeModelCard extends DodgeButton
 {
 
     protected function initTypeName() : string
@@ -19,19 +19,28 @@ class DodgeModelCard extends WButton
 
     public function __construct(WFrom $importer)
     {
-        $this->title = WLabel::fromXpath('Название модели', ".//div[contains(@class, 'vehicle-title')]");
+        $this->title = DodgeLabel::fromXpath('Название модели', ".//div[contains(@class, 'vehicle-title')]");
+
+        $this->buildButton = DodgeButton::fromXpath('Build', ".//div[text()='Build']");
 
         parent::__construct($importer);
     }
 
     public function getModelName() : string
     {
-        WLogger::logDebug($this . " -> получаем название модели");
+        WLogger::logDebug($this, "получаем название модели");
 
         $name = $this->title->getCurrentValueString();
 
-        WLogger::logDebug($this . " -> имеет название: $name");
+        WLogger::logDebug($this, "имеет название: $name");
 
         return $name;
+    }
+
+    public function build()
+    {
+        WLogger::logDebug($this, "Начинаем конфигурацию");
+
+        $this->buildButton->click();
     }
 }

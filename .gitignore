@@ -1,0 +1,11 @@
+.idea
+output
+vendor
+composer.phar
+_generated
+src/Codeception/Lib/WFramework/SeleniumBin/*
+!src/Codeception/Lib/WFramework/SeleniumBin/geckodriver_linux64_default
+!src/Codeception/Lib/WFramework/SeleniumBin/chromedriver_linux64_default
+!src/Codeception/Lib/WFramework/SeleniumBin/chromedriver_mac64_default
+!src/Codeception/Lib/WFramework/SeleniumBin/geckodriver_mac64_default
+local.log

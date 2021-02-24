@@ -1,0 +1,9 @@
+# `chrome` environment config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            browser: chrome
+            capabilities:
+                chromeOptions:
+                    args: ['start-maximized']
+                browserVersion: 'latest'

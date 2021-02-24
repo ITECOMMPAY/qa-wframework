@@ -1,0 +1,5 @@
+# `nl3 Dashboard` environment config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            url: 'https://www.dodge.com/'

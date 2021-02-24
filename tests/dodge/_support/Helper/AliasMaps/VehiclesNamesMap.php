@@ -4,7 +4,7 @@
 namespace dodge\Helper\AliasMaps;
 
 
-use Common\Module\WFramework\AliasMap\AliasMap;
+use Codeception\Lib\WFramework\AliasMaps\AliasMap;
 
 class VehiclesNamesMap extends AliasMap
 {

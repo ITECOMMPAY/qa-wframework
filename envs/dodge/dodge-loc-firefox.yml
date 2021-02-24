@@ -1,5 +1,0 @@
-# `local` environment config
-modules:
-    config:
-        Common\Module\WFramework\Modules\WebTestingModule:
-            browser: firefox

@@ -4,11 +4,11 @@
 namespace dodge\Helper\Blocks\BuildModelPage;
 
 
-use Common\Module\WFramework\WebObjects\Primitive\WArray;
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\DodgeBlock;
+use dodge\Helper\Collections\DodgeCollection;
 use dodge\Helper\Elements\DodgeOption\DodgeOption;
-use dodge\Helper\TestSteps\DodgeSteps;
+use dodge\Helper\Steps\DodgeSteps;
 
 class StripesAndDecalsBlock extends DodgeBlock
 {
@@ -39,7 +39,7 @@ class StripesAndDecalsBlock extends DodgeBlock
 
     public function __construct(DodgeTester $actor)
     {
-        $this->decalsOptions = WArray::fromFirstElement(DodgeOption::fromXpath('Винил', ".//div[contains(@class, 'checkbox-group')]//div[contains(@class, 'sdp-form-checkbox ')]"));
+        $this->decalsOptions = DodgeCollection::fromFirstElement(DodgeOption::fromXpath('Винил', ".//div[contains(@class, 'checkbox-group')]//div[contains(@class, 'sdp-form-checkbox ')]"));
 
         parent::__construct($actor);
     }
@@ -52,7 +52,7 @@ class StripesAndDecalsBlock extends DodgeBlock
 
 
 
-    public function getDecalsOptions() : WArray
+    public function getDecalsOptions() : DodgeCollection
     {
         return $this->decalsOptions;
     }

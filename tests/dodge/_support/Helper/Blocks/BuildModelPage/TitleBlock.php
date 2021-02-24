@@ -4,10 +4,10 @@
 namespace dodge\Helper\Blocks\BuildModelPage;
 
 
-use Common\Module\WFramework\WebObjects\Primitive\WLabel;
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\DodgeBlock;
-use dodge\Helper\TestSteps\DodgeSteps;
+use dodge\Helper\Elements\Basic\DodgeLabel;
+use dodge\Helper\Steps\DodgeSteps;
 
 class TitleBlock extends DodgeBlock
 {
@@ -38,7 +38,7 @@ class TitleBlock extends DodgeBlock
 
     public function __construct(DodgeTester $actor)
     {
-        $this->titleLabel = WLabel::fromXpath('Название модели', ".//h2[text()='Exterior']/preceding-sibling::h1/span");
+        $this->titleLabel = DodgeLabel::fromXpath('Название модели', ".//h2[text()='Exterior']/preceding-sibling::h1/span");
 
         parent::__construct($actor);
     }
@@ -55,7 +55,7 @@ class TitleBlock extends DodgeBlock
 
 
 
-    public function getTitleLabel() : WLabel
+    public function getTitleLabel() : DodgeLabel
     {
         return $this->titleLabel;
     }

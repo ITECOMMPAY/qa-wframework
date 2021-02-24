@@ -1,0 +1,5 @@
+# `local` environment config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            browser: chrome
