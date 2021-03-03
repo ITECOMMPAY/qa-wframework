@@ -7,6 +7,7 @@ namespace Codeception\Command;
 use Codeception\Configuration;
 use Codeception\CustomCommandInterface;
 use Codeception\Lib\WFramework\Generator\WProjectStructure;
+use Codeception\Lib\WFramework\Helpers\Codeception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,14 +30,17 @@ class WBuild extends Command implements CustomCommandInterface
         foreach ($suites as $suite)
         {
             $suiteSettings = $this->getSuiteConfig($suite);
+            $actorNameShort = $suiteSettings['actor'];
+            $namespace = $suiteSettings['namespace'] ?? '';
 
-            if (!$this->suiteUsesWFramework($suiteSettings))
+            $frameworkConfig = Codeception::getModuleConfig('WebTestingModule', $suiteSettings);
+
+            if ($frameworkConfig === null)
             {
                 continue;
             }
 
-            $actorNameShort = $suiteSettings['actor'];
-            $namespace = $suiteSettings['namespace'] ?? '';
+            $commonDirs = $frameworkConfig['commonDirs'] ?? [];
 
             if (!empty($namespace))
             {
@@ -54,32 +58,9 @@ class WBuild extends Command implements CustomCommandInterface
                 }
             }
 
-            (new WProjectStructure($projectName, $namespace, $actorNameShort, $supportDir))->build();
+            (new WProjectStructure($projectName, $namespace, $actorNameShort, $supportDir, $commonDirs))->build();
         }
 
         return 0;
-    }
-
-    protected function suiteUsesWFramework(array $suiteSettings) : bool
-    {
-        $enabledModules = $suiteSettings['modules']['enabled'];
-
-        foreach ($enabledModules as $module)
-        {
-            $moduleName = $module;
-
-            if (is_array($module))
-            {
-                $moduleName = array_keys($module);
-                $moduleName = reset($moduleName);
-            }
-
-            if (strpos($moduleName, 'WebTestingModule') !== false)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

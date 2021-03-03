@@ -7,7 +7,9 @@ namespace Codeception\Extension;
 use Codeception\Configuration;
 use Codeception\Event\SuiteEvent;
 use Codeception\Events;
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Generator\WProjectStructure;
+use Codeception\Lib\WFramework\Helpers\Codeception;
 
 class WAutoRebuild extends \Codeception\Extension
 {
@@ -27,6 +29,15 @@ class WAutoRebuild extends \Codeception\Extension
         $actorNameShort = $suiteSettings['actor'];
         $namespace = $suiteSettings['namespace'] ?? '';
 
+        $frameworkConfig = Codeception::getModuleConfig('WebTestingModule', $suiteSettings);
+
+        if ($frameworkConfig === null)
+        {
+            throw new UsageException('WAutoRebuild добавлен, но WebTestingModule не подключен');
+        }
+
+        $commonDirs = $frameworkConfig['commonDirs'] ?? [];
+
         if (!empty($namespace))
         {
             $projectName = ucfirst($namespace);
@@ -43,7 +54,7 @@ class WAutoRebuild extends \Codeception\Extension
             }
         }
 
-        (new WProjectStructure($projectName, $namespace, $actorNameShort, $supportDir))->build();
+        (new WProjectStructure($projectName, $namespace, $actorNameShort, $supportDir, $commonDirs))->build();
     }
 
 }

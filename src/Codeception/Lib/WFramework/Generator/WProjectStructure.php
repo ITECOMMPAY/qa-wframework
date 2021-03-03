@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Generator;
 
 
+use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Generator\FileGenerator\FileGeneratorVisitor;
 use Codeception\Lib\WFramework\Generator\ParsingTree\RootNode;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\SourceGeneratorVisitor;
@@ -39,15 +40,57 @@ class WProjectStructure
     /** @var string */
     protected $actorNameFull;
 
-    public function __construct(string $projectName, string $outputNamespace, string $actorNameShort, string $supportDir)
+    public function __construct(string $projectName, string $outputNamespace, string $actorNameShort, string $supportDir, array $commonDirs = [])
     {
         $this->projectName = $projectName;
         $this->outputPath = $supportDir;
         $this->outputNamespace = $outputNamespace;
         $this->actorNameShort = $actorNameShort;
         $this->actorNameFull = $this->getActorNameFull();
-        $this->operationsPath = [__DIR__ . '/../Operations', $supportDir . '/Helper/Operations'];
+        $this->operationsPath = array_merge([__DIR__ . '/../Operations'], $this->getCommonDirsFull($commonDirs), [$supportDir . '/Helper/Operations']);
         $this->stepObjectsPath = $supportDir . '/Helper/Steps';
+    }
+
+    protected function getCommonDirsFull(array $commonDirs) : array
+    {
+        $findComposerRootDir = function (string $dir) use (&$findComposerRootDir) : ?string {
+            if ($dir === '/' || !is_dir($dir))
+            {
+                return null;
+            }
+
+            $dir = dirname($dir);
+
+            if (file_exists("$dir/composer.json"))
+            {
+                return $dir;
+            }
+
+            return $findComposerRootDir($dir);
+        };
+
+        $rootDir = $findComposerRootDir(codecept_root_dir());
+
+        if ($rootDir === null)
+        {
+            throw new UsageException('Не найден composer.json');
+        }
+
+        $result = [];
+
+        foreach ($commonDirs as $commonDir)
+        {
+            $fullCommonDir = "$rootDir/$commonDir";
+
+            if (!is_dir($fullCommonDir))
+            {
+                continue;
+            }
+
+            $result[] = $fullCommonDir;
+        }
+
+        return $result;
     }
 
     protected function getActorNameFull() : string

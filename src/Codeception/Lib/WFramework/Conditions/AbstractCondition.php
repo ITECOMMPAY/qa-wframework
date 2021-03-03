@@ -7,10 +7,12 @@ namespace Codeception\Lib\WFramework\Conditions;
 use Codeception\Lib\WFramework\Conditions\Interfaces\IWrapOtherCondition;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Explanations\DefaultExplanation;
+use Codeception\Lib\WFramework\Explanations\Formatters\AbstractExplanationResultVisitor;
 use Codeception\Lib\WFramework\Explanations\Formatters\DefaultExplanationResultFormatter;
 use Codeception\Lib\WFramework\Explanations\Result\AbstractExplanationResult;
 use Codeception\Lib\WFramework\Explanations\Result\ExplanationResultAggregate;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
+use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -65,7 +67,13 @@ abstract class AbstractCondition extends PageObjectVisitor
             $resultAggregate->addChild($explanationResult);
         }
 
-        $formatter = new DefaultExplanationResultFormatter();
+        $formatterClass = TestProperties::getValue('explanationResultFormatter', DefaultExplanationResultFormatter::class);
+        $formatter = new $formatterClass;
+
+        if (!$formatter instanceof AbstractExplanationResultVisitor)
+        {
+            throw new UsageException("$formatterClass должен быть наследником AbstractExplanationResultVisitor");
+        }
 
         /** @var AbstractExplanationResult $explanationResult */
         foreach ($resultAggregate->traverseDepthFirst() as $explanationResult)

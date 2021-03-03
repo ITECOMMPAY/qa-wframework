@@ -242,7 +242,7 @@ EOF;
         $inputDir = $this->screenshotsDirectory;
         $outputFile = "$this->screenshotsDirectory/video";
 
-        $cmd = "{$this->ffmpegPath} -framerate 1 -i $inputDir/%08d.png -c:v libx264 -tune stillimage -movflags +faststart -vf fps=1 -pix_fmt yuv422p $outputFile.mp4";
+        $cmd = "{$this->ffmpegPath} -framerate 1 -i $inputDir/%08d.png -c:v libx264 -tune stillimage -movflags +faststart -vf fps=1 -pix_fmt yuv422p  -vf \"pad=ceil(iw/2)*2:ceil(ih/2)*2\" $outputFile.mp4";
 
         $this->logDebug($this, 'Команда для запуска: ' . $cmd);
 
