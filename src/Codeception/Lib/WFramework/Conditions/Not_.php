@@ -5,6 +5,8 @@ namespace Codeception\Lib\WFramework\Conditions;
 
 
 use Codeception\Lib\WFramework\Conditions\Interfaces\IWrapOtherCondition;
+use Codeception\Lib\WFramework\Explanations\Formatter\Why;
+use Codeception\Lib\WFramework\Explanations\Result\ExplanationResultAggregate;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 
 class Not_ extends AbstractCondition implements IWrapOtherCondition
@@ -44,9 +46,9 @@ class Not_ extends AbstractCondition implements IWrapOtherCondition
         return !$pageObject->accept($this->condition);
     }
 
-    public function why(IPageObject $pageObject, bool $actualValue = true) : string
+    protected function explainWhy(AbstractCondition $condition, IPageObject $pageObject, bool $actualValue) : array
     {
-        return $this->getWrappedCondition()->why($pageObject, !$actualValue);
+        return parent::explainWhy($condition, $pageObject, !$actualValue);
     }
 
     public function getWrappedCondition() : AbstractCondition

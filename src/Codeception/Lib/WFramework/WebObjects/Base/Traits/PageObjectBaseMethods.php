@@ -11,10 +11,6 @@ use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Conditions\FullyVisible;
 use Codeception\Lib\WFramework\Conditions\Hidden;
 use Codeception\Lib\WFramework\Conditions\Not_;
-use Codeception\Lib\WFramework\Conditions\Text;
-use Codeception\Lib\WFramework\Conditions\TextContains;
-use Codeception\Lib\WFramework\Conditions\Value;
-use Codeception\Lib\WFramework\Conditions\ValueContains;
 use Codeception\Lib\WFramework\Conditions\Visible;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Exceptions\WaitUntilElement;
@@ -54,6 +50,20 @@ trait PageObjectBaseMethods
     }
 
     /**
+     * Метод мягко валит тест
+     *
+     * @param string $description - причина
+     * @throws UsageException
+     */
+    protected function failSoft(string $description = '')
+    {
+        $this
+            ->returnCodeceptionActor()
+            ->failSoft($description)
+        ;
+    }
+
+    /**
      * Ждёт выполнение заданного условия для данного PageObject'а.
      *
      * Если условие не было выполнено в течении заданного таймаута (elementTimeout/collectionTimeout) - валит тест.
@@ -83,7 +93,7 @@ trait PageObjectBaseMethods
             {
                 $explanation = $condition->why($selfOrChild, false);
 
-                WLogger::logError($this, $explanation);
+                WLogger::logError($this, $explanation->getMessage(), ['screenshot_blob' => $explanation->getScreenshot()]);
 
                 $this->fail($this . " -> условие: '$condition' - не выполнилось в течение таймаута: " . $this->getTimeout());
             }

@@ -32,6 +32,11 @@ abstract class AbstractExplanation extends PageObjectVisitor
      */
     protected $conditionResult;
 
+    public function getName() : string
+    {
+        return "почему " . ($this->conditionResult ? '' : 'НЕ ') . $this->condition;
+    }
+
     public function __construct(AbstractCondition $condition, bool $conditionResult = true)
     {
         $this->condition = $condition;

@@ -183,17 +183,7 @@ abstract class WElement extends WPageObject
      */
     protected function getWBlock() : WBlock
     {
-        foreach ($this->traverseToRoot() as $parent)
-        {
-            if (!$parent instanceof WBlock)
-            {
-                continue;
-            }
-
-            return $parent;
-        }
-
-        throw new UsageException($this . ' -> должен располагаться на WBlock.');
+        return $this->getFirstParentWithClass(WBlock::class);
     }
 
     public function __toString() : string

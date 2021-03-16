@@ -1,13 +1,17 @@
 <?php
 
 
-namespace Codeception\Lib\WFramework\Explanations\Formatters;
+namespace Codeception\Lib\WFramework\Explanations\Formatter;
 
 
+use Codeception\Lib\WFramework\Explanations\Result\AbstractExplanationResult;
 use Codeception\Lib\WFramework\Explanations\Result\DefaultExplanationResult;
 use Codeception\Lib\WFramework\Explanations\Result\ExplanationResultAggregate;
+use Codeception\Lib\WFramework\Explanations\Result\ImagickExplanationResult;
+use Codeception\Lib\WFramework\Explanations\Result\TextExplanationResult;
 use Codeception\Lib\WFramework\Explanations\Result\MissingValue;
 use Codeception\Lib\WFramework\Explanations\Result\TraverseFromRootExplanationResult;
+use Codeception\Lib\WFramework\Logger\WLogger;
 
 class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
 {
@@ -17,19 +21,45 @@ class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
 
     protected $message = '';
 
+    protected $plainTexts = [];
+
+    protected $screenshot = '';
+
     protected $header = '';
 
     protected $traverseFromRootResult = '';
 
     protected $defaultResult = '';
 
+    protected $imagickResultArray = [];
+
+    protected $result = null;
+
     public function acceptExplanationResultAggregate(ExplanationResultAggregate $explanationResult) : void
     {
-        $this->header = PHP_EOL . PHP_EOL . static::EXPLANATIONS_DELIMITER;
-        $this->header .= 'ДИАГНОСТИРУЕМ ЭЛЕМЕНТ:' . PHP_EOL;
-        $this->header .= static::EXPLANATIONS_TAB . $explanationResult->getPageObject() . PHP_EOL;
-        $this->header .= 'ПРОБЛЕМА:' . PHP_EOL;
-        $this->header .= static::EXPLANATIONS_TAB .  'почему ' . ($explanationResult->getActualResult() ? '' : 'НЕ ') . $explanationResult->getCondition() . PHP_EOL;
+        if (empty($this->header))
+        {
+            $this->header = PHP_EOL . PHP_EOL . static::EXPLANATIONS_DELIMITER;
+            $this->header .= 'ДИАГНОСТИРУЕМ ЭЛЕМЕНТ:' . PHP_EOL;
+            $this->header .= static::EXPLANATIONS_TAB . $explanationResult->getPageObject() . PHP_EOL;
+            $this->header .= 'ВОПРОС:' . PHP_EOL;
+            $this->header .= static::EXPLANATIONS_TAB .
+                             'почему ' .
+                             ($explanationResult->getActualResult() ? '' : 'НЕ ') .
+                             $explanationResult->getCondition() .
+                             PHP_EOL;
+        }
+
+        /** @var AbstractExplanationResult $result */
+        foreach ($explanationResult->traverseDepthFirst(true) as $result)
+        {
+            $result->accept($this);
+        }
+    }
+
+    public function acceptTextExplanationResult(TextExplanationResult $explanationResult)
+    {
+        $this->plainTexts []= $explanationResult->getText();
     }
 
     public function acceptTraverseFromRootExplanationResult(TraverseFromRootExplanationResult $explanationResult) : void
@@ -107,21 +137,93 @@ class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
         }
     }
 
-    public function getMessage() : string
+    public function acceptImagickExplanationResult(ImagickExplanationResult $result) : void
     {
-        if (!empty($this->message))
-        {
-            return $this->message;
-        }
+        $this->imagickResultArray []= $result;
+    }
 
+    protected function constructMessage() : void
+    {
         $this->message = $this->header;
 
         $this->message .= $this->traverseFromRootResult;
 
         $this->message .= $this->defaultResult;
 
-        $this->message .= PHP_EOL;
+        $this->message .= implode(static::EXPLANATIONS_DELIMITER, $this->plainTexts);
 
-        return $this->message;
+        if (!empty($this->imagickResultArray))
+        {
+            /** @var ImagickExplanationResult $imagickResult */
+            foreach ($this->imagickResultArray as $imagickResult)
+            {
+                $text = $imagickResult->getText();
+
+                if (empty($text))
+                {
+                    continue;
+                }
+
+                $this->message .= static::EXPLANATIONS_DELIMITER . $text;
+            }
+        }
+
+        $this->message .= PHP_EOL;
+    }
+
+    protected function constructScreenshot() : void
+    {
+        $backgroundToLayer = [];
+
+        if (empty($this->imagickResultArray))
+        {
+            return;
+        }
+
+        /** @var ImagickExplanationResult $imagickResult */
+        foreach ($this->imagickResultArray as $imagickResult)
+        {
+            $backgroundToLayer[$imagickResult->getBackground()] [] = $imagickResult->getExplanationLayer();
+        }
+
+        if (count($backgroundToLayer) > 1)
+        {
+            WLogger::logWarning($this, "Вьюпорт сдвинулся при создании Explanations - в лог будет выведен скриншот только для одного из них");
+        }
+
+        $explanationLayers = reset($backgroundToLayer);
+        $screenshot = key($backgroundToLayer);
+
+        $imagick = new \Imagick();
+        $imagick->readImageBlob($screenshot);
+
+        foreach ($explanationLayers as $layer)
+        {
+            if ($layer === null)
+            {
+                continue;
+            }
+
+            $imagick->addImage($layer);
+        }
+
+        $imagick = $imagick->mergeImageLayers(\Imagick::LAYERMETHOD_FLATTEN);
+
+        $this->screenshot = $imagick->getImageBlob();
+    }
+
+    public function getResult() : Why
+    {
+        if ($this->result !== null)
+        {
+            return $this->result;
+        }
+
+        $this->constructMessage();
+        $this->constructScreenshot();
+
+        $this->result = new Why($this->message, $this->screenshot);
+
+        return $this->result;
     }
 }

@@ -51,6 +51,14 @@ class Rect
         return $result;
     }
 
+    public function equals(Rect $otherRect) : bool
+    {
+        return $otherRect->getX() === $this->getX() &&
+               $otherRect->getY() === $this->getY() &&
+               $otherRect->getWidth() === $this->getWidth() &&
+               $otherRect->getHeight() === $this->getHeight();
+    }
+
     public function __toString() : string
     {
         return "X: $this->x Y: $this->y    Size: {$this->width}x{$this->height}    T:$this->top B: $this->bottom L: $this->left R: $this->right";

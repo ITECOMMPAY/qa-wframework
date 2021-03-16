@@ -117,6 +117,14 @@ abstract class Composite extends ModernObject
         $child->setParent($this);
     }
 
+    public function addChildren(Composite ...$children)
+    {
+        foreach ($children as $child)
+        {
+            $this->addChild($child);
+        }
+    }
+
     /**
      * Очищает массив своих детей
      */
@@ -191,11 +199,21 @@ abstract class Composite extends ModernObject
      *    /   \   /   \
      *    4   5   6   7
      * ```
+     * @param bool $skipThis - пропустить этот узел?
      * @return \Generator
      */
-    public function traverseBreadthFirst() : \Generator
+    public function traverseBreadthFirst(bool $skipThis = false) : \Generator
     {
-        $deque = new Deque([$this]);
+        $deque = new Deque();
+
+        if (!$skipThis)
+        {
+            $deque->push($this);
+        }
+        else
+        {
+            $deque->push(... $this->getChildren()->values());
+        }
 
         while (!$deque->isEmpty())
         {
@@ -222,11 +240,21 @@ abstract class Composite extends ModernObject
      *
      * Для PageObject'ов, по умолчанию, следует использовать этот способ т.к. он перебирает элементы страницы сверху-вниз.
      *
+     * @param bool $skipThis - пропустить этот узел?
      * @return \Generator
      */
-    public function traverseDepthFirst() : \Generator
+    public function traverseDepthFirst(bool $skipThis = false) : \Generator
     {
-        $deque = new Deque([$this]);
+        $deque = new Deque();
+
+        if (!$skipThis)
+        {
+            $deque->push($this);
+        }
+        else
+        {
+            $deque->push(... $this->getChildren()->values());
+        }
 
         while (!$deque->isEmpty())
         {
@@ -248,11 +276,17 @@ abstract class Composite extends ModernObject
      *    /   \
      *   (1)   X
      * ```
+     * @param bool $skipThis - пропустить этот узел?
      * @return Sequence
      */
-    public function traverseToRoot() : Sequence
+    public function traverseToRoot(bool $skipThis = false) : Sequence
     {
-        $result = new Vector([$this]);
+        $result = new Vector();
+
+        if (!$skipThis)
+        {
+            $result->push($this);
+        }
 
         $parent = $this->getParent();
 
@@ -276,11 +310,17 @@ abstract class Composite extends ModernObject
      *    /   \
      *   (3)   X
      * ```
+     * @param bool $skipThis - пропустить этот узел?
      * @return Sequence
      */
-    public function traverseFromRoot() : Sequence
+    public function traverseFromRoot(bool $skipThis = false) : Sequence
     {
-        $result = new Deque([$this]);
+        $result = new Deque();
+
+        if (!$skipThis)
+        {
+            $result->push($this);
+        }
 
         $parent = $this->getParent();
 
@@ -297,7 +337,6 @@ abstract class Composite extends ModernObject
      * Возвращает первого родителя узла с классом $class
      *
      * @param string $class
-     * @return Composite
      * @throws UsageException
      */
     public function getFirstParentWithClass(string $class)

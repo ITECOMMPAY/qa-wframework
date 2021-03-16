@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Mouse;
 
 
+use Codeception\Lib\WFramework\Conditions\Clickable;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
@@ -57,24 +58,22 @@ class MouseClick extends AbstractOperation
                 throw $e;
             }
 
-            $otherElement = '';
+            $autoClickViaJS = (bool) TestProperties::getValue('autoClickViaJS', false);
 
-            if (preg_match('/Other element would receive the click: (?\'element\'.+) \(Session info/ms', $e->getMessage(), $matches) === 1)
+            $explanation = (new Clickable())->why($pageObject, false);
+
+            if (!$autoClickViaJS)
             {
-                $otherElement = $matches['element'];
+                WLogger::logError($this, $explanation->getMessage(), ['screenshot_blob' => $explanation->getScreenshot()]);
+
+                throw $e;
             }
 
-            WLogger::logWarning($this, 'Не получается кликнуть на элементе - он перекрыт другим элементом: ' . $otherElement);
+            WLogger::logWarning($this, $explanation->getMessage(), ['screenshot_blob' => $explanation->getScreenshot()]);
 
-            $autoClickViaJS = (bool) TestProperties::getValue('autoClickViaJS', False);
+            WLogger::logDebug($this, 'autoClickViaJS = true -> пробуем кликнуть с помощью JS');
 
-            if ($autoClickViaJS)
-            {
-                WLogger::logDebug($this, 'autoClickViaJS = true -> пробуем кликнуть с помощью JS');
-
-                $pageObject->accept(new MouseClickViaJS());
-                return;
-            }
+            $pageObject->accept(new MouseClickViaJS());
         }
     }
 }

@@ -16,10 +16,8 @@ use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Execute\ExecuteActions;
-use Codeception\Lib\WFramework\Operations\Get\GetScreenshot;
 use Codeception\Lib\WFramework\Operations\Get\GetTextRaw;
 use Codeception\Lib\WFramework\Operations\Get\GetText;
-use Codeception\Lib\WFramework\Operations\Get\GetLayoutViewportSize;
 use Codeception\Lib\WFramework\Operations\Get\GetValue;
 use Codeception\Lib\WFramework\Operations\Mouse\MouseScrollTo;
 use Codeception\Lib\WFramework\Properties\TestProperties;
@@ -33,8 +31,6 @@ use Codeception\Lib\WFramework\WLocator\EmptyLocator;
 use Codeception\Lib\WFramework\WLocator\WLocator;
 use Facebook\WebDriver\Interactions\WebDriverActions;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\WebDriverDimension;
-use function usleep;
 
 /**
  * Класс-предок для всех PageObject'ов
@@ -350,79 +346,15 @@ abstract class WPageObject extends Composite implements IPageObject
     {
         WLogger::logAction($this, 'должен выглядеть, как сохранённый эталон: ' . $suffix);
 
-        $shotRun = (bool) TestProperties::getValue('shotRun');
+        $condition = new LikeBefore($suffix, $defaultDelay, $waitClosure);
 
-        $name = $this . '_' . $suffix;
+        $result = $this->finally_($condition);
 
-        if ($shotRun)
-        {
-            WLogger::logDebug($this, 'сохраняем эталон: ' . $suffix);
+        $explanation = $condition->why($this, $result);
 
-            $screenshot = $this->accept(new GetScreenshot('', $waitClosure));
-
-            $this->returnCodeceptionActor()->putTempShot($name, $screenshot);
-
-            usleep($defaultDelay);
-
-            return $this;
-        }
-
-        $condition = new LikeBefore($suffix, $waitClosure);
-
-        if ($this->finally_($condition))
-        {
-            return $this;
-        }
-
-        //TODO переделать эту часть на Explanations
-
-        $this->returnCodeceptionActor()->putTempShot($name, $condition->screenshot);
-
-        $viewportSize = $this->accept(new GetLayoutViewportSize());
-
-        $diffImage = $this->fitIntoDimensions($condition->diff, $viewportSize);
-
-        $this->returnCodeceptionActor()->failSoft($this . ' -> не совпадает с сохранённым образцом: ' . $suffix, ['screenshot_blob' => $diffImage]);
+        $this->returnCodeceptionActor()->assertSoftTrue($result, $explanation->getMessage(), ['screenshot_blob' => $explanation->getScreenshot()]);
 
         return $this;
-    }
-
-    /**
-     * Подгоняет картинку под заданное разрешение.
-     *
-     * Будет создан холст заданного разрешения, залитый чёрным цветом. Картинка будет размещена в центре холста.
-     * Если картинка больше чем холст, то она будет отмасштабирована под его размер.
-     *
-     * @param string $imageBlob
-     * @param WebDriverDimension $dimensions
-     * @return string
-     * @throws \ImagickException
-     */
-    private function fitIntoDimensions(string $imageBlob, WebDriverDimension $dimensions) : string
-    {
-        WLogger::logDebug($this, 'Подгоняем картинку под разрешение, если она в него не вмещается');
-
-        $imagick = new \Imagick();
-        $imagick->readImageBlob($imageBlob);
-
-        $imageGeometry = $imagick->getImageGeometry();
-
-        if ($imageGeometry['width'] > $dimensions->getWidth() || $imageGeometry['height'] > $dimensions->getHeight())
-        {
-            $imagick->scaleImage($dimensions->getWidth(), $dimensions->getHeight(), true);
-        }
-
-        $canvas = new \Imagick();
-        $canvas->newImage($dimensions->getWidth(), $dimensions->getHeight(), 'black', 'PNG32');
-
-        $imageGeometry = $imagick->getImageGeometry();
-
-        $offsetX = (int)($dimensions->getWidth()  / 2) - (int)($imageGeometry['width']  / 2);
-        $offsetY = (int)($dimensions->getHeight() / 2) - (int)($imageGeometry['height'] / 2);
-
-        $canvas->compositeImage($imagick, \Imagick::COMPOSITE_OVER, $offsetX, $offsetY);
-
-        return $canvas->getImageBlob();
     }
 
     /**
@@ -453,22 +385,7 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function isLikeBefore(string $suffix = 'default', bool $defaultValue = true, $waitClosure = null) : bool
     {
-        WLogger::logInfo($this, 'выглядит, как сохранённый образец: ' . $suffix . '?');
-
-        $shotRun = (bool) TestProperties::getValue('shotRun');
-
-        if ($shotRun)
-        {
-            $screenshot = $this->accept(new GetScreenshot('', $waitClosure));
-
-            $name = $this . '_' . $suffix;
-
-            $this->returnCodeceptionActor()->putTempShot($name, $screenshot);
-
-            return $defaultValue;
-        }
-
-        return $this->is(new LikeBefore($suffix, $waitClosure));
+        return $this->is(new LikeBefore($suffix, $defaultValue, $waitClosure));
     }
 
 

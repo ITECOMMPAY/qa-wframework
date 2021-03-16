@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Codeception\Lib\WFramework\Explanations\Formatters;
+namespace Codeception\Lib\WFramework\Explanations\Formatter;
 
 use Codeception\Lib\WFramework\Logger\WLogger;
 
 abstract class AbstractExplanationResultVisitor
 {
-    abstract public function getMessage() : string;
+    abstract public function getResult() : Why;
 
     public function __call($name, $arguments)
     {

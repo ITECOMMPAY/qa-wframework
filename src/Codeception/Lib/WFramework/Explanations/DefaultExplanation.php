@@ -10,11 +10,6 @@ use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 
 class DefaultExplanation extends AbstractExplanation
 {
-    public function getName() : string
-    {
-        return "почему " . ($this->conditionResult ? '' : 'НЕ ') . $this->condition;
-    }
-
     public function acceptWElement($element) : DefaultExplanationResult
     {
         return $this->apply($element);

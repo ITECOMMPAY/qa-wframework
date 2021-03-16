@@ -100,12 +100,18 @@ class WebAssertsModule extends Asserts
         parent::$functionName(...$parameters);
     }
 
-    protected function softAssert(string $functionName, ...$parameters)
+    protected function softAssert(string $functionName, array $parameters)
     {
         $this->log($functionName, $parameters, false);
 
+        $getHardAssertName = static function ($softName) {
+            return str_replace('assertSoft', 'assert', $softName);
+        };
+
         try
         {
+            $functionName = $getHardAssertName($functionName);
+
             parent::$functionName(...$parameters);
         }
         catch (AssertionFailedError $e)

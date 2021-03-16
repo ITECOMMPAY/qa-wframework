@@ -6,6 +6,8 @@ namespace Codeception\Lib\WFramework\Conditions;
 
 use Codeception\Lib\WFramework\Conditions\Interfaces\IWrapOtherCondition;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
+use Codeception\Lib\WFramework\Explanations\Formatter\Why;
+use Codeception\Lib\WFramework\Explanations\Result\TextExplanationResult;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
@@ -56,7 +58,7 @@ class SomeElement_ extends AbstractCondition implements IWrapOtherCondition
         return $this->condition->getExplanationClasses();
     }
 
-    public function why(IPageObject $pageObject, bool $actualValue = true) : string
+    public function why(IPageObject $pageObject, bool $actualValue = true) : Why
     {
         if (!$pageObject instanceof WCollection)
         {
@@ -70,11 +72,31 @@ class SomeElement_ extends AbstractCondition implements IWrapOtherCondition
 
         if ($pageObject->isEmpty())
         {
-            return $pageObject . ' -> не содержит элементов';
+            return new Why($pageObject . ' -> не содержит элементов');
         }
 
         return $this->getWrappedCondition()->why($pageObject->getFirstElement(), $actualValue);
     }
+
+    protected function explainWhy(AbstractCondition $condition, IPageObject $pageObject, bool $actualValue) : array
+    {
+        if (!$pageObject instanceof WCollection)
+        {
+            throw new UsageException($this . " -> должен применяться к WCollection");
+        }
+
+        if ($this->firstValidElement !== null)
+        {
+            return parent::explainWhy($condition, $this->firstValidElement, $actualValue);
+        }
+
+        if ($pageObject->isEmpty())
+        {
+            return [new TextExplanationResult($pageObject . ' -> не содержит элементов')];
+        }
+
+        return parent::explainWhy($condition, $pageObject->getFirstElement(), $actualValue);
+     }
 
     public function getWrappedCondition() : AbstractCondition
     {

@@ -5,6 +5,7 @@ namespace Codeception\Lib\WFramework\Conditions;
 
 
 use Codeception\Lib\WFramework\Exceptions\UsageException;
+use Codeception\Lib\WFramework\Explanations\NotLikeBeforeExplanation;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Get\GetScreenshot;
 use Codeception\Lib\WFramework\Properties\TestProperties;
@@ -12,18 +13,19 @@ use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
 class LikeBefore extends AbstractCondition
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $suffix;
 
-    /**
-     * @var null
-     */
+    /** @var bool|int */
+    protected $default;
+
+    /** @var null */
     protected $waitClosure;
 
+    /** @var string */
     public $screenshot;
 
+    /** @var \Imagick */
     public $diff;
 
     public function getName() : string
@@ -31,10 +33,11 @@ class LikeBefore extends AbstractCondition
         return "выглядит, как сохранённый эталон: $this->suffix?";
     }
 
-    public function __construct(string $suffix = 'default', $waitClosure = null)
+    public function __construct(string $suffix = 'default', $default = true, $waitClosure = null)
     {
         $this->suffix = $suffix;
         $this->waitClosure = $waitClosure;
+        $this->default = $default;
     }
 
     public function acceptWBlock($block) : bool
@@ -47,25 +50,39 @@ class LikeBefore extends AbstractCondition
         return $this->apply($element);
     }
 
-    public function acceptWCollection($collection) : bool
-    {
-        if ($collection->isEmpty())
-        {
-            return false;
-        }
-
-        return $this->apply($collection->getFirstElement());
-    }
-
     protected function apply(WPageObject $pageObject) : bool
     {
         $this->screenshot = $pageObject->accept(new GetScreenshot('', $this->waitClosure));
 
         $name = $pageObject . '_' . $this->suffix;
 
+        $shotRun = (bool) TestProperties::getValue('shotRun', true);
+
+        if ($shotRun)
+        {
+            WLogger::logDebug($this, 'сохраняем эталон: ' . $this->suffix);
+
+            $pageObject->returnCodeceptionActor()->putTempShot($name, $this->screenshot);
+
+            if (is_int($this->default))
+            {
+                usleep($this->default);
+                return true;
+            }
+
+            return $this->default;
+        }
+
         $reference = $pageObject->returnCodeceptionActor()->getShot($name);
 
-        return $this->compareImages($reference, $this->screenshot);
+        $similar = $this->compareImages($reference, $this->screenshot);
+
+        if (!$similar)
+        {
+            $pageObject->returnCodeceptionActor()->putTempShot($name, $this->screenshot);
+        }
+
+        return $similar;
     }
 
     /**
@@ -126,5 +143,10 @@ class LikeBefore extends AbstractCondition
         WLogger::logDebug($this, "Картинки - разные ($deviation > $maxDeviation)");
 
         return false;
+    }
+
+    public function getExplanationClasses() : array
+    {
+        return [NotLikeBeforeExplanation::class];
     }
 }

@@ -37,17 +37,19 @@
         .alert {
             border-left: 18px solid #ffa726;
             background-color: #fff3e0;
+            font-family: Consolas, "courier new";
         }
 
         .critical {
             border-left: 18px solid #42a5f5;
             background-color: #e3f2fd;
+            font-family: Consolas, "courier new";
         }
 
         .error {
             border-left: 18px solid #f44336;
             background-color: #ffcdd2;
-            font-size: 0.8rem;
+            font-size: 1.0rem;
             font-weight: bold;
             font-family: Consolas, "courier new";
         }
@@ -55,8 +57,9 @@
         .warning {
             border-left: 18px solid #ef9a9a;
             background-color: #ffebee;
-            font-size: 1.2rem;
+            font-size: 1.0rem;
             font-weight: bold;
+            font-family: Consolas, "courier new";
         }
 
         .notice {

@@ -179,7 +179,7 @@ EOF;
 
     protected function getScreenshot(array $context) : string
     {
-        if (isset($context['screenshot_blob']))
+        if (!empty($context['screenshot_blob']))
         {
             return $this->saveScreenshot($context['screenshot_blob']);
         }
