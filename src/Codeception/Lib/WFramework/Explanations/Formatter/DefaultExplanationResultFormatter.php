@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Explanations\Formatter;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Explanations\Result\AbstractExplanationResult;
 use Codeception\Lib\WFramework\Explanations\Result\DefaultExplanationResult;
 use Codeception\Lib\WFramework\Explanations\Result\ExplanationResultAggregate;
@@ -19,21 +20,19 @@ class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
 
     public const EXPLANATIONS_TAB = '    ';
 
-    protected $message = '';
-
-    protected $plainTexts = [];
-
-    protected $screenshot = '';
+    protected $result = null;
 
     protected $header = '';
 
-    protected $traverseFromRootResult = '';
+    protected $textResultArray = [];
+
+    protected $traverseFromRootResultArray = [];
 
     protected $defaultResult = '';
 
     protected $imagickResultArray = [];
 
-    protected $result = null;
+
 
     public function acceptExplanationResultAggregate(ExplanationResultAggregate $explanationResult) : void
     {
@@ -57,28 +56,130 @@ class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
         }
     }
 
-    public function acceptTextExplanationResult(TextExplanationResult $explanationResult)
+    public function acceptTextExplanationResult(TextExplanationResult $explanationResult) : void
     {
-        $this->plainTexts []= $explanationResult->getText();
+        $this->textResultArray [] = $explanationResult->getText();
+    }
+
+    protected function printTextExplanationResults() : string
+    {
+        $result = static::EXPLANATIONS_DELIMITER;
+
+        return $result . implode(static::EXPLANATIONS_DELIMITER, $this->textResultArray);
     }
 
     public function acceptTraverseFromRootExplanationResult(TraverseFromRootExplanationResult $explanationResult) : void
     {
-        $this->traverseFromRootResult = static::EXPLANATIONS_DELIMITER;
-        $this->traverseFromRootResult .= 'ПРОВЕРЯЕМ ЦЕПОЧКУ:' . PHP_EOL;
+        $this->traverseFromRootResultArray []= $explanationResult;
+    }
+
+    protected function printTraverseFromRootExplanationResult() : string
+    {
+        if (empty($this->traverseFromRootResultArray))
+        {
+            return '';
+        }
+
+        $aggregatePageObjectChecks = function ()
+        {
+            $result = [];
+
+            $existCheckName = (new Exist())->getName();
+
+            $pageObjectChecks = array_map(
+                function (TraverseFromRootExplanationResult $v)
+                {
+                    return $v->getPageObjectChecks();
+                },
+                $this->traverseFromRootResultArray
+            );
+
+            foreach ($pageObjectChecks as $pageObjectCheck)
+            {
+                foreach ($pageObjectCheck as $class => $check)
+                {
+                    if (!isset($result[$class]))
+                    {
+                        $result[$class] = $check;
+                        continue;
+                    }
+
+                    $checkResults = array_filter(
+                        $check['results'],
+                        function ($v) use ($existCheckName)
+                        {
+                            return $v['checkName'] !== $existCheckName;
+                        }
+                    );
+
+                    array_push($result[$class]['results'], ...$checkResults);
+                }
+            }
+
+            return $result;
+        };
+
+        $aggregatePageObjectOrder = function ()
+        {
+            $pageObjectOrders = array_map(
+                function (TraverseFromRootExplanationResult $v)
+                {
+                    return $v->getPageObjectOrder();
+                },
+                $this->traverseFromRootResultArray
+            );
+
+            $result = array_pop($pageObjectOrders);
+
+            foreach ($pageObjectOrders as $pageObjectOrder)
+            {
+                if (count($pageObjectOrder) < count($result))
+                {
+                    $result = $pageObjectOrder;
+                }
+            }
+
+            return $result;
+        };
+
+        $aggregateProblemNotFound = function ()
+        {
+            $notFound = array_map(
+                function (TraverseFromRootExplanationResult $v)
+                {
+                    return $v->isProblemNotFound();
+                },
+                $this->traverseFromRootResultArray
+            );
+
+            return !in_array(false, $notFound, true);
+        };
+
+        $pageObjectChecks = $aggregatePageObjectChecks();
+        $pageObjectOrder  = $aggregatePageObjectOrder();
+        $problemNotFound  = $aggregateProblemNotFound();
+
+        $result = static::EXPLANATIONS_DELIMITER;
+        $result .= 'ПРОВЕРЯЕМ ЦЕПОЧКУ:' . PHP_EOL;
 
         $messages = [];
 
-        $pageObjectChecks = $explanationResult->getPageObjectChecks();
-
-        foreach ($explanationResult->getPageObjectOrder() as $index => $className)
+        foreach ($pageObjectOrder as $index => $className)
         {
             $pageObjectCheck = $pageObjectChecks[$className];
 
             $message = '';
             $message .= static::EXPLANATIONS_TAB . $pageObjectCheck['name'] . PHP_EOL;
-            $message .= static::EXPLANATIONS_TAB . static::EXPLANATIONS_TAB . 'класс: ' . $pageObjectCheck['class'] . PHP_EOL;
-            $message .= static::EXPLANATIONS_TAB . static::EXPLANATIONS_TAB . 'локатор: ' . $pageObjectCheck['locator'] . PHP_EOL;
+            $message .= static::EXPLANATIONS_TAB .
+                        static::EXPLANATIONS_TAB .
+                        'класс: ' .
+                        $pageObjectCheck['class'] .
+                        PHP_EOL;
+            $message .= static::EXPLANATIONS_TAB .
+                        static::EXPLANATIONS_TAB .
+                        'локатор: ' .
+                        $pageObjectCheck['locator'] .
+                        PHP_EOL;
 
             $checkResults = [];
 
@@ -95,14 +196,20 @@ class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
             $messages[] = $message;
         }
 
-        $this->traverseFromRootResult .= implode(static::EXPLANATIONS_TAB . '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^' . PHP_EOL, $messages);
+        $result .= implode(
+            static::EXPLANATIONS_TAB . '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^' . PHP_EOL,
+            $messages
+        );
 
-        if ($explanationResult->isProblemNotFound())
+        if ($problemNotFound)
         {
-            $this->traverseFromRootResult .= static::EXPLANATIONS_DELIMITER;
-            $this->traverseFromRootResult .= 'ПРОБЛЕМА НЕ ВЫЯВЛЕНА! ' . PHP_EOL;
-            $this->traverseFromRootResult .= '                            возможно в тесте отсутствует умное ожидание перед операцией' . PHP_EOL;
+            $result .= static::EXPLANATIONS_DELIMITER;
+            $result .= 'ПРОБЛЕМА НЕ ВЫЯВЛЕНА! ' . PHP_EOL;
+            $result .= '                            возможно в тесте отсутствует умное ожидание перед операцией' .
+                       PHP_EOL;
         }
+
+        return $result;
     }
 
     public function acceptDefaultExplanationResult(DefaultExplanationResult $explanationResult) : void
@@ -137,47 +244,65 @@ class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
         }
     }
 
+    protected function printDefaultExplanationResult() : string
+    {
+        return $this->defaultResult;
+    }
+
     public function acceptImagickExplanationResult(ImagickExplanationResult $result) : void
     {
         $this->imagickResultArray []= $result;
     }
 
-    protected function constructMessage() : void
+    protected function printImagickExplanationResult() : string
     {
-        $this->message = $this->header;
+        $result = '';
 
-        $this->message .= $this->traverseFromRootResult;
-
-        $this->message .= $this->defaultResult;
-
-        $this->message .= implode(static::EXPLANATIONS_DELIMITER, $this->plainTexts);
-
-        if (!empty($this->imagickResultArray))
+        if (empty($this->imagickResultArray))
         {
-            /** @var ImagickExplanationResult $imagickResult */
-            foreach ($this->imagickResultArray as $imagickResult)
-            {
-                $text = $imagickResult->getText();
-
-                if (empty($text))
-                {
-                    continue;
-                }
-
-                $this->message .= static::EXPLANATIONS_DELIMITER . $text;
-            }
+            return $result;
         }
 
-        $this->message .= PHP_EOL;
+        /** @var ImagickExplanationResult $imagickResult */
+        foreach ($this->imagickResultArray as $imagickResult)
+        {
+            $text = $imagickResult->getText();
+
+            if (empty($text))
+            {
+                continue;
+            }
+
+            $result .= static::EXPLANATIONS_DELIMITER . $text;
+        }
+
+        return $result;
     }
 
-    protected function constructScreenshot() : void
+    protected function constructMessage() : string
+    {
+        $result = $this->header;
+
+        $result .= $this->printTraverseFromRootExplanationResult();
+
+        $result .= $this->printDefaultExplanationResult();
+
+        $result .= $this->printTextExplanationResults();
+
+        $result .= $this->printImagickExplanationResult();
+
+        $result .= PHP_EOL;
+
+        return $result;
+    }
+
+    protected function constructScreenshot() : string
     {
         $backgroundToLayer = [];
 
         if (empty($this->imagickResultArray))
         {
-            return;
+            return '';
         }
 
         /** @var ImagickExplanationResult $imagickResult */
@@ -209,7 +334,7 @@ class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
 
         $imagick = $imagick->mergeImageLayers(\Imagick::LAYERMETHOD_FLATTEN);
 
-        $this->screenshot = $imagick->getImageBlob();
+        return $imagick->getImageBlob();
     }
 
     public function getResult() : Why
@@ -219,10 +344,7 @@ class DefaultExplanationResultFormatter extends AbstractExplanationResultVisitor
             return $this->result;
         }
 
-        $this->constructMessage();
-        $this->constructScreenshot();
-
-        $this->result = new Why($this->message, $this->screenshot);
+        $this->result = new Why($this->constructMessage(), $this->constructScreenshot());
 
         return $this->result;
     }
