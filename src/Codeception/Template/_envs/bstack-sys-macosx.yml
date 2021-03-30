@@ -1,0 +1,7 @@
+# BrowserStack OSX system config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            capabilities:
+                os: 'OS X'
+                os_version: 'Catalina'

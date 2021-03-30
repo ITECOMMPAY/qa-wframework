@@ -24,10 +24,12 @@ class WAutoRebuild extends \Codeception\Extension
             return;
         }
 
-        $supportDir = Configuration::supportDir();
-        $suiteSettings = $e->getSettings();
-        $actorNameShort = $suiteSettings['actor'];
-        $namespace = $suiteSettings['namespace'] ?? '';
+        $projectDir      = Configuration::projectDir();
+        $supportDir      = Configuration::supportDir();
+        $testsDir        = Configuration::testsDir();
+        $suiteSettings   = $e->getSettings();
+        $actorClassShort = $suiteSettings['actor'];
+        $namespace       = $suiteSettings['namespace'] ?? '';
 
         $frameworkConfig = Codeception::getModuleConfig('WebTestingModule', $suiteSettings);
 
@@ -44,7 +46,7 @@ class WAutoRebuild extends \Codeception\Extension
         }
         else
         {
-            $projectName = ucfirst($actorNameShort);
+            $projectName = ucfirst($actorClassShort);
 
             $length = strpos($projectName, 'Tester');
 
@@ -54,7 +56,7 @@ class WAutoRebuild extends \Codeception\Extension
             }
         }
 
-        (new WProjectStructure($projectName, $namespace, $actorNameShort, $supportDir, $commonDirs))->build();
+        (new WProjectStructure($projectName, $actorClassShort, $namespace, $projectDir, $supportDir, $testsDir, $commonDirs, false))->build();
     }
 
 }

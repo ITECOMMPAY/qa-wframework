@@ -1,0 +1,5 @@
+# Local Firefox browser config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            browser: firefox

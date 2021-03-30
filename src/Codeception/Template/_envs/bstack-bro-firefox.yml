@@ -1,0 +1,7 @@
+# BrowserStack Firefox browser config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            browser: firefox
+            capabilities:
+                browserVersion: 'latest'

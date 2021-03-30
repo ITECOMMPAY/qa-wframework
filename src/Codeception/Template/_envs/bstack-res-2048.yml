@@ -1,0 +1,6 @@
+# BrowserStack 2048x1536 resolution config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            capabilities:
+                resolution: '2048x1536'

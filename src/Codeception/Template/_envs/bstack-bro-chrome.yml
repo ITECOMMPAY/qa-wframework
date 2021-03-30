@@ -1,8 +1,9 @@
-# `local` environment config
+# BrowserStack Chrome browser config
 modules:
     config:
         Codeception\Module\WebTestingModule:
             browser: chrome
             capabilities:
                 chromeOptions:
-                    args: ["headless"]
+                    args: ['start-maximized']
+                browserVersion: 'latest'

@@ -1,0 +1,7 @@
+# BrowserStack Windows 10 system config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            capabilities:
+                os: 'Windows'
+                os_version: '10'

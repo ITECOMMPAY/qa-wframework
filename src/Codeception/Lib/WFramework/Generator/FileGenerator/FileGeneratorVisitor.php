@@ -6,60 +6,81 @@ namespace Codeception\Lib\WFramework\Generator\FileGenerator;
 
 use Codeception\Lib\WFramework\Exceptions\GeneralException;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
-use Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNodes\AbstractBasicElement;
-use Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNodes\AbstractPageObjectNode;
-use Codeception\Lib\WFramework\Helpers\Composite;
+use Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\PageObjectExampleNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\PageObjectNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\StepExampleNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\TestExampleNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\IDescribeClass;
 
 class FileGeneratorVisitor
 {
-    /**
-     * @var string
-     */
-    protected $outputPath;
+    protected string $projectDir;
 
-    protected $neverOverwriteTheseNodes = [AbstractPageObjectNode::class, AbstractBasicElement::class];
+    protected string $supportDir;
 
-    public function __construct(string $outputPath)
+    protected bool $firstInit;
+
+
+    public function __construct(string $projectDir, string $supportDir, bool $firstInit = false)
     {
-        $this->outputPath = $this->mkDir($outputPath);
+        $this->projectDir = $projectDir;
+        $this->supportDir = $supportDir;
+        $this->firstInit = $firstInit;
     }
 
     public function __call(string $name, array $arguments)
     {
         $node = reset($arguments);
 
-        if (!$node instanceof Composite)
+        if (!$node instanceof AbstractNode)
         {
-            throw new UsageException('Первым аргументов визитора должен быть Composite');
+            throw new UsageException('Первым аргументов визитора должен быть AbstractNode');
         }
 
-        if (empty($node->outputNamespace) || empty($node->source))
+        if (!$node instanceof IDescribeClass || $this->shouldNotGenerate($node))
         {
             return;
         }
 
-        $folder = $this->namespaceToPath($node->outputNamespace);
+        if (empty($node->getSource()) || empty($node->getOutputNamespace()))
+        {
+            return;
+        }
 
-        $folder = $this->mkDir($folder);
+        $subpath = $this->namespaceToPath($node->getOutputNamespace());
 
-        $filename = $folder . '/' . $node->getName() . '.php';
+        if ($node instanceof TestExampleNode)
+        {
+            $path = $this->projectDir . $subpath;
+        }
+        else
+        {
+            $path = $this->supportDir . $subpath;
+        }
+
+        $path = $this->mkDir($path);
+
+        $filename = $path . DIRECTORY_SEPARATOR . $node->getEntityClassShort() . '.php';
 
         if (file_exists($filename))
         {
-            if ($this->mustNotBeOverwritten($node))
-            {
-                return;
-            }
-
             unlink($filename);
         }
 
-        file_put_contents($filename, $node->source);
+        file_put_contents($filename, $node->getSource());
     }
 
-    protected function mustNotBeOverwritten($node) : bool
+    protected function shouldNotGenerate($node) : bool
     {
-        foreach ($this->neverOverwriteTheseNodes as $nodeClass)
+        if ($this->firstInit)
+        {
+            return false;
+        }
+
+        $generateOnFirstInitOnly = [PageObjectNode::class, PageObjectExampleNode::class, StepExampleNode::class, TestExampleNode::class];
+
+        foreach ($generateOnFirstInitOnly as $nodeClass)
         {
             if ($node instanceof $nodeClass)
             {
@@ -74,7 +95,7 @@ class FileGeneratorVisitor
     {
         $namespace = substr($namespace, strpos($namespace, '\\') + 1);
 
-        return $this->outputPath . '/' . str_replace('\\', '/', $namespace);
+        return DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
     }
 
     protected function mkDir(string $dir) : string

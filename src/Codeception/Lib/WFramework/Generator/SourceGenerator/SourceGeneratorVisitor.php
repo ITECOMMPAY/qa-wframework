@@ -4,245 +4,138 @@
 namespace Codeception\Lib\WFramework\Generator\SourceGenerator;
 
 
-use Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNodes\AbstractFacadeNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNodes\AbstractOperationGroupNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\AbstractNodes\AbstractOperationNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\ButtonNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\CheckboxNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\ImageNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\LabelNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\LinkNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\BasicElements\TextBoxNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Block\BlockFacadeNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Block\BlockNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Block\BlockOperationGroupNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Block\BlockOperationNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Collection\CollectionFacadeNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Collection\CollectionNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Collection\CollectionOperationGroupNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Collection\CollectionOperationNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementFacadeNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementOperationGroupNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Element\ElementOperationNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\RootNode;
-use Codeception\Lib\WFramework\Generator\ParsingTree\Steps\StepsNode;
-use Codeception\Lib\WFramework\Generator\SourceGenerator\BasicElements\ButtonSource;
-use Codeception\Lib\WFramework\Generator\SourceGenerator\BasicElements\CheckboxSource;
-use Codeception\Lib\WFramework\Generator\SourceGenerator\BasicElements\ImageSource;
-use Codeception\Lib\WFramework\Generator\SourceGenerator\BasicElements\LabelSource;
-use Codeception\Lib\WFramework\Generator\SourceGenerator\BasicElements\LinkSource;
-use Codeception\Lib\WFramework\Generator\SourceGenerator\BasicElements\TextBoxSource;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\FacadeNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\OperationGroupNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\OperationNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\PageObjectExampleNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\PageObjectNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\StepExampleNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\StepsNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\TestExampleNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Block\LoginBlockNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Steps\LoginStepsNode;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\BaseStructure\BlockSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\BaseStructure\CollectionSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\BaseStructure\ElementSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\BaseStructure\FacadeSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\BaseStructure\OperationGroupSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\BaseStructure\OperationSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\BaseStructure\StepsSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Blocks\LoginBlockSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\ButtonSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\CheckboxSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\ImageSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\LabelSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\LinkSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\TextBoxSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Steps\FrontPageStepsSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Steps\LoginStepsSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Tests\LoginCestSource;
+use Codeception\Lib\WFramework\Helpers\Composite;
+use Codeception\Lib\WFramework\Helpers\CompositeVisitor;
 
-class SourceGeneratorVisitor
+class SourceGeneratorVisitor extends CompositeVisitor
 {
-    public function acceptRootNode(RootNode $node)
+    public function acceptComposite(Composite $composite){}
+
+    public function acceptPageObjectNode(PageObjectNode $node)
     {
-        if ($node->source !== null)
+        if ($node->getName() === 'Block')
         {
-            return;
+            (new BlockSource($node))->generate(); return;
         }
 
-        $node->source = '';
-    }
-
-    public function acceptBlockNode(BlockNode $node)
-    {
-        if ($node->source !== null)
+        if ($node->getName() === 'Element')
         {
-            return;
+            (new ElementSource($node))->generate(); return;
         }
 
-        $node->source = (new BlockSource($node->outputNamespace, $node->name, $node->actorClassFull, $node->getFacade()->classFull))->produce();
-    }
-
-    public function acceptElementNode(ElementNode $node)
-    {
-        if ($node->source !== null)
+        if ($node->getName() === 'Collection')
         {
-            return;
+            (new CollectionSource($node))->generate(); return;
         }
-
-        $node->source = (new ElementSource($node->outputNamespace, $node->name, $node->actorClassFull, $node->getFacade()->classFull))->produce();
     }
 
-    public function acceptCollectionNode(CollectionNode $node)
+    public function acceptFacadeNode(FacadeNode $node)
     {
-        if ($node->source !== null)
-        {
-            return;
-        }
-
-        $node->source = (new CollectionSource($node->outputNamespace, $node->name, $node->actorClassFull, $node->getFacade()->classFull))->produce();
+        (new FacadeSource($node))->generate();
     }
 
-    public function acceptBlockFacadeNode(BlockFacadeNode $node)
+    public function acceptOperationGroupNode(OperationGroupNode $node)
     {
-        $this->acceptFacadeNode($node);
-    }
-
-    public function acceptElementFacadeNode(ElementFacadeNode $node)
-    {
-        $this->acceptFacadeNode($node);
-    }
-
-    public function acceptCollectionFacadeNode(CollectionFacadeNode $node)
-    {
-        $this->acceptFacadeNode($node);
-    }
-
-    protected function acceptFacadeNode(AbstractFacadeNode $node)
-    {
-        if ($node->source !== null)
-        {
-            return;
-        }
-
-        $groupNameToGroupClassFull = [];
-
         /**
-         * @var string $name
-         * @var AbstractOperationGroupNode $child
+         * @var string $methodName
+         * @var OperationNode $operationNode
          */
-        foreach ($node->getChildren() as $name => $child)
+        foreach ($node->getChildren() as $methodName => $operationNode)
         {
-            $groupNameToGroupClassFull[$name] = $child->classFull;
+            (new OperationSource($operationNode))->generate();
         }
 
-        $node->source = (new FacadeSource($node->outputNamespace, $node->name, $node->getPageObject()->classFull, $groupNameToGroupClassFull))->produce();
-    }
-
-    public function acceptBlockOperationGroupNode(BlockOperationGroupNode $node)
-    {
-        $this->acceptOperationGroupNode($node);
-    }
-
-    public function acceptElementOperationGroupNode(ElementOperationGroupNode $node)
-    {
-        $this->acceptOperationGroupNode($node);
-    }
-
-    public function acceptCollectionOperationGroupNode(CollectionOperationGroupNode $node)
-    {
-        $this->acceptOperationGroupNode($node);
-    }
-
-    protected function acceptOperationGroupNode(AbstractOperationGroupNode $node)
-    {
-        if ($node->source !== null)
-        {
-            return;
-        }
-
-        $operationsSources = [];
-
-        /**
-         * @var string $name
-         * @var AbstractOperationNode $operation
-         */
-        foreach ($node->getChildren() as $name => $operation)
-        {
-            $operation->accept($this);
-            $operationsSources[] = $operation->source;
-        }
-
-        $operationsSource = implode(PHP_EOL, $operationsSources);
-
-        $node->source = (new OperationGroupSource($node->outputNamespace, $node->name, $node->getFacade()->classFull, $operationsSource))->produce();
-    }
-
-    public function acceptBlockOperationNode(BlockOperationNode $node)
-    {
-        $this->acceptOperationNode($node);
-    }
-
-    public function acceptElementOperationNode(ElementOperationNode $node)
-    {
-        $this->acceptOperationNode($node);
-    }
-
-    public function acceptCollectionOperationNode(CollectionOperationNode $node)
-    {
-        $this->acceptOperationNode($node);
-    }
-
-    protected function acceptOperationNode(AbstractOperationNode $node)
-    {
-        if ($node->source !== null)
-        {
-            return;
-        }
-
-        $node->source = (new OperationSource($node->name, $node->classFull, $node->reflectionClass, $node->reflectionMethod))->produce();
-    }
-
-    public function acceptButtonNode(ButtonNode $node)
-    {
-        if ($node->source !== null)
-        {
-            return;
-        }
-
-        $node->source = (new ButtonSource($node->outputNamespace, $node->classFull, $node->getElementNode()->classFull))->produce();
-    }
-
-    public function acceptCheckboxNode(CheckboxNode $node)
-    {
-        if ($node->source !== null)
-        {
-            return;
-        }
-
-        $node->source = (new CheckboxSource($node->outputNamespace, $node->classFull, $node->getElementNode()->classFull))->produce();
-    }
-
-    public function acceptLinkNode(LinkNode $node)
-    {
-        if ($node->source !== null)
-        {
-            return;
-        }
-
-        $node->source = (new LinkSource($node->outputNamespace, $node->classFull, $node->getElementNode()->classFull))->produce();
-    }
-
-    public function acceptImageNode(ImageNode $node)
-    {
-        if ($node->source !== null)
-        {
-            return;
-        }
-
-        $node->source = (new ImageSource($node->outputNamespace, $node->classFull, $node->getElementNode()->classFull))->produce();
-    }
-
-    public function acceptLabelNode(LabelNode $node)
-    {
-        if ($node->source !== null)
-        {
-            return;
-        }
-
-        $node->source = (new LabelSource($node->outputNamespace, $node->classFull, $node->getElementNode()->classFull))->produce();
-    }
-
-    public function acceptTextBoxNode(TextBoxNode $node)
-    {
-        if ($node->source !== null)
-        {
-            return;
-        }
-
-        $node->source = (new TextBoxSource($node->outputNamespace, $node->classFull, $node->getElementNode()->classFull))->produce();
+        (new OperationGroupSource($node))->generate();
     }
 
     public function acceptStepsNode(StepsNode $node)
     {
-        if ($node->source !== null)
+        (new StepsSource($node))->generate();
+    }
+
+    public function acceptPageObjectExampleNode(PageObjectExampleNode $node)
+    {
+        if ($node->getName() === 'Button')
         {
-            return;
+            (new ButtonSource($node))->generate(); return;
         }
 
-        $node->source = (new StepsSource($node->outputNamespace, $node->name, $node->stepObjectClassesFull))->produce();
+        if ($node->getName() === 'Checkbox')
+        {
+            (new CheckboxSource($node))->generate(); return;
+        }
+
+        if ($node->getName() === 'Image')
+        {
+            (new ImageSource($node))->generate(); return;
+        }
+
+        if ($node->getName() === 'Label')
+        {
+            (new LabelSource($node))->generate(); return;
+        }
+
+        if ($node->getName() === 'Link')
+        {
+            (new LinkSource($node))->generate(); return;
+        }
+
+        if ($node->getName() === 'TextBox')
+        {
+            (new TextBoxSource($node))->generate(); return;
+        }
+
+        if ($node instanceof LoginBlockNode)
+        {
+            (new LoginBlockSource($node))->generate(); return;
+        }
+    }
+
+    public function acceptStepExampleNode(StepExampleNode $node)
+    {
+        if ($node->getName() === 'FrontPageSteps')
+        {
+            (new FrontPageStepsSource($node))->generate(); return;
+        }
+
+        if ($node instanceof LoginStepsNode)
+        {
+            (new LoginStepsSource($node))->generate(); return;
+        }
+    }
+
+    public function acceptTestExampleNode(TestExampleNode $node)
+    {
+        if ($node->getName() === 'LoginCest')
+        {
+            (new LoginCestSource($node))->generate(); return;
+        }
     }
 }

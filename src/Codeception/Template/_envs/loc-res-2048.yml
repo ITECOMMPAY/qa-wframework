@@ -1,0 +1,5 @@
+# Local 2048x1536 resolution config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            window_size: "2048x1536"

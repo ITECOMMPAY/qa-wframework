@@ -6,11 +6,18 @@ namespace Codeception\Lib\WFramework\Generator;
 
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Generator\FileGenerator\FileGeneratorVisitor;
-use Codeception\Lib\WFramework\Generator\ParsingTree\RootNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\RootNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Block\LoginBlockNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Steps\LoginStepsNode;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\SourceGeneratorVisitor;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use Codeception\Lib\WFramework\Steps\StepsGroup;
+use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
+use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
+use Ds\Map;
+use Ds\Set;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
@@ -19,36 +26,56 @@ use RegexIterator;
 
 class WProjectStructure
 {
-    /** @var string */
-    protected $projectName;
+    protected string $projectName;
 
-    /** @var string */
-    protected $outputPath;
+    protected string $actorClassShort;
 
-    /** @var string */
-    protected $outputNamespace;
+    protected string $actorClassFull;
 
-    /** @var array */
-    protected $operationsPath = [];
+    protected string $supportNamespace;
 
-    /** @var string */
-    protected $stepObjectsPath;
+    protected string $testsNamespace;
 
-    /** @var string */
-    protected $actorNameShort;
+    protected string $projectDir;
 
-    /** @var string */
-    protected $actorNameFull;
+    protected string $supportDir;
 
-    public function __construct(string $projectName, string $outputNamespace, string $actorNameShort, string $supportDir, array $commonDirs = [])
+    protected string $testsDir;
+
+    protected array $operationsPath = [];
+
+    protected string $stepObjectsPath;
+
+    protected bool $firstInit;
+
+
+    public function __construct(string $projectName, string $actorClassShort, string $outputNamespace, string $projectDirFull, string $supportDirFull, string $testsDirFull, array $commonDirs = [], bool $firstInit = false)
     {
-        $this->projectName = $projectName;
-        $this->outputPath = $supportDir;
-        $this->outputNamespace = $outputNamespace;
-        $this->actorNameShort = $actorNameShort;
-        $this->actorNameFull = $this->getActorNameFull();
-        $this->operationsPath = array_merge([__DIR__ . '/../Operations'], $this->getCommonDirsFull($commonDirs), [$supportDir . '/Helper/Operations']);
-        $this->stepObjectsPath = $supportDir . '/Helper/Steps';
+        $this->projectName      = $projectName;
+        $this->projectDir       = realpath($projectDirFull);
+        $this->supportDir       = realpath($supportDirFull);
+        $this->testsDir         = realpath($testsDirFull);
+        $this->supportNamespace = $outputNamespace;
+        $this->testsNamespace   = $this->getTestsNamespace($outputNamespace, $projectDirFull, $testsDirFull);
+        $this->actorClassShort  = $actorClassShort;
+        $this->actorClassFull   = empty($outputNamespace) ? $actorClassShort : $outputNamespace . '\\' . $actorClassShort;
+        $this->operationsPath   = array_merge([__DIR__ . '/../Operations'], $this->getCommonDirsFull($commonDirs), [$supportDirFull . '/Helper/Operations']);
+        $this->stepObjectsPath  = $supportDirFull . '/Helper/Steps';
+        $this->firstInit        = $firstInit;
+    }
+
+    protected function getTestsNamespace(string $outputNamespace, string $projectDirFull, string $testsDirFull) : string
+    {
+        $testsSubDir = mb_substr($testsDirFull, mb_strpos($testsDirFull, $projectDirFull) + mb_strlen($projectDirFull));
+
+        $parts = array_filter(explode(DIRECTORY_SEPARATOR, $testsSubDir));
+
+        if (!empty($outputNamespace))
+        {
+            array_unshift($parts, $outputNamespace);
+        }
+
+        return implode('\\', $parts);
     }
 
     protected function getCommonDirsFull(array $commonDirs) : array
@@ -93,19 +120,9 @@ class WProjectStructure
         return $result;
     }
 
-    protected function getActorNameFull() : string
-    {
-        if (!empty($this->outputNamespace))
-        {
-            return $this->outputNamespace . '\\' . $this->actorNameShort;
-        }
-
-        return $this->actorNameShort;
-    }
-
     public function build()
     {
-        $parsingTree = new RootNode($this->projectName, $this->actorNameFull, $this->outputNamespace, $this->getOperationClasses(), $this->getStepObjectsClasses());
+        $parsingTree = $this->makeTree();
 
         $sourceGenerator = new SourceGeneratorVisitor();
 
@@ -114,7 +131,7 @@ class WProjectStructure
             $node->accept($sourceGenerator);
         }
 
-        $fileGenerator = new FileGeneratorVisitor($this->outputPath);
+        $fileGenerator = new FileGeneratorVisitor($this->projectDir, $this->supportDir, $this->firstInit);
 
         foreach ($parsingTree->traverseDepthFirst() as $node)
         {
@@ -122,9 +139,59 @@ class WProjectStructure
         }
     }
 
-    protected function getOperationClasses() : array
+    protected function makeTree() : RootNode
     {
-        $result = [];
+        $parsingTree = new RootNode($this->projectName, $this->actorClassFull, $this->supportNamespace, $this->testsNamespace, $this->getOperationClasses(), $this->getStepObjectsClasses());
+
+        $parsingTree
+            ->addPageObjectNode('Block', WBlock::class)
+            ->addFacadeNode('Operations')
+            ->addOperations()
+        ;
+
+        $parsingTree
+            ->addPageObjectNode('Element', WElement::class)
+            ->addFacadeNode('Operations')
+            ->addOperations()
+        ;
+
+        $parsingTree
+            ->addPageObjectNode('Collection', WCollection::class)
+            ->addFacadeNode('Operations')
+            ->addOperations()
+        ;
+
+        $parsingTree->addStepsNode('Steps');
+
+        if (!$this->firstInit)
+        {
+            return $parsingTree;
+        }
+
+        $elementNode = $parsingTree->getPageObjectNode('Element');
+        $button     = $elementNode->addExampleNode('Button', $this->projectName . 'Button');
+        $checkbox   = $elementNode->addExampleNode('Checkbox', $this->projectName . 'Checkbox');
+        $link       = $elementNode->addExampleNode('Link', $this->projectName . 'Link');
+        $image      = $elementNode->addExampleNode('Image', $this->projectName . 'Image');
+        $label      = $elementNode->addExampleNode('Label', $this->projectName . 'Label');
+        $textBox    = $elementNode->addExampleNode('TextBox', $this->projectName . 'TextBox');
+
+        $blockNode = $parsingTree->getPageObjectNode('Block');
+        /** @var LoginBlockNode $loginBlock */
+        $loginBlock = $blockNode->addExampleNodeExisting(new LoginBlockNode('LoginBlock', 'LoginBlock', $blockNode, $button, $textBox));
+
+        $stepsNode = $parsingTree->getStepsNode('Steps');
+        $frontPageSteps = $stepsNode->addExampleNode('FrontPageSteps', 'FrontPageSteps');
+        $loginSteps = $stepsNode->addExampleNodeExisting(new LoginStepsNode('LoginSteps', 'LoginSteps', $stepsNode, $loginBlock, $frontPageSteps));
+
+        $parsingTree->addTestExampleNode('LoginCest', $stepsNode);
+
+        return $parsingTree;
+    }
+
+    protected function getOperationClasses() : Map
+    {
+        $result = new Map();
 
         foreach ($this->operationsPath as $path)
         {
@@ -134,28 +201,29 @@ class WProjectStructure
                 continue;
             }
 
-            $result[] = $this->loadSubclassesFromDir($path, AbstractOperation::class);
+            $result->putAll($this->loadSubclassesFromDir($path, AbstractOperation::class));
         }
 
-        $result = array_merge(...$result);
-
-        ksort($result);
+        $result->sort();
 
         return $result;
     }
 
-    protected function getStepObjectsClasses() : array
+    protected function getStepObjectsClasses() : Set
     {
+        $result = new Set();
+
         if (!is_dir($this->stepObjectsPath))
         {
-            return [];
+            return $result;
         }
 
-        $result = $this->loadSubclassesFromDir($this->stepObjectsPath, StepsGroup::class);
+        $result = $this
+                    ->loadSubclassesFromDir($this->stepObjectsPath, StepsGroup::class)
+                    ->keys()
+                    ;
 
-        $result = array_keys($result);
-
-        sort($result);
+        $result->sort();
 
         return $result;
     }
@@ -166,7 +234,7 @@ class WProjectStructure
      * @return array - [class full name => reflection object]
      * @throws \ReflectionException
      */
-    protected function loadSubclassesFromDir(string $path, string $classOrInterface) : array
+    protected function loadSubclassesFromDir(string $path, string $classOrInterface) : Map
     {
         $directory = new RecursiveDirectoryIterator($path);
         $iterator = new RecursiveIteratorIterator($directory);
@@ -179,7 +247,7 @@ class WProjectStructure
 
         $classes = get_declared_classes();
 
-        $result = [];
+        $result = new Map();
 
         foreach ($classes as $class)
         {
@@ -195,7 +263,7 @@ class WProjectStructure
                 continue;
             }
 
-            $result[$class] = $reflectionClass;
+            $result->put($class, $reflectionClass);
         }
 
         return $result;

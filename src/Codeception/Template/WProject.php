@@ -5,8 +5,20 @@ namespace Codeception\Template;
 use Codeception\InitTemplate;
 use Codeception\Lib\WFramework\Generator\WProjectStructure;
 use Codeception\Util\Template;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use RegexIterator;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Class WProject
+ *
+ * Генерация нового проекта.
+ * Запускать так: ./vendor/bin/codecept init --path ./tests WProject
+ *
+ * @package Codeception\Template
+ */
 class WProject extends InitTemplate
 {
     protected $configTemplate = <<<EOF
@@ -21,6 +33,11 @@ suites:
 modules:
     enabled:
         -   Codeception\Module\WebTestingModule:
+                url: '{{url}}'
+                email: 'some@email.com'
+                password: '123456'
+                browser: chrome
+                window_size: "1920x1080"
                 elementTimeout:          16      # Таймаут умных ожиданий для PageObject'ов (наследников WBlock, WElement)
                 collectionTimeout:       32      # Таймаут умных ожиданий для коллекций PageObject'ов (наследников WCollection)
                 autostartSeleniumServer: true    # Автоматически запускать SeleniumServer при старте тестов
@@ -77,28 +94,6 @@ settings:
 
 EOF;
 
-    protected $firstTest = <<<EOF
-<?php
-class LoginCest 
-{    
-    public function _before(AcceptanceTester \$I)
-    {
-        \$I->amOnPage('/');
-    }
-
-    public function loginSuccessfully(AcceptanceTester \$I)
-    {
-        // write a positive login test 
-    }
-    
-    public function loginWithInvalidPassword(AcceptanceTester \$I)
-    {
-        // write a negative login test
-    }       
-}
-EOF;
-
-
     public function setup()
     {
         $this->checkInstalled();
@@ -106,7 +101,17 @@ EOF;
         $this->say("Настраиваем тестовый проект");
         $this->say("");
 
-        $projectName = $this->ask("Задайте короткое название проекта: ", 'ui');
+        while(true)
+        {
+            $projectName = $this->ask("Задайте короткое название проекта (<=5 символов латиницы): ", 'ui');
+
+            if (strlen($projectName) <= 5 && preg_match('%^[[:alpha:]][[:alnum:]]*$%', $projectName))
+            {
+                break;
+            }
+        }
+
+        $url = $this->ask("Задайте адрес сайта: ", 'https://colorlib.com/etc/lf/Login_v1/index.html');
 
         $projectUCFirst = ucfirst($projectName);
         $projectLowercase = strtolower($projectName);
@@ -115,19 +120,19 @@ EOF;
         $this->namespace = $projectLowercase;
         $root = $projectLowercase;
 
-        $this->createEmptyDirectory($outputDir = $root . DIRECTORY_SEPARATOR . '_output');
-        $this->createEmptyDirectory($root . DIRECTORY_SEPARATOR . '_data');
-        $this->createEmptyDirectory($root . DIRECTORY_SEPARATOR . '_envs');
-        $this->createEmptyDirectory($root . DIRECTORY_SEPARATOR . 'Tests');
-        $this->createDirectoryFor($supportDir = $root . DIRECTORY_SEPARATOR . '_support');
+        $this->createEmptyDirectory($outputDir =  $root . DIRECTORY_SEPARATOR . '_output');
+        $this->createEmptyDirectory(          $root . DIRECTORY_SEPARATOR . '_data');
+        $this->createEmptyDirectory($envsDir =    $root . DIRECTORY_SEPARATOR . '_envs');
+        $this->createEmptyDirectory($testsDir =   $root . DIRECTORY_SEPARATOR . 'Tests');
+        $this->createDirectoryFor($supportDir =   $root . DIRECTORY_SEPARATOR . '_support');
         $this->createDirectoryFor($generatedDir = $supportDir . DIRECTORY_SEPARATOR . '_generated');
-        $this->createDirectoryFor($helperDir = $supportDir . DIRECTORY_SEPARATOR . 'Helper');
-        $this->createEmptyDirectory($helperDir . DIRECTORY_SEPARATOR  . 'AliasMaps');
-        $this->createDirectoryFor($helperDir . DIRECTORY_SEPARATOR  . 'Blocks');
-        $this->createEmptyDirectory($helperDir . DIRECTORY_SEPARATOR  . 'Conditions');
-        $this->createDirectoryFor($helperDir . DIRECTORY_SEPARATOR  . 'Elements');
-        $this->createEmptyDirectory($helperDir . DIRECTORY_SEPARATOR  . 'Operations');
-        $this->createDirectoryFor($helperDir . DIRECTORY_SEPARATOR  . 'Steps');
+        $this->createDirectoryFor($helperDir =    $supportDir . DIRECTORY_SEPARATOR . 'Helper');
+        $this->createEmptyDirectory(          $helperDir . DIRECTORY_SEPARATOR  . 'AliasMaps');
+        $this->createDirectoryFor(        $helperDir . DIRECTORY_SEPARATOR  . 'Blocks');
+        $this->createEmptyDirectory(          $helperDir . DIRECTORY_SEPARATOR  . 'Conditions');
+        $this->createDirectoryFor(        $helperDir . DIRECTORY_SEPARATOR  . 'Elements');
+        $this->createEmptyDirectory(          $helperDir . DIRECTORY_SEPARATOR  . 'Operations');
+        $this->createDirectoryFor(        $helperDir . DIRECTORY_SEPARATOR  . 'Steps');
 
         $this->gitIgnore($outputDir);
         $this->gitIgnore($generatedDir);
@@ -140,6 +145,7 @@ EOF;
         $configFile = (new Template($this->configTemplate))
                                 ->place('namespace', $this->namespace)
                                 ->place('actor_name', $actorName)
+                                ->place('url', $url)
                                 ->place('project_uppercase', $projectUppercase)
                                 ->produce();
 
@@ -152,27 +158,33 @@ EOF;
 
         $this->sayInfo("Актор проекта: $actorName - успешно создан");
 
+        $projectFullDir = getcwd() . '/' . $root;
+        $supportFullDir = getcwd() . '/' . $supportDir;
+        $testFullDir    = getcwd() . '/' . $testsDir;
 
-        (new WProjectStructure($projectUCFirst, $this->namespace, $actorName, $supportDir))->build();
+        (new WProjectStructure($projectUCFirst, $actorName, $this->namespace, $projectFullDir, $supportFullDir, $testFullDir, [],true))->build();
 
         $this->sayInfo("Хелперы проекта успешно сгенерированы");
 
+        $directory = new RecursiveDirectoryIterator(__DIR__ . DIRECTORY_SEPARATOR . '_envs');
+        $iterator = new RecursiveIteratorIterator($directory);
+        $ymlFiles = new RegexIterator($iterator, '/^.+\.yml$/i', RecursiveRegexIterator::GET_MATCH);
 
-//        $this->sayInfo("Created global config codeception.yml inside the root directory");
-//        $this->createFile($root . DIRECTORY_SEPARATOR . 'LoginCest.php', $this->firstTest);
-//        $this->sayInfo("Created a demo test LoginCest.php");
+        $targetEnvDir = getcwd() . '/' .$envsDir;
+
+        foreach ($ymlFiles as $ymlFile)
+        {
+            copy($ymlFile[0], $targetEnvDir . DIRECTORY_SEPARATOR . basename($ymlFile[0]));
+        }
+
+        $this->sayInfo("env-файлы успешно скопированы");
 
         $this->say();
         $this->saySuccess("ПРОЕКТ НАСТРОЕН");
+    }
 
-//        $this->say();
-//        $this->say("<bold>Next steps:</bold>");
-//        $this->say('1. Launch Selenium Server and webserver');
-//        $this->say("2. Edit <bold>$root/LoginCest.php</bold> to test login of your application");
-//        $this->say("3. Run tests using: <comment>codecept run</comment>");
-//        $this->say();
-//        $this->say("HINT: Add '\\Codeception\\Step\\Retry' trait to AcceptanceTester class to enable auto-retries");
-//        $this->say("HINT: See https://codeception.com/docs/03-AcceptanceTests#retry");
-//        $this->say("<bold>Happy testing!</bold>");
+    protected function gitIgnore($path)
+    {
+        $this->createFile($path . DIRECTORY_SEPARATOR . '.gitignore', '**');
     }
 }

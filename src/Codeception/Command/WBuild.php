@@ -23,15 +23,16 @@ class WBuild extends Command implements CustomCommandInterface
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $projectDir = Configuration::projectDir();
         $supportDir = Configuration::supportDir();
-
-        $suites = $this->getSuites();
+        $testsDir   = Configuration::testsDir();
+        $suites     = Configuration::suites();
 
         foreach ($suites as $suite)
         {
-            $suiteSettings = $this->getSuiteConfig($suite);
-            $actorNameShort = $suiteSettings['actor'];
-            $namespace = $suiteSettings['namespace'] ?? '';
+            $suiteSettings   = $this->getSuiteConfig($suite);
+            $actorClassShort = $suiteSettings['actor'];
+            $namespace       = $suiteSettings['namespace'] ?? '';
 
             $frameworkConfig = Codeception::getModuleConfig('WebTestingModule', $suiteSettings);
 
@@ -48,7 +49,7 @@ class WBuild extends Command implements CustomCommandInterface
             }
             else
             {
-                $projectName = ucfirst($actorNameShort);
+                $projectName = ucfirst($actorClassShort);
 
                 $length = strpos($projectName, 'Tester');
 
@@ -58,7 +59,7 @@ class WBuild extends Command implements CustomCommandInterface
                 }
             }
 
-            (new WProjectStructure($projectName, $namespace, $actorNameShort, $supportDir, $commonDirs))->build();
+            (new WProjectStructure($projectName, $actorClassShort, $namespace, $projectDir, $supportDir, $testsDir, $commonDirs, false))->build();
         }
 
         return 0;

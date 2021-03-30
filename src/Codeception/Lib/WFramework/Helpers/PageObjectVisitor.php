@@ -4,10 +4,6 @@
 namespace Codeception\Lib\WFramework\Helpers;
 
 
-use Codeception\Lib\WFramework\Exceptions\UsageException;
-use Codeception\Lib\WFramework\Exceptions\VisitorNotImplementedException;
-use Codeception\Lib\WFramework\Logger\WLogger;
-use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
@@ -21,7 +17,7 @@ use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
  * @method mixed acceptWCollection(WCollection $collection)
  * @package Codeception\Lib\WFramework\Helpers
  */
-abstract class PageObjectVisitor
+abstract class PageObjectVisitor extends CompositeVisitor
 {
     /**
      * Понятное описание визитора.
@@ -36,68 +32,13 @@ abstract class PageObjectVisitor
      */
     abstract public function getName() : string;
 
-    public function __call(string $name, array $arguments)
-    {
-        $pageObject = reset($arguments);
-
-        if (!$pageObject instanceof IPageObject)
-        {
-            throw new UsageException('Первым аргументов визитора должен быть IPageObject');
-        }
-
-        foreach ($this->getParentAcceptMethods($pageObject) as $methodToCall)
-        {
-            if (method_exists($this, $methodToCall))
-            {
-                return $this->$methodToCall($pageObject);
-            }
-        }
-
-        $poClassFull = $pageObject->getClass();
-        $poClassShort = $pageObject->getClassShort();
-
-        throw new VisitorNotImplementedException( "Визитор: " . static::class . " - не умеет работать с $poClassFull. Если это необходимо, реализуйте в визиторе метод 'accept$poClassShort' или более общий - '$methodToCall'");
-    }
-
-    public function applicable(IPageObject $pageObject) : bool
-    {
-        WLogger::logDebug($this, 'Применимо ли к: ' . $pageObject . ' - условие: ' . $this);
-
-        if (method_exists($this, 'accept' . $pageObject->getClassShort()))
-        {
-            return true;
-        }
-
-        foreach ($this->getParentAcceptMethods($pageObject) as $methodToCall)
-        {
-            if (method_exists($this, $methodToCall))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function getParentAcceptMethods(IPageObject $pageObject) : array
-    {
-        $result = [];
-
-        foreach (class_parents($pageObject) as $class)
-        {
-            if ($class === WPageObject::class)
-            {
-                break;
-            }
-
-            $result[] = 'accept' . ClassHelper::getShortName($class);
-        }
-
-        return $result;
-    }
-
     public function __toString() : string
     {
         return $this->getName();
+    }
+
+    protected function shouldStopAfterClass(string $fullClassName) : bool
+    {
+        return WPageObject::class === $fullClassName;
     }
 }

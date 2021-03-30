@@ -1,0 +1,8 @@
+# Local headless Firefox browser config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            browser: firefox
+            capabilities:
+                moz:firefoxOptions:
+                    args: ["-headless"]

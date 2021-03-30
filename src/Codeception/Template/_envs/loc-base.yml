@@ -1,0 +1,5 @@
+# Local base config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            useBrowserStack: false

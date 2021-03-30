@@ -1,0 +1,7 @@
+# BrowserStack Safari browser config
+modules:
+    config:
+        Codeception\Module\WebTestingModule:
+            browser: Safari
+            capabilities:
+                browserVersion: 'latest'
