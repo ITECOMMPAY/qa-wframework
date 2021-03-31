@@ -14,6 +14,7 @@ use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\StepsNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\TestExampleNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Block\LoginBlockNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Steps\LoginStepsNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Tests\SelfCheckCestNode;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\BaseStructure\BlockSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\BaseStructure\CollectionSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\BaseStructure\ElementSource;
@@ -31,6 +32,8 @@ use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Element
 use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Steps\FrontPageStepsSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Steps\LoginStepsSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Tests\LoginCestSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Tests\SelfCheckCestSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Tests\StoreShotsCestSource;
 use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Helpers\CompositeVisitor;
 
@@ -136,6 +139,16 @@ class SourceGeneratorVisitor extends CompositeVisitor
         if ($node->getName() === 'LoginCest')
         {
             (new LoginCestSource($node))->generate(); return;
+        }
+
+        if ($node->getName() === 'storeShotsCest')
+        {
+            (new StoreShotsCestSource($node))->generate(); return;
+        }
+
+        if ($node instanceof SelfCheckCestNode)
+        {
+            (new SelfCheckCestSource($node))->generate(); return;
         }
     }
 }

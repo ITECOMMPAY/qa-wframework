@@ -9,6 +9,7 @@ use Codeception\Lib\WFramework\Generator\FileGenerator\FileGeneratorVisitor;
 use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\RootNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Block\LoginBlockNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Steps\LoginStepsNode;
+use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Tests\SelfCheckCestNode;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\SourceGeneratorVisitor;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
@@ -51,17 +52,18 @@ class WProjectStructure
 
     public function __construct(string $projectName, string $actorClassShort, string $outputNamespace, string $projectDirFull, string $supportDirFull, string $testsDirFull, array $commonDirs = [], bool $firstInit = false)
     {
-        $this->projectName      = $projectName;
-        $this->projectDir       = realpath($projectDirFull);
-        $this->supportDir       = realpath($supportDirFull);
-        $this->testsDir         = realpath($testsDirFull);
-        $this->supportNamespace = $outputNamespace;
-        $this->testsNamespace   = $this->getTestsNamespace($outputNamespace, $projectDirFull, $testsDirFull);
-        $this->actorClassShort  = $actorClassShort;
-        $this->actorClassFull   = empty($outputNamespace) ? $actorClassShort : $outputNamespace . '\\' . $actorClassShort;
-        $this->operationsPath   = array_merge([__DIR__ . '/../Operations'], $this->getCommonDirsFull($commonDirs), [$supportDirFull . '/Helper/Operations']);
-        $this->stepObjectsPath  = $supportDirFull . '/Helper/Steps';
-        $this->firstInit        = $firstInit;
+        $this->projectName             = $projectName;
+        $this->projectDir              = realpath($projectDirFull);
+        $this->supportDir              = realpath($supportDirFull);
+        $this->testsDir                = realpath($testsDirFull);
+        $this->codeceptionConfigSubdir = $this->getCodeceptionConfigSubdir($projectDirFull);
+        $this->supportNamespace        = $outputNamespace;
+        $this->testsNamespace          = $this->getTestsNamespace($outputNamespace, $projectDirFull, $testsDirFull);
+        $this->actorClassShort         = $actorClassShort;
+        $this->actorClassFull          = empty($outputNamespace) ? $actorClassShort : $outputNamespace . '\\' . $actorClassShort;
+        $this->operationsPath          = array_merge([__DIR__ . '/../Operations'], $this->getCommonDirsFull($commonDirs), [$supportDirFull . '/Helper/Operations']);
+        $this->stepObjectsPath         = $supportDirFull . '/Helper/Steps';
+        $this->firstInit               = $firstInit;
     }
 
     protected function getTestsNamespace(string $outputNamespace, string $projectDirFull, string $testsDirFull) : string
@@ -78,30 +80,33 @@ class WProjectStructure
         return implode('\\', $parts);
     }
 
-    protected function getCommonDirsFull(array $commonDirs) : array
+    protected function findComposerRootDir(string $dir) : string
     {
-        $findComposerRootDir = function (string $dir) use (&$findComposerRootDir) : ?string {
-            if ($dir === '/' || !is_dir($dir))
-            {
-                return null;
-            }
-
-            $dir = dirname($dir);
-
-            if (file_exists("$dir/composer.json"))
-            {
-                return $dir;
-            }
-
-            return $findComposerRootDir($dir);
-        };
-
-        $rootDir = $findComposerRootDir(codecept_root_dir());
-
-        if ($rootDir === null)
+        if ($dir === '/' || !is_dir($dir))
         {
             throw new UsageException('Не найден composer.json');
         }
+
+        $dir = dirname($dir);
+
+        if (file_exists("$dir/composer.json"))
+        {
+            return $dir;
+        }
+
+        return $this->findComposerRootDir($dir);
+    }
+
+    protected function getCodeceptionConfigSubdir(string $projectDirFull) : string
+    {
+        $composerRoot = $this->findComposerRootDir($projectDirFull);
+
+        return '.' . mb_substr($projectDirFull, mb_strpos($projectDirFull, $composerRoot) + mb_strlen($composerRoot));
+    }
+
+    protected function getCommonDirsFull(array $commonDirs) : array
+    {
+        $rootDir = $this->findComposerRootDir(codecept_root_dir());
 
         $result = [];
 
@@ -141,7 +146,7 @@ class WProjectStructure
 
     protected function makeTree() : RootNode
     {
-        $parsingTree = new RootNode($this->projectName, $this->actorClassFull, $this->supportNamespace, $this->testsNamespace, $this->getOperationClasses(), $this->getStepObjectsClasses());
+        $parsingTree = new RootNode($this->projectName, $this->actorClassFull, $this->supportNamespace, $this->testsNamespace, $this->codeceptionConfigSubdir, $this->getOperationClasses(), $this->getStepObjectsClasses());
 
         $parsingTree
             ->addPageObjectNode('Block', WBlock::class)
@@ -185,6 +190,8 @@ class WProjectStructure
         $loginSteps = $stepsNode->addExampleNodeExisting(new LoginStepsNode('LoginSteps', 'LoginSteps', $stepsNode, $loginBlock, $frontPageSteps));
 
         $parsingTree->addTestExampleNode('LoginCest', $stepsNode);
+        $parsingTree->addTestExampleNode('storeShotsCest', $stepsNode);
+        $parsingTree->addTestExampleNodeExisting(new SelfCheckCestNode('selfCheckCest', $stepsNode, $parsingTree, $loginBlock));
 
         return $parsingTree;
     }

@@ -23,8 +23,8 @@ use {{actor_class_full}};
 /**
  * Class {{class_short}}
  *
- * Локально:           ./vendor/bin/codecept run webui LoginCest -c ./tests/{{project_name}} --env loc-base,loc-bro-chrome,loc-res-1920
- * Через BrowserStack: ./vendor/bin/codecept run webui LoginCest -c ./tests/{{project_name}} --env bstack-base,bstack-bro-chrome,bstack-res-1920,bstack-sys-windows
+ * Локально:           ./vendor/bin/codecept run webui LoginCest -c {{codeception_config_subdir}} --env loc-base,loc-bro-chrome,loc-res-1920
+ * Через BrowserStack: ./vendor/bin/codecept run webui LoginCest -c {{codeception_config_subdir}} --env bstack-base,bstack-bro-chrome,bstack-res-1920,bstack-sys-windows
  * 
  */
 class {{class_short}}
@@ -51,13 +51,13 @@ EOF;
     public function generate() : void
     {
         $source = (new Template(static::TEMPLATE))
-                        ->place('namespace',            $this->node->getOutputNamespace())
-                        ->place('class_short',          $this->node->getEntityClassShort())
-                        ->place('project_name',         strtolower($this->node->getRootNode()->getProjectName()))
-                        ->place('actor_class_full',     $this->node->getRootNode()->getActorClassFull())
-                        ->place('actor_class_short',    $this->node->getRootNode()->getActorClassShort())
-                        ->place('steps_class_full',     $this->node->getStepsNode()->getEntityClassFull())
-                        ->place('steps_class_short',    $this->node->getStepsNode()->getEntityClassShort())
+                        ->place('namespace',                 $this->node->getOutputNamespace())
+                        ->place('class_short',               $this->node->getEntityClassShort())
+                        ->place('codeception_config_subdir', $this->node->getRootNode()->getCodeceptionConfigSubdir())
+                        ->place('actor_class_full',          $this->node->getRootNode()->getActorClassFull())
+                        ->place('actor_class_short',         $this->node->getRootNode()->getActorClassShort())
+                        ->place('steps_class_full',          $this->node->getStepsNode()->getEntityClassFull())
+                        ->place('steps_class_short',         $this->node->getStepsNode()->getEntityClassShort())
                         ->produce();
 
         $this->node->setSource($source);

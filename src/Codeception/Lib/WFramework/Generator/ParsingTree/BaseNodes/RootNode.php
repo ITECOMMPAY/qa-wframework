@@ -19,6 +19,8 @@ class RootNode extends AbstractNode
 
     protected string $testNamespace;
 
+    protected string $codeceptionConfigSubdir;
+
     protected string $helperNamespace;
 
     protected string $generatedNamespace;
@@ -30,8 +32,7 @@ class RootNode extends AbstractNode
     protected Set $stepObjectClassesFull;
 
 
-
-    public function __construct(string $projectName, string $projectActorClassFull, string $supportNamespace, string $testsNamespace, Map $operationClassFullToReflectionClass, Set $stepObjectClassesFull)
+    public function __construct(string $projectName, string $projectActorClassFull, string $supportNamespace, string $testsNamespace, string $codeceptionConfigSubdir, Map $operationClassFullToReflectionClass, Set $stepObjectClassesFull)
     {
         $this->projectName                          = $projectName;
         $this->actorClassShort                      = ClassHelper::getShortName($projectActorClassFull);
@@ -39,6 +40,7 @@ class RootNode extends AbstractNode
         $this->operationClassFullToReflectionClass  = $operationClassFullToReflectionClass;
         $this->stepObjectClassesFull                = $stepObjectClassesFull;
         $this->testNamespace                        = $testsNamespace;
+        $this->codeceptionConfigSubdir              = $codeceptionConfigSubdir;
         $this->helperNamespace                      = (!empty($supportNamespace) ? "$supportNamespace\\" : '') . 'Helper';
         $this->generatedNamespace                   = (!empty($supportNamespace) ? "$supportNamespace\\" : '') . '_generated';
 
@@ -62,6 +64,12 @@ class RootNode extends AbstractNode
     public function addTestExampleNode(string $classShort, StepsNode $stepsNode) : TestExampleNode
     {
         $node = new TestExampleNode($classShort, $stepsNode, $this);
+        $this->addChild($node);
+        return $node;
+    }
+
+    public function addTestExampleNodeExisting(TestExampleNode $node) : TestExampleNode
+    {
         $this->addChild($node);
         return $node;
     }
@@ -119,5 +127,10 @@ class RootNode extends AbstractNode
     public function getGeneratedNamespace() : string
     {
         return $this->generatedNamespace;
+    }
+
+    public function getCodeceptionConfigSubdir() : string
+    {
+        return $this->codeceptionConfigSubdir;
     }
 }
