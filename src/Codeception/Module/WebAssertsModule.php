@@ -104,7 +104,7 @@ class WebAssertsModule extends Asserts
     {
         $this->log($functionName, $parameters, false);
 
-        $getHardAssertName = static function ($softName) {
+        $getHardAssertName = static function ($softName) : string {
             return str_replace('assertSoft', 'assert', $softName);
         };
 
