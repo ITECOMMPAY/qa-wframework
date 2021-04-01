@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Generator\SourceGenerator;
 
 
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\CollectionNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\FacadeNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\OperationGroupNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\OperationNode;
@@ -53,7 +54,7 @@ class SourceGeneratorVisitor extends CompositeVisitor
             (new ElementSource($node))->generate(); return;
         }
 
-        if ($node->getName() === 'Collection')
+        if ($node instanceof CollectionNode)
         {
             (new CollectionSource($node))->generate(); return;
         }

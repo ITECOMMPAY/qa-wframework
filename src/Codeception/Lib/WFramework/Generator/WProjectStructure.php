@@ -6,6 +6,7 @@ namespace Codeception\Lib\WFramework\Generator;
 
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Generator\FileGenerator\FileGeneratorVisitor;
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\CollectionNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\RootNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Block\LoginBlockNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\ExampleNodes\Steps\LoginStepsNode;
@@ -154,14 +155,18 @@ class WProjectStructure
             ->addOperations()
         ;
 
+        $blockNode = $parsingTree->getPageObjectNode('Block');
+
         $parsingTree
             ->addPageObjectNode('Element', WElement::class)
             ->addFacadeNode('Operations')
             ->addOperations()
         ;
 
+        $elementNode = $parsingTree->getPageObjectNode('Element');
+
         $parsingTree
-            ->addPageObjectNode('Collection', WCollection::class)
+            ->addPageObjectNodeExisting(new CollectionNode('Collection', WCollection::class, $parsingTree, $elementNode))
             ->addFacadeNode('Operations')
             ->addOperations()
         ;
@@ -173,7 +178,6 @@ class WProjectStructure
             return $parsingTree;
         }
 
-        $elementNode = $parsingTree->getPageObjectNode('Element');
         $button     = $elementNode->addExampleNode('Button', $this->projectName . 'Button');
         $checkbox   = $elementNode->addExampleNode('Checkbox', $this->projectName . 'Checkbox');
         $link       = $elementNode->addExampleNode('Link', $this->projectName . 'Link');
@@ -181,7 +185,6 @@ class WProjectStructure
         $label      = $elementNode->addExampleNode('Label', $this->projectName . 'Label');
         $textBox    = $elementNode->addExampleNode('TextBox', $this->projectName . 'TextBox');
 
-        $blockNode = $parsingTree->getPageObjectNode('Block');
         /** @var LoginBlockNode $loginBlock */
         $loginBlock = $blockNode->addExampleNodeExisting(new LoginBlockNode('LoginBlock', 'LoginBlock', $blockNode, $button, $textBox));
 
