@@ -4,16 +4,13 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
-use Codeception\Lib\WFramework\Logger\WLogger;
-use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use Ds\Map;
 use Ds\Sequence;
 
-class GetCssMap extends AbstractOperation
+class GetComputedStyleMap extends AbstractOperation
 {
     public function getName() : string
     {
