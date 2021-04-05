@@ -16,7 +16,7 @@ class DodgeLabel extends DodgeElement implements IHaveReadableText, IHaveCurrent
         return 'Текстовый элемент';
     }
 
-    public function getFilteredText(string $regex) : string
+    public function getFilteredText(string $regex, string $groupName = "") : string
     {
         WLogger::logAction($this, "получаем надпись отфильтрованную по регулярке: $regex");
 

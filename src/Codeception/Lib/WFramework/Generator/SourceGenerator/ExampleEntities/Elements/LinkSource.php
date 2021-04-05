@@ -19,9 +19,10 @@ namespace {{namespace}};
 
 
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IHaveReadableText;
 use {{element_class_full}};
 
-class {{link_class_short}} extends {{element_class_short}}
+class {{link_class_short}} extends {{element_class_short}} implements IHaveReadableText
 {
     protected function initTypeName() : string
     {
@@ -36,6 +37,16 @@ class {{link_class_short}} extends {{element_class_short}}
                     ->returnOperations()
                     ->get()
                     ->file()
+                    ;
+    }
+    
+    
+    public function getFilteredText(string $regex, string $groupName = "") : string
+    {
+        return $this
+                    ->returnOperations()
+                    ->get()
+                    ->textFiltered($regex, $groupName)
                     ;
     }
 }

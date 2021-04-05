@@ -42,7 +42,7 @@ class DodgeButton extends DodgeElement implements IClickable, IHaveReadableText
         return $this;
     }
 
-    public function getFilteredText(string $regex) : string
+    public function getFilteredText(string $regex, string $groupName = "") : string
     {
         return $this
                     ->returnOperations()

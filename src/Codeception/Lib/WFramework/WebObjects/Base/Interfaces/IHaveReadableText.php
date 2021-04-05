@@ -24,5 +24,5 @@ interface IHaveReadableText
     /**
      * Возвращает видимый текст элемента, отфильтрованный по регулярке
      */
-    public function getFilteredText(string $regex) : string;
+    public function getFilteredText(string $regex, string $groupName = "") : string;
 }
