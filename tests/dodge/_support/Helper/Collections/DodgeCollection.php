@@ -17,6 +17,8 @@ class DodgeCollection extends WCollection
         return $this->operations ?? $this->operations = new Operations($this);
     }
 
+    //Ниже переопределяем методы Коллекции, чтобы они возвращали классы нашего проекта
+
     /**
      * Данный метод возвращает массив элементов коллекции
      *
@@ -72,5 +74,45 @@ class DodgeCollection extends WCollection
         /** @var DodgeElement $element */
         $element = parent::getLastElement();
         return $element;
+    }
+
+    public function shouldExist(bool $deep = true) : DodgeCollection
+    {
+        return parent::shouldExist($deep);
+    }
+
+    public function shouldNotExist(bool $deep = true) : DodgeCollection
+    {
+        return parent::shouldNotExist($deep);
+    }
+
+    public function shouldBeDisplayed(bool $deep = true) : DodgeCollection
+    {
+        return parent::shouldBeDisplayed($deep);
+    }
+
+    public function shouldBeHidden(bool $deep = true) : DodgeCollection
+    {
+        return parent::shouldBeHidden($deep);
+    }
+
+    public function shouldBeEnabled(bool $deep = true) : DodgeCollection
+    {
+        return parent::shouldBeEnabled($deep);
+    }
+
+    public function shouldBeDisabled(bool $deep = true) : DodgeCollection
+    {
+        return parent::shouldBeDisabled($deep);
+    }
+
+    public function shouldBeInViewport(bool $deep = true) : DodgeCollection
+    {
+        return parent::shouldBeInViewport($deep);
+    }
+
+    public function shouldBeOutOfViewport(bool $deep = true) : DodgeCollection
+    {
+        return parent::shouldBeOutOfViewport($deep);
     }
 }

@@ -30,14 +30,14 @@ class {{label_class_short}} extends {{element_class_short}} implements IHaveRead
         return 'Текстовый элемент';
     }
 
-    public function getFilteredText(string $regex) : string
+    public function getFilteredText(string $regex, string $groupName = "") : string
     {
         WLogger::logAction($this, "получаем надпись отфильтрованную по регулярке: $regex");
     
         return $this
                     ->returnOperations()
                     ->get()
-                    ->textFiltered($regex)
+                    ->textFiltered($regex, $groupName)
                     ;
     }
 

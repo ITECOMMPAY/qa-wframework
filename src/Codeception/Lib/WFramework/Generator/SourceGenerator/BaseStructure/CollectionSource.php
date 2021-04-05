@@ -31,7 +31,9 @@ class {{collection_class_short}} extends WCollection
         return $this->operations ?? $this->operations = new {{collection_facade_class_short}}($this);
     }
     
-        /**
+    //Ниже переопределяем методы Коллекции, чтобы они возвращали классы нашего проекта
+    
+    /**
      * Данный метод возвращает массив элементов коллекции
      *
      * Элементы коллекции будут иметь тот же класс, что и веб-элемент из которого она была создана
@@ -86,6 +88,46 @@ class {{collection_class_short}} extends WCollection
         /** @var {{element_class_short}} $element */
         $element = parent::getLastElement();
         return $element;
+    }
+    
+        public function shouldExist(bool $deep = true) : {{collection_class_short}}
+    {
+        return parent::shouldExist($deep);
+    }
+    
+    public function shouldNotExist(bool $deep = true) : {{collection_class_short}}
+    {
+        return parent::shouldNotExist($deep);
+    }
+    
+    public function shouldBeDisplayed(bool $deep = true) : {{collection_class_short}}
+    {
+        return parent::shouldBeDisplayed($deep);
+    }
+    
+    public function shouldBeHidden(bool $deep = true) : {{collection_class_short}}
+    {
+        return parent::shouldBeHidden($deep);
+    }
+    
+    public function shouldBeEnabled(bool $deep = true) : {{collection_class_short}}
+    {
+        return parent::shouldBeEnabled($deep);
+    }
+    
+    public function shouldBeDisabled(bool $deep = true) : {{collection_class_short}}
+    {
+        return parent::shouldBeDisabled($deep);
+    }
+    
+    public function shouldBeInViewport(bool $deep = true) : {{collection_class_short}}
+    {
+        return parent::shouldBeInViewport($deep);
+    }
+    
+    public function shouldBeOutOfViewport(bool $deep = true) : {{collection_class_short}}
+    {
+        return parent::shouldBeOutOfViewport($deep);
     }
 }
 EOF;

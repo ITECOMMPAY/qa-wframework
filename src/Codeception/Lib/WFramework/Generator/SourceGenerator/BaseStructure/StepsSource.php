@@ -70,7 +70,7 @@ EOF;
         foreach ($this->node->getRootNode()->getStepObjectClassesFull() as $stepObjectClassFull)
         {
             $stepObjectClassShort = ClassHelper::getShortName($stepObjectClassFull);
-            $stepObjectVariableName = lcfirst($stepObjectClassShort);
+            $stepObjectVariableName = $this->lowerCamelCase($stepObjectClassShort);
 
             if ($stepObjectClassShort === $this->node->getEntityClassShort())
             {
@@ -107,5 +107,15 @@ EOF;
                         ->produce();
 
         $this->node->setSource($source);
+    }
+
+    protected function lowerCamelCase(string $input) : string
+    {
+        if (preg_match('%^(?\'prefix\'[A-Z]+)(?\'word\'[A-Z].*)$%m', $input, $matches) === 1)
+        {
+            return strtolower($matches['prefix']) . $matches['word'];
+        }
+
+        return lcfirst($input);
     }
 }
