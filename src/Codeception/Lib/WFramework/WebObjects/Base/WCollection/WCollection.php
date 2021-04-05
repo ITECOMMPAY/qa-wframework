@@ -327,9 +327,9 @@ abstract class WCollection extends Composite implements IPageObject
      *
      * @param string $methodOrProperty
      * @param bool $preserveDuplicates
-     * @return WElement[]
+     * @return WElement[]|Map
      */
-    public function getElementsMap(string $methodOrProperty, bool $preserveDuplicates = false) : array
+    public function getElementsMap(string $methodOrProperty, bool $preserveDuplicates = false) : Map
     {
         WLogger::logAction($this, "получаем ассоциативный массив элементов, где ключи будут получены путём вызова: $methodOrProperty - для каждого элемента коллекции");
 
@@ -393,7 +393,7 @@ abstract class WCollection extends Composite implements IPageObject
             $result["{$key}_{$sameKeysCount[$key]}"] = $element;
         }
 
-        return $result;
+        return new Map($result);
     }
 
     public function count() : int

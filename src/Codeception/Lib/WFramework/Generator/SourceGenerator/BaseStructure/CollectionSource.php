@@ -23,6 +23,7 @@ use {{actor_class_full}};
 use {{collection_facade_class_full}};
 use {{element_class_full}};
 use Ds\Sequence;
+use Ds\Map;
 
 class {{collection_class_short}} extends WCollection
 {
@@ -64,7 +65,7 @@ class {{collection_class_short}} extends WCollection
      * @param bool $preserveDuplicates
      * @return {{element_class_short}}[]
      */
-    public function getElementsMap(string $methodOrProperty, bool $preserveDuplicates = false) : array
+    public function getElementsMap(string $methodOrProperty, bool $preserveDuplicates = false) : Map
     {
         return parent::getElementsMap($methodOrProperty, $preserveDuplicates);
     }

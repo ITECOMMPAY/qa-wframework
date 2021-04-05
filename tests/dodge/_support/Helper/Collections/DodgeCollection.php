@@ -8,6 +8,7 @@ use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use dodge\DodgeTester;
 use dodge\_generated\Collection\Operations;
 use dodge\Helper\Elements\DodgeElement;
+use Ds\Map;
 use Ds\Sequence;
 
 class DodgeCollection extends WCollection
@@ -50,7 +51,7 @@ class DodgeCollection extends WCollection
      * @param bool $preserveDuplicates
      * @return DodgeElement[]
      */
-    public function getElementsMap(string $methodOrProperty, bool $preserveDuplicates = false) : array
+    public function getElementsMap(string $methodOrProperty, bool $preserveDuplicates = false) : Map
     {
         return parent::getElementsMap($methodOrProperty, $preserveDuplicates);
     }
