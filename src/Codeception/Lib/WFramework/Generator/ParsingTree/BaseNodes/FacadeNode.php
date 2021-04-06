@@ -32,7 +32,7 @@ class FacadeNode extends AbstractNode implements IDescribeClass
 
     protected function getVisitorNames() : array
     {
-        return ['accept' . $this->getPageObjectNode()->getClassShort(), 'accept' . $this->getPageObjectNode()->getBasePageObjectClassShort()];
+        return ['accept' . $this->getPageObjectNode()->getEntityClassShort(), 'accept' . $this->getPageObjectNode()->getBasePageObjectClassShort()];
     }
 
     public function addOperations() : void

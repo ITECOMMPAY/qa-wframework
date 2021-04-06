@@ -67,7 +67,7 @@ class ExecuteScriptOnThis extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - если скрипт возвращает значение, то массив значений скрипта.
+     * @return \Ds\Sequence - если скрипт возвращает значение, то массив значений скрипта.
      */
     public function acceptWCollection($collection) : Sequence
     {
