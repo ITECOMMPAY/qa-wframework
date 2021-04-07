@@ -98,7 +98,7 @@ trait PageObjectBaseMethods
                 $this->fail($this . " -> условие: '$condition' - не выполнилось в течение таймаута: " . $this->getTimeout());
             }
 
-            if (!$deep)
+            if (!$deep && !$selfOrChild->getLocator()->isHtmlRoot())
             {
                 break;
             }
@@ -137,7 +137,7 @@ trait PageObjectBaseMethods
                 return false;
             }
 
-            if (!$deep)
+            if (!$deep && !$selfOrChild->getLocator()->isHtmlRoot())
             {
                 break;
             }
@@ -171,7 +171,7 @@ trait PageObjectBaseMethods
                 return false;
             }
 
-            if (!$deep)
+            if (!$deep && !$selfOrChild->getLocator()->isHtmlRoot())
             {
                 break;
             }
