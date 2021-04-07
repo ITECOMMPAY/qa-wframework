@@ -453,7 +453,7 @@ abstract class WCollection extends Composite implements IPageObject
 
         $elements = $this->getElementsArray();
 
-        if (empty($elements->isEmpty()))
+        if ($elements->isEmpty())
         {
             throw new UsageException('Перед вызовом getLastElement() нужно быть уверенным, что коллекция содержит хотя бы один элемент');
         }

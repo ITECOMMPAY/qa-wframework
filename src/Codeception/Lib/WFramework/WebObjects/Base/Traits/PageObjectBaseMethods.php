@@ -181,42 +181,42 @@ trait PageObjectBaseMethods
     }
 
 
-    public function shouldExist(bool $deep = true)
+    public function shouldExist(bool $deep = false)
     {
         return $this->should(new Exist(), $deep);
     }
 
-    public function shouldNotExist(bool $deep = true)
+    public function shouldNotExist(bool $deep = false)
     {
         return $this->should(new Not_(new Exist()), $deep);
     }
 
-    public function shouldBeDisplayed(bool $deep = true)
+    public function shouldBeDisplayed(bool $deep = false)
     {
         return $this->should(new Visible(), $deep);
     }
 
-    public function shouldBeHidden(bool $deep = true)
+    public function shouldBeHidden(bool $deep = false)
     {
         return $this->should(new Hidden(), $deep);
     }
 
-    public function shouldBeEnabled(bool $deep = true)
+    public function shouldBeEnabled(bool $deep = false)
     {
         return $this->should(new Enabled(), $deep);
     }
 
-    public function shouldBeDisabled(bool $deep = true)
+    public function shouldBeDisabled(bool $deep = false)
     {
         return $this->should(new Disabled(), $deep);
     }
 
-    public function shouldBeInViewport(bool $deep = true)
+    public function shouldBeInViewport(bool $deep = false)
     {
         return $this->should(new FullyVisible(), $deep);
     }
 
-    public function shouldBeOutOfViewport(bool $deep = true)
+    public function shouldBeOutOfViewport(bool $deep = false)
     {
         return $this->should(new Not_(new FullyVisible()), $deep);
     }
@@ -224,42 +224,42 @@ trait PageObjectBaseMethods
 
 
 
-    public function finallyExist(bool $deep = true) : bool
+    public function finallyExist(bool $deep = false) : bool
     {
         return $this->finally_(new Exist(), $deep);
     }
 
-    public function finallyNotExist(bool $deep = true) : bool
+    public function finallyNotExist(bool $deep = false) : bool
     {
         return $this->finally_(new Not_(new Exist()), $deep);
     }
 
-    public function finallyDisplayed(bool $deep = true) : bool
+    public function finallyDisplayed(bool $deep = false) : bool
     {
         return $this->finally_(new Visible(), $deep);
     }
 
-    public function finallyHidden(bool $deep = true) : bool
+    public function finallyHidden(bool $deep = false) : bool
     {
         return $this->finally_(new Hidden(), $deep);
     }
 
-    public function finallyEnabled(bool $deep = true) : bool
+    public function finallyEnabled(bool $deep = false) : bool
     {
         return $this->finally_(new Enabled(), $deep);
     }
 
-    public function finallyDisabled(bool $deep = true) : bool
+    public function finallyDisabled(bool $deep = false) : bool
     {
         return $this->finally_(new Disabled(), $deep);
     }
 
-    public function finallyInViewport(bool $deep = true) : bool
+    public function finallyInViewport(bool $deep = false) : bool
     {
         return $this->finally_(new FullyVisible(), $deep);
     }
 
-    public function finallyOutOfViewport(bool $deep = true) : bool
+    public function finallyOutOfViewport(bool $deep = false) : bool
     {
         return $this->finally_(new Not_(new FullyVisible()), $deep);
     }
@@ -267,42 +267,42 @@ trait PageObjectBaseMethods
 
 
 
-    public function isExist(bool $deep = true) : bool
+    public function isExist(bool $deep = false) : bool
     {
         return $this->is(new Exist(), $deep);
     }
 
-    public function isNotExist(bool $deep = true) : bool
+    public function isNotExist(bool $deep = false) : bool
     {
         return $this->is(new Not_(new Exist()), $deep);
     }
 
-    public function isDisplayed(bool $deep = true) : bool
+    public function isDisplayed(bool $deep = false) : bool
     {
         return $this->is(new Visible(), $deep);
     }
 
-    public function isHidden(bool $deep = true) : bool
+    public function isHidden(bool $deep = false) : bool
     {
         return $this->is(new Hidden(), $deep);
     }
 
-    public function isEnabled(bool $deep = true) : bool
+    public function isEnabled(bool $deep = false) : bool
     {
         return $this->is(new Enabled(), $deep);
     }
 
-    public function isDisabled(bool $deep = true) : bool
+    public function isDisabled(bool $deep = false) : bool
     {
         return $this->is(new Disabled(), $deep);
     }
 
-    public function isInViewport(bool $deep = true) : bool
+    public function isInViewport(bool $deep = false) : bool
     {
         return $this->is(new FullyVisible(), $deep);
     }
 
-    public function isOutOfViewport(bool $deep = true) : bool
+    public function isOutOfViewport(bool $deep = false) : bool
     {
         return $this->is(new Not_(new FullyVisible()), $deep);
     }
