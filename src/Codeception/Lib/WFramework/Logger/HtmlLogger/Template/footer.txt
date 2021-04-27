@@ -1,11 +1,12 @@
     </div>
 
-    <div class="right-panel">
-                    <video id="video-insert" controls>
-                        <source src="./screenshots/video.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
+            <div class="right-panel">
+                <video id="video-insert" controls>
+                    <source id = "video-insert-source" src="./screenshots/video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <img id="image-insert" src="./screenshots/00000000.png" alt="Page Screenshot">
+            </div>
 
             </div>
 
@@ -46,18 +47,26 @@
                     }
 
                     if (screenshotNumberToElement.length === 0) {
-                        hideVideoPanel();
+                        hideRightPanel();
                     }
                 }
 
-                function hideVideoPanel() {
-                    logVideo.style.display = "none";
-
+                function hideRightPanel() {
                     let leftPanel = document.getElementsByClassName('left-panel');
                     leftPanel[0].style.width = "100%";
 
                     let rightPanel = document.getElementsByClassName('right-panel');
                     rightPanel[0].style.width = "0%";
+                }
+
+                function hideVideo() {
+                    logVideo.style.display = "none";
+                    logScreenshot.style.display = "inline-block";
+                }
+
+                function hideScreenshot() {
+                    logVideo.style.display = "inline-block";
+                    logScreenshot.style.display = "none";
                 }
 
                 function getScreenshotNumber(element) {
@@ -249,12 +258,16 @@
                 }
 
                 var logVideo = document.getElementById("video-insert");
+                var logVideoSource = document.getElementById("video-insert-source");
+                var logScreenshot = document.getElementById("image-insert");
 
                 addAccordions();
                 updateScreenshotsList();
                 checkResult();
 
                 logVideo.ontimeupdate = function () { onTimeUpdateCallback() };
+
+                logVideoSource.onerror = function () { onVideoError() };
 
                 var previousTime = -1;
 
@@ -290,10 +303,15 @@
                     screenshotDiv.classList.add("current-frame");
                 }
 
+                function onVideoError() {
+                    hideVideo();
+                }
+
                 function onHoverSeekVideoCallback(event) {
                     element = event.currentTarget;
 
                     let currentTime = getScreenshotNumber(element);
+                    let name = element.getAttribute("data-shot");
 
                     if (currentTime === null) {
                         return;
@@ -304,6 +322,7 @@
                     previousTime = currentTime;
 
                     logVideo.currentTime = currentTime;
+                    logScreenshot.src=`./screenshots/${name}.png`;
 
                     let screenshotDiv = screenshotNumberToElement[currentTime];
                     screenshotDiv.classList.add("current-frame");
