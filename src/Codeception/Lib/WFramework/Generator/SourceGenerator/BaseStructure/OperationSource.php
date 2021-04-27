@@ -18,7 +18,7 @@ class OperationSource implements IGenerator
      */
     public function {{operation_name}}({{params}}){{return_type}}
     {
-        {{return}}$this->getFacade()->getPageObject()->accept(new \{{operation_class_full}}({{args}}));{{return_this}}
+        {{return}}$this->getFacade()->accept(new \{{operation_class_full}}({{args}}));{{return_this}}
     }
 EOF;
 
