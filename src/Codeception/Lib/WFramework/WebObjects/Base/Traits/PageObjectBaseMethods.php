@@ -17,6 +17,7 @@ use Codeception\Lib\WFramework\Exceptions\WaitUntilElement;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Wait\WaitUntil;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 /**
  * Trait PageObjectBaseMethods
@@ -34,6 +35,10 @@ trait PageObjectBaseMethods
     abstract public function traverseDepthFirst() : \Generator;
 
     abstract public function getParent();
+
+    abstract public function returnCodeceptionActor();
+
+    abstract public function returnSeleniumServer() : RemoteWebDriver;
 
     /**
      * Метод валит тест

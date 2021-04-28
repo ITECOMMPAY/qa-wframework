@@ -27,6 +27,11 @@ use Ds\Map;
 
 class {{collection_class_short}} extends WCollection
 {
+    public function returnCodeceptionActor() : {{actor_class_short}}
+    {
+        return parent::returnCodeceptionActor();
+    }
+
     public function returnOperations() : {{collection_facade_class_short}}
     {
         return $this->operations ?? $this->operations = new {{collection_facade_class_short}}($this);

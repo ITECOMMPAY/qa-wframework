@@ -29,6 +29,7 @@ use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Ds\Sequence;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\Helpers\Composite;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 use function array_keys;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Logger\WLogger;
@@ -183,6 +184,16 @@ abstract class WCollection extends Composite implements IPageObject
         }
 
         return $this->proxyWebElements;
+    }
+
+    public function returnSeleniumServer() : RemoteWebDriver
+    {
+        return $this->getParent()->returnSeleniumServer();
+    }
+
+    public function returnCodeceptionActor()
+    {
+        return $this->getParent()->returnCodeceptionActor();
     }
 
     /**

@@ -3,6 +3,8 @@
 
 namespace Codeception\Lib\WFramework\WebObjects\Base\Interfaces;
 
+use Codeception\Actor;
+use Codeception\Lib\WFramework\Actor\ImaginaryActor;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
@@ -10,6 +12,7 @@ use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 use Codeception\Lib\WFramework\WLocator\WLocator;
 use Ds\Map;
 use Ds\Sequence;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 /**
  * Interface IPageObject
@@ -28,6 +31,22 @@ use Ds\Sequence;
  */
 interface IPageObject
 {
+    /**
+     * С помощью этого метода можно обратиться к методам главного актора Codeception
+     *
+     * @return Actor|ImaginaryActor
+     * @throws UsageException
+     */
+    public function returnCodeceptionActor();
+
+    /**
+     * С помощью этого метода можно обратиться к методам Сервера Селениума
+     *
+     * @return RemoteWebDriver
+     * @throws UsageException
+     */
+    public function returnSeleniumServer() : RemoteWebDriver;
+
     /**
      * Возвращает полное имя своего класса
      *
