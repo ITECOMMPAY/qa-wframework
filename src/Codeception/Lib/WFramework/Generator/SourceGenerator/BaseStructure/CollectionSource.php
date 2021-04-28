@@ -96,42 +96,42 @@ class {{collection_class_short}} extends WCollection
         return $element;
     }
     
-        public function shouldExist(bool $deep = true) : {{collection_class_short}}
+        public function shouldExist(bool $deep = false) : {{collection_class_short}}
     {
         return parent::shouldExist($deep);
     }
     
-    public function shouldNotExist(bool $deep = true) : {{collection_class_short}}
+    public function shouldNotExist(bool $deep = false) : {{collection_class_short}}
     {
         return parent::shouldNotExist($deep);
     }
     
-    public function shouldBeDisplayed(bool $deep = true) : {{collection_class_short}}
+    public function shouldBeDisplayed(bool $deep = false) : {{collection_class_short}}
     {
         return parent::shouldBeDisplayed($deep);
     }
     
-    public function shouldBeHidden(bool $deep = true) : {{collection_class_short}}
+    public function shouldBeHidden(bool $deep = false) : {{collection_class_short}}
     {
         return parent::shouldBeHidden($deep);
     }
     
-    public function shouldBeEnabled(bool $deep = true) : {{collection_class_short}}
+    public function shouldBeEnabled(bool $deep = false) : {{collection_class_short}}
     {
         return parent::shouldBeEnabled($deep);
     }
     
-    public function shouldBeDisabled(bool $deep = true) : {{collection_class_short}}
+    public function shouldBeDisabled(bool $deep = false) : {{collection_class_short}}
     {
         return parent::shouldBeDisabled($deep);
     }
     
-    public function shouldBeInViewport(bool $deep = true) : {{collection_class_short}}
+    public function shouldBeInViewport(bool $deep = false) : {{collection_class_short}}
     {
         return parent::shouldBeInViewport($deep);
     }
     
-    public function shouldBeOutOfViewport(bool $deep = true) : {{collection_class_short}}
+    public function shouldBeOutOfViewport(bool $deep = false) : {{collection_class_short}}
     {
         return parent::shouldBeOutOfViewport($deep);
     }
