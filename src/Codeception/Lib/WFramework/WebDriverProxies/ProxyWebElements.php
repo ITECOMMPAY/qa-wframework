@@ -120,6 +120,11 @@ class ProxyWebElements implements Iterator, Countable
 
             $result = $locator . $result;
 
+            if (isset($locator[0]) && mb_strpos($locator, '(') === 0)
+            {
+                break;
+            }
+
             $element = $element->getParentElement();
         }
 

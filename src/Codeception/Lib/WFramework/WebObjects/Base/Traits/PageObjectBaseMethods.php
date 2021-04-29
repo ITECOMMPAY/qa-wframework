@@ -64,6 +64,11 @@ trait PageObjectBaseMethods
 
             $result = $locator . $result;
 
+            if (isset($locator[0]) && mb_strpos($locator, '(') === 0)
+            {
+                break;
+            }
+
             $element = $element->getParent();
         }
 
