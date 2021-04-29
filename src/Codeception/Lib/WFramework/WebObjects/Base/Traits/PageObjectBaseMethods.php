@@ -216,41 +216,65 @@ trait PageObjectBaseMethods
     }
 
 
+    /**
+     * @return $this
+     */
     public function shouldExist(bool $deep = false)
     {
         return $this->should(new Exist(), $deep);
     }
 
+    /**
+     * @return $this
+     */
     public function shouldNotExist(bool $deep = false)
     {
         return $this->should(new Not_(new Exist()), $deep);
     }
 
+    /**
+     * @return $this
+     */
     public function shouldBeDisplayed(bool $deep = false)
     {
         return $this->should(new Visible(), $deep);
     }
 
+    /**
+     * @return $this
+     */
     public function shouldBeHidden(bool $deep = false)
     {
         return $this->should(new Hidden(), $deep);
     }
 
+    /**
+     * @return $this
+     */
     public function shouldBeEnabled(bool $deep = false)
     {
         return $this->should(new Enabled(), $deep);
     }
 
+    /**
+     * @return $this
+     */
     public function shouldBeDisabled(bool $deep = false)
     {
         return $this->should(new Disabled(), $deep);
     }
 
+    /**
+     * @return $this
+     */
     public function shouldBeInViewport(bool $deep = false)
     {
         return $this->should(new FullyVisible(), $deep);
     }
 
+    /**
+     * @return $this
+     */
     public function shouldBeOutOfViewport(bool $deep = false)
     {
         return $this->should(new Not_(new FullyVisible()), $deep);
