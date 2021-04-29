@@ -136,26 +136,15 @@ abstract class WCollection extends Composite implements IPageObject
         $this->firstElement = $importer->getFirstElement();
 
         $this->name = 'Коллекция элементов: ' . $this->firstElement->getName();
-
-        $this->initLastElement();
     }
 
     public function setParent(Composite $parent)
     {
         parent::setParent($parent);
 
+        // На момент создания коллекции она ещё не знает о своём родителе, равно, как и её firstElement
+        // Поэтому когда родитель прописывается в коллекции заодно прописываем его родителем firstElement
         $this->firstElement->setParent($parent);
-        $this->lastElement->setParent($parent);
-    }
-
-    private function initLastElement()
-    {
-        $elementClass = $this->firstElement->getClass();
-        $instanceName = $this->firstElement->getName();
-        $locator      = WLocator::xpath('(' . $this->firstElement->getFullXPath() . ')[last()]');
-
-        /** @var WElement firstElement */
-        $this->lastElement = $elementClass::fromLocator($instanceName, $locator, false);
     }
 
     public function __toString() : string
@@ -443,6 +432,16 @@ abstract class WCollection extends Composite implements IPageObject
     public function getLastElement() : WElement
     {
         WLogger::logAction($this, 'получаем последний элемент');
+
+        if ($this->lastElement === null)
+        {
+            $elementClass = $this->firstElement->getClass();
+            $instanceName = $this->firstElement->getName();
+            $locator      = WLocator::xpath('(' . $this->firstElement->getFullXPath() . ')[last()]');
+
+            $this->lastElement = $elementClass::fromLocator($instanceName, $locator, false);
+            $this->lastElement->setParent($this->getParent());
+        }
 
         return $this->lastElement;
     }
