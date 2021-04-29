@@ -35,15 +35,11 @@ interface IPageObject
      * С помощью этого метода можно обратиться к методам главного актора Codeception
      *
      * @return Actor|ImaginaryActor
-     * @throws UsageException
      */
     public function returnCodeceptionActor();
 
     /**
      * С помощью этого метода можно обратиться к методам Сервера Селениума
-     *
-     * @return RemoteWebDriver
-     * @throws UsageException
      */
     public function returnSeleniumServer() : RemoteWebDriver;
 
@@ -101,6 +97,13 @@ interface IPageObject
      * @return bool
      */
     public function isRelative() : bool;
+
+    /**
+     * Возвращает полный XPath-локатор.
+     *
+     * @return string
+     */
+    public function getFullXPath() : string;
 
     /**
      * Возвращает детей узла в следующем порядке, включая этот узел (1 - этот узел):

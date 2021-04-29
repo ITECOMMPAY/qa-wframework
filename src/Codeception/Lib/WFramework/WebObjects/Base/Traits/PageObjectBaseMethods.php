@@ -14,8 +14,10 @@ use Codeception\Lib\WFramework\Conditions\Not_;
 use Codeception\Lib\WFramework\Conditions\Visible;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Exceptions\WaitUntilElement;
+use Codeception\Lib\WFramework\Helpers\EmptyComposite;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Wait\WaitUntil;
+use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 
@@ -39,6 +41,34 @@ trait PageObjectBaseMethods
     abstract public function returnCodeceptionActor();
 
     abstract public function returnSeleniumServer() : RemoteWebDriver;
+
+    public function getFullXPath() : string
+    {
+        /** @var IPageObject $element */
+        $element = $this;
+        $result = '';
+
+        while (!$element instanceof EmptyComposite)
+        {
+            if ('xpath' !== $element->getLocator()->getMechanism())
+            {
+                throw new UsageException($element . ' -> имеет не Xpath локатор');
+            }
+
+            $locator = trim($element->getLocator()->getValue());
+
+            if (isset($locator[0]) && mb_strpos($locator, '.') === 0)
+            {
+                $locator = mb_substr($locator, 1);
+            }
+
+            $result = $locator . $result;
+
+            $element = $element->getParent();
+        }
+
+        return $result;
+    }
 
     /**
      * Метод валит тест

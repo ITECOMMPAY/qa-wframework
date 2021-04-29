@@ -17,11 +17,7 @@ class WsFromFirstElement extends WsFrom
     {
         //Здесь нельзя вызывать родительский конструктор
 
-        $this->instanceName = $webElement->getName();
-        $this->locator = $webElement->getLocator();
-        $this->relative = $webElement->isRelative();
-        $this->elementClass = $webElement->getClass();
-
         $this->proxyWebElements = null;
+        $this->firstElement = $webElement;
     }
 }

@@ -23,6 +23,7 @@ use Codeception\Lib\WFramework\Operations\Get\GetTextRaw;
 use Codeception\Lib\WFramework\Operations\Get\GetText;
 use Codeception\Lib\WFramework\Operations\Get\GetValue;
 use Codeception\Lib\WFramework\Properties\TestProperties;
+use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElement;
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElements;
 use Codeception\Lib\WFramework\WebObjects\Base\Traits\PageObjectBaseMethods;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
@@ -96,17 +97,11 @@ abstract class WCollection extends Composite implements IPageObject
     /** @var ProxyWebElements|null  */
     protected $proxyWebElements = null;
 
-    /** @var string */
-    protected $instanceName = '';
+    /** @var WElement|null */
+    protected $firstElement = null;
 
-    /** @var WLocator */
-    protected $locator = null;
-
-    /** @var bool */
-    protected $relative = true;
-
-    /** @var WElement|string */
-    protected $elementClass = '';
+    /** @var WElement|null */
+    protected $lastElement = null;
 
     protected $proxyWebElementsStateId = 0;
 
@@ -128,9 +123,9 @@ abstract class WCollection extends Composite implements IPageObject
         return new static(WsFrom::firstElement($webElement));
     }
 
-    public static function fromProxyWebElements(string $instanceName, ProxyWebElements $proxyWebElements, string $elementClass, WPageObject $parent)
+    public static function fromProxyWebElements(string $instanceName, ProxyWebElements $proxyWebElements, string $elementClass)
     {
-        return new static(WsFrom::proxyWebElements($instanceName, $proxyWebElements, $elementClass, $parent));
+        return new static(WsFrom::proxyWebElements($instanceName, $proxyWebElements, $elementClass));
     }
 
     public function __construct(WsFrom $importer)
@@ -138,22 +133,34 @@ abstract class WCollection extends Composite implements IPageObject
         parent::__construct();
 
         $this->proxyWebElements = $importer->getProxyWebElements();
-        $this->instanceName = $importer->getInstanceName();
-        $this->locator = $importer->getLocator();
-        $this->relative = $importer->getRelative();
-        $this->elementClass = $importer->getElementClass();
+        $this->firstElement = $importer->getFirstElement();
 
-        if (!$importer->getParent() instanceof EmptyComposite)
-        {
-            $this->setParent($importer->getParent());
-        }
+        $this->name = 'Коллекция элементов: ' . $this->firstElement->getName();
 
-        $this->name = 'Коллекция элементов: ' . $this->instanceName;
+        $this->initLastElement();
+    }
+
+    public function setParent(Composite $parent)
+    {
+        parent::setParent($parent);
+
+        $this->firstElement->setParent($parent);
+        $this->lastElement->setParent($parent);
+    }
+
+    private function initLastElement()
+    {
+        $elementClass = $this->firstElement->getClass();
+        $instanceName = $this->firstElement->getName();
+        $locator      = WLocator::xpath('(' . $this->firstElement->getFullXPath() . ')[last()]');
+
+        /** @var WElement firstElement */
+        $this->lastElement = $elementClass::fromLocator($instanceName, $locator, false);
     }
 
     public function __toString() : string
     {
-        if ($this->relative && !$this->getParent() instanceof EmptyComposite)
+        if ($this->isRelative() && !$this->getParent() instanceof EmptyComposite)
         {
             return $this->getParent() . ' / ' . $this->getClassShort() . ' (' . $this->getName() . ')';
         }
@@ -161,12 +168,11 @@ abstract class WCollection extends Composite implements IPageObject
         return '/ ' . $this->getClassShort() . ' (' . $this->getName() . ')';
     }
 
-
     public function returnSeleniumElements() : ProxyWebElements
     {
         if ($this->proxyWebElements === null)
         {
-            if ($this->relative === true)
+            if ($this->isRelative())
             {
                 /**
                  * WCollection является специальным механизмом для создания коллекции элементов.
@@ -175,11 +181,11 @@ abstract class WCollection extends Composite implements IPageObject
                  * объявлен.
                  */
 
-                $this->proxyWebElements = new ProxyWebElements($this->locator, $this->getParent()->returnSeleniumServer(), $this->getTimeout(), $this->getParent()->returnSeleniumElement());
+                $this->proxyWebElements = new ProxyWebElements($this->getLocator(), $this->getParent()->returnSeleniumServer(), $this->getTimeout(), $this->getParent()->returnSeleniumElement());
             }
             else
             {
-                $this->proxyWebElements = new ProxyWebElements($this->locator, $this->getParent()->returnSeleniumServer(), $this->getTimeout());
+                $this->proxyWebElements = new ProxyWebElements($this->getLocator(), $this->getParent()->returnSeleniumServer(), $this->getTimeout());
             }
         }
 
@@ -277,8 +283,7 @@ abstract class WCollection extends Composite implements IPageObject
 
         foreach ($this->returnSeleniumElements()->getElementsArray() as $index => $proxyWebElement)
         {
-            /** @var WElement $webElement */
-            $webElement = $this->elementClass::fromProxyWebElement($this->instanceName . " [$index]", $proxyWebElement, $this->getParent());
+            $webElement = $this->wrapInPageObject($index, $proxyWebElement);
 
             if ($this->mustBeFilteredOut($webElement))
             {
@@ -290,6 +295,11 @@ abstract class WCollection extends Composite implements IPageObject
         }
     }
 
+    protected function wrapInPageObject(int $index, ProxyWebElement $proxyWebElement) : WElement
+    {
+        return $this->firstElement->getClass()::fromProxyWebElement($this->firstElement->getName() . " [$index]", $proxyWebElement, $this->getParent());
+    }
+
     public function getChildren() : Map
     {
         $this->updateFromProxyWebElements();
@@ -299,12 +309,12 @@ abstract class WCollection extends Composite implements IPageObject
 
     public function getLocator() : WLocator
     {
-        return $this->locator;
+        return $this->firstElement->getLocator();
     }
 
     public function isRelative() : bool
     {
-        return $this->relative;
+        return $this->firstElement->isRelative();
     }
 
     /**
@@ -424,14 +434,17 @@ abstract class WCollection extends Composite implements IPageObject
     {
         WLogger::logAction($this, 'получаем первый элемент');
 
-        $elements = $this->getElementsArray();
+        return $this->firstElement;
+    }
 
-        if ($elements->isEmpty())
-        {
-            throw new UsageException('Перед вызовом getFirstElement() нужно быть уверенным, что коллекция содержит хотя бы один элемент');
-        }
+    /**
+     * Возвращает последний элемент коллекции
+     */
+    public function getLastElement() : WElement
+    {
+        WLogger::logAction($this, 'получаем последний элемент');
 
-        return $elements->first();
+        return $this->lastElement;
     }
 
     public function getElement(int $index) : WElement
@@ -453,23 +466,6 @@ abstract class WCollection extends Composite implements IPageObject
         WLogger::logAction($this, "содержит элемент по индексу: $index?");
 
         return isset($elementsArray[$index]);
-    }
-
-    /**
-     * Возвращает последний элемент коллекции
-     */
-    public function getLastElement() : WElement
-    {
-        WLogger::logAction($this, 'получаем последний элемент');
-
-        $elements = $this->getElementsArray();
-
-        if ($elements->isEmpty())
-        {
-            throw new UsageException('Перед вызовом getLastElement() нужно быть уверенным, что коллекция содержит хотя бы один элемент');
-        }
-
-        return $elements->last();
     }
 
     /**

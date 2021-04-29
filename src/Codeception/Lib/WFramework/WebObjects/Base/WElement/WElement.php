@@ -161,7 +161,6 @@ abstract class WElement extends WPageObject
         $this->name = $importer->getName();
         $this->setLocator($importer->getLocator());
         $this->setRelative($importer->getRelative());
-        $this->facadeWebElement = $importer->getProxyWebElement();
         $this->setParent($importer->getParent());
     }
 

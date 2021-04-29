@@ -10,21 +10,20 @@ namespace Codeception\Lib\WFramework\WebObjects\Base\WCollection\Import;
 
 
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElements;
-use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
+use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 
 class WsFromProxyWebElements extends WsFrom
 {
     /** @noinspection MagicMethodsValidityInspection */
-    public function __construct(string $instanceName, ProxyWebElements $proxyWebElements, string $elementClass, WPageObject $parent)
+    public function __construct(string $instanceName, ProxyWebElements $proxyWebElements, string $elementClass)
     {
         //Здесь нельзя вызывать родительский конструктор
 
-        $this->instanceName = $instanceName;
-        $this->locator = $proxyWebElements->getLocator();
-        $this->relative = $proxyWebElements->getParentElement() !== null;
-        $this->elementClass = $elementClass;
-        $this->parentElement = $parent;
-
         $this->proxyWebElements = $proxyWebElements;
+        $locator = $proxyWebElements->getLocator();
+        $relative = $proxyWebElements->getParentElement() !== null;
+
+        /** @var WElement firstElement */
+        $this->firstElement = $elementClass::fromLocator($instanceName, $locator, $relative);
     }
 }

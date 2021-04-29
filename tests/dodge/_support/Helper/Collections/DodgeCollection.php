@@ -77,42 +77,42 @@ class DodgeCollection extends WCollection
         return $element;
     }
 
-    public function shouldExist(bool $deep = true) : DodgeCollection
+    public function shouldExist(bool $deep = false) : DodgeCollection
     {
         return parent::shouldExist($deep);
     }
 
-    public function shouldNotExist(bool $deep = true) : DodgeCollection
+    public function shouldNotExist(bool $deep = false) : DodgeCollection
     {
         return parent::shouldNotExist($deep);
     }
 
-    public function shouldBeDisplayed(bool $deep = true) : DodgeCollection
+    public function shouldBeDisplayed(bool $deep = false) : DodgeCollection
     {
         return parent::shouldBeDisplayed($deep);
     }
 
-    public function shouldBeHidden(bool $deep = true) : DodgeCollection
+    public function shouldBeHidden(bool $deep = false) : DodgeCollection
     {
         return parent::shouldBeHidden($deep);
     }
 
-    public function shouldBeEnabled(bool $deep = true) : DodgeCollection
+    public function shouldBeEnabled(bool $deep = false) : DodgeCollection
     {
         return parent::shouldBeEnabled($deep);
     }
 
-    public function shouldBeDisabled(bool $deep = true) : DodgeCollection
+    public function shouldBeDisabled(bool $deep = false) : DodgeCollection
     {
         return parent::shouldBeDisabled($deep);
     }
 
-    public function shouldBeInViewport(bool $deep = true) : DodgeCollection
+    public function shouldBeInViewport(bool $deep = false) : DodgeCollection
     {
         return parent::shouldBeInViewport($deep);
     }
 
-    public function shouldBeOutOfViewport(bool $deep = true) : DodgeCollection
+    public function shouldBeOutOfViewport(bool $deep = false) : DodgeCollection
     {
         return parent::shouldBeOutOfViewport($deep);
     }
