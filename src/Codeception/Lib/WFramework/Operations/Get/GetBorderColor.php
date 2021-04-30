@@ -51,10 +51,6 @@ class GetBorderColor extends AbstractOperation
                             ->getCSSValue('border-top-color')
                             ;
 
-        $result = Color::fromString($borderColor);
-
-        WLogger::logDebug($this, 'Получили цвет обводки: ' . $result);
-
-        return $result;
+        return Color::fromString($borderColor);
     }
 }

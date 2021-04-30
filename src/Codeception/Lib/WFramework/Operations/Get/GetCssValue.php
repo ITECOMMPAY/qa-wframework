@@ -55,13 +55,9 @@ class GetCssValue extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : string
     {
-        $result = $pageObject
+        return $pageObject
                         ->returnSeleniumElement()
                         ->getCSSValue($this->property)
                         ;
-
-        WLogger::logDebug($this, 'CSS-свойство имеет значение: ' . $result);
-
-        return $result;
     }
 }

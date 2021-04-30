@@ -76,8 +76,6 @@ class GetTextFiltered extends AbstractOperation
 
         $index = empty($this->groupName) ? 1 : $this->groupName;
 
-        WLogger::logDebug($this, 'Получили отфильтрованный текст: ' . $matches[$index]);
-
         return $matches[$index];
     }
 }

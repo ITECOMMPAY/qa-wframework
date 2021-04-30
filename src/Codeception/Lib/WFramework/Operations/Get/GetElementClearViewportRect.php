@@ -46,11 +46,7 @@ class GetElementClearViewportRect extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Rect
     {
-        $rect = Rect::fromDOMRect($pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_GET_ELEMENT_CLEAR_VIEWPORT_SIZE));
-
-        WLogger::logDebug($this, 'Viewport для элемента имеет размер: ' . $rect);
-
-        return $rect;
+        return Rect::fromDOMRect($pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_GET_ELEMENT_CLEAR_VIEWPORT_SIZE));
     }
 
     protected const SCRIPT_GET_ELEMENT_CLEAR_VIEWPORT_SIZE = <<<EOF

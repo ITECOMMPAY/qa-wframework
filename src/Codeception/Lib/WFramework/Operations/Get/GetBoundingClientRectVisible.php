@@ -33,11 +33,7 @@ class GetBoundingClientRectVisible extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Rect
     {
-        $rect = Rect::fromDOMRect($pageObject->returnSeleniumElement()->executeScriptOnThis(static::GET_VISIBLE_BOUNDING_CLIENT_RECT));
-
-        WLogger::logDebug($this, 'Получили видимый boundingClientRect элемента: ' . $rect);
-
-        return $rect;
+        return Rect::fromDOMRect($pageObject->returnSeleniumElement()->executeScriptOnThis(static::GET_VISIBLE_BOUNDING_CLIENT_RECT));
     }
 
     protected const GET_VISIBLE_BOUNDING_CLIENT_RECT = <<<EOF

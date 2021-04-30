@@ -230,9 +230,33 @@ abstract class WPageObject extends Composite implements IPageObject
      */
     public function accept($visitor)
     {
-        WLogger::logDebug($this, $visitor->getName());
+        WLogger::logDebug($this, $visitor);
 
-        return parent::accept($visitor);
+        $result = parent::accept($visitor);
+
+        if ($result !== null)
+        {
+            WLogger::logDebug($this, $visitor . ' => ' . $this->printAcceptResult($result));
+        }
+
+        return $result;
+    }
+
+    private function printAcceptResult($result) : string
+    {
+        if (method_exists($result, '__toString'))
+        {
+            return $result;
+        }
+
+        $resultText = json_encode($result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        if (is_string($resultText) && mb_strlen($resultText) > 64)
+        {
+            $resultText = substr($resultText, 0, 64) . ' ...';
+        }
+
+        return $resultText;
     }
 
     public function getTimeout() : int

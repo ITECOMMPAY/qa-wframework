@@ -37,13 +37,9 @@ class GetTagName extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : string
     {
-        $result = $pageObject
+        return $pageObject
                         ->returnSeleniumElement()
                         ->getTagName()
                         ;
-
-        WLogger::logDebug($this, 'Имя тега элемента: ' . $result);
-
-        return $result;
     }
 }

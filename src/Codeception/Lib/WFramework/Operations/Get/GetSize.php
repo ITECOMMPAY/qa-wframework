@@ -46,13 +46,9 @@ class GetSize extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WebDriverDimension
     {
-        $result = $pageObject
+        return $pageObject
                         ->returnSeleniumElement()
                         ->getSize()
                         ;
-
-        WLogger::logDebug($this, 'Элемент имеет размер: ' . $result->getWidth() . 'x' . $result->getHeight());
-
-        return $result;
     }
 }

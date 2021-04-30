@@ -64,10 +64,6 @@ class GetValue extends AbstractOperation
             $result = $element->getAttribute('value');
         }
 
-        $result = $result ?? '';
-
-        WLogger::logDebug($this, 'Получили значение: ' . $result);
-
-        return $result;
+        return $result ?? '';
     }
 }

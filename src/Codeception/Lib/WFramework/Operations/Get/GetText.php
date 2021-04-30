@@ -54,18 +54,12 @@ class GetText extends AbstractOperation
         {
             $select = new WebDriverSelect($element);
 
-            $result = $select
+            return $select
                             ->getFirstSelectedOption()
                             ->getText()
                             ;
         }
-        else
-        {
-            $result = $element->getText();
-        }
 
-        WLogger::logDebug($this, 'Получили видимый текст: ' . $result);
-
-        return $result;
+        return $element->getText();
     }
 }

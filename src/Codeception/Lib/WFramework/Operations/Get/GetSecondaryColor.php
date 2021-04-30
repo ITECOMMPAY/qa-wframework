@@ -75,10 +75,6 @@ class GetSecondaryColor extends AbstractOperation
         $keys = array_keys($stat);
         $key = $keys[1] ?? $keys[0];
 
-        $secondaryColor = $stat[$key];
-
-        WLogger::logDebug($this, 'Получили второстепенный цвет: ' . $secondaryColor);
-
-        return $secondaryColor;
+        return $stat[$key];
     }
 }

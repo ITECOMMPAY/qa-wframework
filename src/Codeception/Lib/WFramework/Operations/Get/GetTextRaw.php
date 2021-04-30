@@ -45,14 +45,10 @@ class GetTextRaw extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : string
     {
-        $result = $pageObject
+        return $pageObject
                         ->returnSeleniumElement()
                         ->executeScriptOnThis(static::SCRIPT_GET_TEXT)
                         ;
-
-        WLogger::logDebug($this, 'Получили сырой текст: ' . $result);
-
-        return $result;
     }
 
     const SCRIPT_GET_TEXT = <<<EOF
