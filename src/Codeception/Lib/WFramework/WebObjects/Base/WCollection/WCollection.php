@@ -100,9 +100,6 @@ abstract class WCollection extends Composite implements IPageObject
     /** @var WElement|null */
     protected $firstElement = null;
 
-    /** @var WElement|null */
-    protected $lastElement = null;
-
     protected $proxyWebElementsStateId = 0;
 
     /** @var AbstractCondition|null */
@@ -433,17 +430,7 @@ abstract class WCollection extends Composite implements IPageObject
     {
         WLogger::logAction($this, 'получаем последний элемент');
 
-        if ($this->lastElement === null)
-        {
-            $elementClass = $this->firstElement->getClass();
-            $instanceName = $this->firstElement->getName();
-            $locator      = WLocator::xpath('(' . $this->firstElement->getFullXPath() . ')[last()]');
-
-            $this->lastElement = $elementClass::fromLocator($instanceName, $locator, false);
-            $this->lastElement->setParent($this->getParent());
-        }
-
-        return $this->lastElement;
+        return $this->getElementsArray()->last();
     }
 
     public function getElement(int $index) : WElement
