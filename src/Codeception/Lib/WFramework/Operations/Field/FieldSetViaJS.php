@@ -43,7 +43,22 @@ class FieldSetViaJS extends AbstractOperation
         $pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_SET, [$this->value]);
     }
 
+    //https://github.com/facebook/react/issues/10135#issuecomment-314441175
     protected const SCRIPT_SET = <<<EOF
-arguments[0].value = arguments[1];
+function setNativeValue(element, value) {
+  const valueSetter = Object.getOwnPropertyDescriptor(element, 'value').set;
+  const prototype = Object.getPrototypeOf(element);
+  const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+  
+  if (valueSetter && valueSetter !== prototypeValueSetter) {
+  	prototypeValueSetter.call(element, value);
+  } else {
+    valueSetter.call(element, value);
+  }
+}
+
+setNativeValue(arguments[0], arguments[1]);
+
+arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
 EOF;
 }
