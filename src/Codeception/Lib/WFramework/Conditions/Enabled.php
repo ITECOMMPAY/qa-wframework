@@ -36,7 +36,7 @@ class Enabled extends AbstractCondition
 
     protected function apply(WPageObject $pageObject) : bool
     {
-        return $pageObject->returnSeleniumElement()->isEnabled();
+        return $pageObject->shouldExist()->returnSeleniumElement()->isEnabled();
     }
 
     protected function getExplanationClasses() : array

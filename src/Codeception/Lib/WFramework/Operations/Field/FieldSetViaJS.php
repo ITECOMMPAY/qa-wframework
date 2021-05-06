@@ -5,6 +5,7 @@ namespace Codeception\Lib\WFramework\Operations\Field;
 
 
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
 class FieldSetViaJS extends AbstractOperation
@@ -40,7 +41,7 @@ class FieldSetViaJS extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        $pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_SET, [$this->value]);
+        $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_SET, [$this->value]));
     }
 
     //https://github.com/facebook/react/issues/10135#issuecomment-314441175

@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
@@ -54,9 +55,7 @@ class GetComputedStyleMap extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Map
     {
-        $element = $pageObject->returnSeleniumElement();
-
-        $computedStyles = $element->executeScriptOnThis(static::SCRIPT_GET_COMPUTED_STYLE, [$this->pseudoElement]);
+        $computedStyles = $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_GET_COMPUTED_STYLE, [$this->pseudoElement]));
 
         return new Map($computedStyles);
     }

@@ -48,6 +48,7 @@ class FindElement extends AbstractOperation
     protected function apply(WPageObject $pageObject) : ProxyWebElement
     {
         return $pageObject
+                    ->shouldExist()
                     ->returnSeleniumElement()
                     ->findElement($this->by)
                     ;

@@ -38,7 +38,7 @@ class FieldUploadFile extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        $element = $pageObject->returnSeleniumElement();
+        $element = $pageObject->shouldExist()->returnSeleniumElement();
 
         $element->setFileDetector(new \Facebook\WebDriver\Remote\LocalFileDetector());
 

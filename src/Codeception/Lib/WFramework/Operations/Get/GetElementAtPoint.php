@@ -54,7 +54,7 @@ class GetElementAtPoint extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WElement
     {
-        $xpath = $pageObject->returnSeleniumElement()->executeScript(static::GET_XPATH_AT_COORDINATES, [$this->x, $this->y]);
+        $xpath = $pageObject->shouldExist()->returnSeleniumElement()->executeScript(static::GET_XPATH_AT_COORDINATES, [$this->x, $this->y]);
 
         $proxyWebElement = new ProxyWebElement(WLocator::xpath($xpath), $pageObject->returnSeleniumServer(), $pageObject->getTimeout());
 

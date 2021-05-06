@@ -62,6 +62,7 @@ class KeyboardPressKeys extends AbstractOperation
     protected function apply(WPageObject $pageObject)
     {
         $pageObject
+            ->shouldExist()
             ->returnSeleniumElement()
             ->sendKeys($this->keys)
             ;

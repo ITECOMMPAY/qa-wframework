@@ -42,6 +42,8 @@ class FieldClear extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
+        $pageObject->shouldExist();
+
         if ($this->animationTimeout > 0)
         {
             $pageObject->accept(new MouseScrollTo());

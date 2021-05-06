@@ -49,6 +49,7 @@ class ExecuteActions extends AbstractOperation
     protected function apply(WPageObject $pageObject) : ProxyWebElementActions
     {
         return $pageObject
+                    ->shouldExist()
                     ->returnSeleniumElement()
                     ->executeActions()
                     ;

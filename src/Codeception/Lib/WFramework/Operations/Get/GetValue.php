@@ -46,7 +46,7 @@ class GetValue extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : string
     {
-        $element = $pageObject->returnSeleniumElement();
+        $element = $pageObject->shouldExist()->returnSeleniumElement();
 
         $tag = $element->getTagName();
 

@@ -56,6 +56,7 @@ class GetCssValue extends AbstractOperation
     protected function apply(WPageObject $pageObject) : string
     {
         return $pageObject
+                        ->shouldExist()
                         ->returnSeleniumElement()
                         ->getCSSValue($this->property)
                         ;

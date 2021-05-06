@@ -36,7 +36,7 @@ class GetLayoutViewportSize extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WebDriverDimension
     {
-        $size = $pageObject->returnSeleniumElement()->executeScript('return {"width": window.innerWidth, "height": window.innerHeight};');
+        $size = $pageObject->shouldExist()->returnSeleniumElement()->executeScript('return {"width": window.innerWidth, "height": window.innerHeight};');
 
         return new WebDriverDimension($size['width'], $size['height']);
     }

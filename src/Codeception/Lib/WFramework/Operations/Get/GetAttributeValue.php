@@ -54,6 +54,7 @@ class GetAttributeValue extends AbstractOperation
     protected function apply(WPageObject $pageObject) : ?string
     {
         return $pageObject
+                        ->shouldExist()
                         ->returnSeleniumElement()
                         ->getAttribute($this->attribute)
                         ;

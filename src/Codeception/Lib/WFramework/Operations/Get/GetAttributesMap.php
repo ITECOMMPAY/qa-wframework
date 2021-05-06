@@ -6,6 +6,7 @@ namespace Codeception\Lib\WFramework\Operations\Get;
 
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Ds\Map;
@@ -39,7 +40,7 @@ class GetAttributesMap extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Map
     {
-        $result = $pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_GET_ATTRIBUTES);
+        $result = $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_GET_ATTRIBUTES));
 
         return new Map($result);
     }

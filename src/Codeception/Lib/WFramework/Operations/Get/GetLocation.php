@@ -45,8 +45,9 @@ class GetLocation extends AbstractOperation
     protected function apply(WPageObject $pageObject) : WebDriverPoint
     {
         return $pageObject
-                            ->returnSeleniumElement()
-                            ->getLocation()
-                            ;
+                        ->shouldExist()
+                        ->returnSeleniumElement()
+                        ->getLocation()
+                        ;
     }
 }

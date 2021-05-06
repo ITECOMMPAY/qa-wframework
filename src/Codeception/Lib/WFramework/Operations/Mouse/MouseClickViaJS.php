@@ -5,6 +5,7 @@ namespace Codeception\Lib\WFramework\Operations\Mouse;
 
 
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 
@@ -37,13 +38,13 @@ class MouseClickViaJS extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        $pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_CLICK);
+        $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_CLICK));
     }
 
     protected const SCRIPT_CLICK = <<<EOF
 let element = arguments[0];
 
-if (!typeof element.click === 'function') {
+if (typeof element.click !== 'function') {
     element.dispatchEvent(new MouseEvent('click', {view: window, bubbles:true, cancelable: true}))
     return;
 }

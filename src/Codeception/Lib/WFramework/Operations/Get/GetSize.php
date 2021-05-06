@@ -47,6 +47,7 @@ class GetSize extends AbstractOperation
     protected function apply(WPageObject $pageObject) : WebDriverDimension
     {
         return $pageObject
+                        ->shouldExist()
                         ->returnSeleniumElement()
                         ->getSize()
                         ;

@@ -38,6 +38,7 @@ class GetTagName extends AbstractOperation
     protected function apply(WPageObject $pageObject) : string
     {
         return $pageObject
+                        ->shouldExist()
                         ->returnSeleniumElement()
                         ->getTagName()
                         ;

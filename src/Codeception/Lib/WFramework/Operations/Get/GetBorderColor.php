@@ -47,6 +47,7 @@ class GetBorderColor extends AbstractOperation
     protected function apply(WPageObject $pageObject) : Color
     {
         $borderColor = $pageObject
+                            ->shouldExist()
                             ->returnSeleniumElement()
                             ->getCSSValue('border-top-color')
                             ;

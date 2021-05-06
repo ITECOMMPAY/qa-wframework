@@ -5,6 +5,7 @@ namespace Codeception\Lib\WFramework\Operations\Get;
 
 
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
@@ -45,10 +46,7 @@ class GetTextRaw extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : string
     {
-        return $pageObject
-                        ->returnSeleniumElement()
-                        ->executeScriptOnThis(static::SCRIPT_GET_TEXT)
-                        ;
+        return $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_GET_TEXT));
     }
 
     const SCRIPT_GET_TEXT = <<<EOF

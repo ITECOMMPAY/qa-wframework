@@ -47,6 +47,7 @@ class MouseClick extends AbstractOperation
         try
         {
             $pageObject
+                ->shouldExist()
                 ->returnSeleniumElement()
                 ->click()
                 ;

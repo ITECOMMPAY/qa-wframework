@@ -6,6 +6,7 @@ namespace Codeception\Lib\WFramework\Operations\Get;
 
 use Codeception\Lib\WFramework\Helpers\Rect;
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
@@ -46,7 +47,7 @@ class GetElementViewportRect extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Rect
     {
-        return Rect::fromDOMRect($pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_GET_ELEMENT_VIEWPORT_SIZE));
+        return Rect::fromDOMRect($pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_GET_ELEMENT_VIEWPORT_SIZE)));
     }
 
     protected const SCRIPT_GET_ELEMENT_VIEWPORT_SIZE = <<<EOF

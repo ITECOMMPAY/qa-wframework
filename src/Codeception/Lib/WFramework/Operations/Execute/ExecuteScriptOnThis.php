@@ -77,6 +77,7 @@ class ExecuteScriptOnThis extends AbstractOperation
     protected function apply(WPageObject $pageObject)
     {
         return $pageObject
+                    ->shouldExist()
                     ->returnSeleniumElement()
                     ->executeScriptOnThis($this->script, $this->arguments)
                     ;
