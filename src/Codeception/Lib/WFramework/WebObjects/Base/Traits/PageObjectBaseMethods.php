@@ -151,6 +151,11 @@ trait PageObjectBaseMethods
         /** @var WPageObject $selfOrChild */
         foreach ($this->traverseDepthFirst() as $selfOrChild)
         {
+            if ($selfOrChild->getLocator()->isHtmlRoot())
+            {
+                continue;
+            }
+
             if ($deep && !$condition->applicable($selfOrChild))
             {
                 continue;
@@ -169,7 +174,7 @@ trait PageObjectBaseMethods
                 $this->fail($this . " -> условие: '$condition' - не выполнилось в течение таймаута: " . $this->getTimeout());
             }
 
-            if (!$deep && !$selfOrChild->getLocator()->isHtmlRoot())
+            if (!$deep)
             {
                 break;
             }
@@ -194,6 +199,11 @@ trait PageObjectBaseMethods
         /** @var WPageObject $selfOrChild */
         foreach ($this->traverseDepthFirst() as $selfOrChild)
         {
+            if ($selfOrChild->getLocator()->isHtmlRoot())
+            {
+                continue;
+            }
+
             if ($deep && !$condition->applicable($selfOrChild))
             {
                 continue;
@@ -208,7 +218,7 @@ trait PageObjectBaseMethods
                 return false;
             }
 
-            if (!$deep && !$selfOrChild->getLocator()->isHtmlRoot())
+            if (!$deep)
             {
                 break;
             }
@@ -232,6 +242,11 @@ trait PageObjectBaseMethods
         /** @var WPageObject $selfOrChild */
         foreach ($this->traverseDepthFirst() as $selfOrChild)
         {
+            if ($selfOrChild->getLocator()->isHtmlRoot())
+            {
+                continue;
+            }
+
             if ($deep && !$condition->applicable($selfOrChild))
             {
                 continue;
@@ -242,7 +257,7 @@ trait PageObjectBaseMethods
                 return false;
             }
 
-            if (!$deep && !$selfOrChild->getLocator()->isHtmlRoot())
+            if (!$deep)
             {
                 break;
             }
