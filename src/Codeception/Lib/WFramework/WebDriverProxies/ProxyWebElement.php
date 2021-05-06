@@ -131,29 +131,7 @@ class ProxyWebElement extends RemoteWebElement
 
         WLogger::logDebug($this, "Ищем элемент с $locatorMechanism: '$locatorValue'");
 
-        try
-        {
-            $this->remoteWebElement = $this->getNewRemoteWebElement();
-            return;
-        }
-        catch (NoSuchElementException $e)
-        {
-//            if ($this->hasDebugInfo())
-//            {
-//                throw new NoSuchElementException((new DebugHelper())->diagnoseLocator($this->debugInfo, DebugHelper::EXIST));
-//            }
-
-            throw $e;
-        }
-        catch (StaleElementReferenceException $e)
-        {
-//            if ($this->hasDebugInfo())
-//            {
-//                throw new StaleElementReferenceException((new DebugHelper())->diagnoseLocator($this->debugInfo, DebugHelper::EXIST));
-//            }
-
-            throw $e;
-        }
+        $this->remoteWebElement = $this->getNewRemoteWebElement();
     }
 
     protected function getNewRemoteWebElement() : RemoteWebElement
