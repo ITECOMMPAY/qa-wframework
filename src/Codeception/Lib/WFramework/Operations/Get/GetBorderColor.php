@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Helpers\Color;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
@@ -47,7 +48,7 @@ class GetBorderColor extends AbstractOperation
     protected function apply(WPageObject $pageObject) : Color
     {
         $borderColor = $pageObject
-                            ->shouldExist()
+                            ->should(new Exist())
                             ->returnSeleniumElement()
                             ->getCSSValue('border-top-color')
                             ;

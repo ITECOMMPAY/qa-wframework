@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -46,7 +47,7 @@ class GetText extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : string
     {
-        $element = $pageObject->shouldExist()->returnSeleniumElement();
+        $element = $pageObject->should(new Exist())->returnSeleniumElement();
 
         $tag = $element->getTagName();
 

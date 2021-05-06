@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -54,7 +55,7 @@ class GetAttributeValue extends AbstractOperation
     protected function apply(WPageObject $pageObject) : ?string
     {
         return $pageObject
-                        ->shouldExist()
+                        ->should(new Exist())
                         ->returnSeleniumElement()
                         ->getAttribute($this->attribute)
                         ;

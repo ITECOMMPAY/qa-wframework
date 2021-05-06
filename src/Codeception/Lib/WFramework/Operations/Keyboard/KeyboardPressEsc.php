@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Keyboard;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -42,7 +43,7 @@ class KeyboardPressEsc extends AbstractOperation
     protected function apply(WPageObject $pageObject)
     {
         $pageObject
-            ->shouldExist()
+            ->should(new Exist())
             ->returnSeleniumElement()
             ->sendKeys(WebDriverKeys::ESCAPE)
             ;

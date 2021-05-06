@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
@@ -38,7 +39,7 @@ class GetTagName extends AbstractOperation
     protected function apply(WPageObject $pageObject) : string
     {
         return $pageObject
-                        ->shouldExist()
+                        ->should(new Exist())
                         ->returnSeleniumElement()
                         ->getTagName()
                         ;

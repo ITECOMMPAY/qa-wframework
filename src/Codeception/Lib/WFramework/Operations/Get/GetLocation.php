@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
@@ -45,7 +46,7 @@ class GetLocation extends AbstractOperation
     protected function apply(WPageObject $pageObject) : WebDriverPoint
     {
         return $pageObject
-                        ->shouldExist()
+                        ->should(new Exist())
                         ->returnSeleniumElement()
                         ->getLocation()
                         ;

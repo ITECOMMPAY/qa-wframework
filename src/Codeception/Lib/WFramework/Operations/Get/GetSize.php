@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -47,7 +48,7 @@ class GetSize extends AbstractOperation
     protected function apply(WPageObject $pageObject) : WebDriverDimension
     {
         return $pageObject
-                        ->shouldExist()
+                        ->should(new Exist())
                         ->returnSeleniumElement()
                         ->getSize()
                         ;
