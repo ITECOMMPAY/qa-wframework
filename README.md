@@ -7,7 +7,7 @@
 ## Установка
 
 * Фреймворк работает только под GNU/Linux
-* Для его работы требуется PHP 7.2 или выше, composer и бинарные расширения PHP (в одних дистрибутивах они ставятся отдельными пакетами, в других - вкомпилированы в PHP, в третьих - нужно самому собрать): `ext-curl, ext-dom, ext-imagick, ext-json, ext-libxml, ext-mbstring, ext-pcre, ext-phar, ext-posix, ext-simplexml, ext-tokenizer, ext-xml, ext-xmlwriter, ext-zip`
+* Для его работы требуется PHP 7.4 или выше, composer и бинарные расширения PHP (в одних дистрибутивах они ставятся отдельными пакетами, в других - вкомпилированы в PHP, в третьих - нужно самому собрать): `ext-curl, ext-dom, ext-imagick, ext-json, ext-libxml, ext-mbstring, ext-pcre, ext-phar, ext-posix, ext-simplexml, ext-tokenizer, ext-xml, ext-xmlwriter, ext-zip`
 * В корне где лежит composer.json нужно выполнить `composer install`
 
 ## Описание примера тестов
