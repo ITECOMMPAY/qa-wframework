@@ -23,12 +23,12 @@ use {{facade_class_full}};
 
 class {{group_class_short}}
 {
-   /**
-    * Этот файл генерируется автоматически при запуске тестов или при вызове команды:
-    * ./vendor/bin/codecept WBuild -c путь_к_codeception.yml
-    * 
-    * Править его вручную - не имеет смысла.
-    */
+    /**
+     * Этот файл генерируется автоматически при запуске тестов или при вызове команды:
+     * ./vendor/bin/codecept WBuild -c путь_к_codeception.yml
+     * 
+     * Править его вручную - не имеет смысла.
+     */
 
     /** @var {{facade_class_short}} */
     protected $facade;
