@@ -24,6 +24,13 @@ use Codeception\Lib\WFramework\Steps\StepsGroup;
 
 class {{steps_class_short}} extends StepsGroup
 {
+   /**
+    * Этот файл генерируется автоматически при запуске тестов или при вызове команды:
+    * ./vendor/bin/codecept WBuild -c путь_к_codeception.yml
+    * 
+    * Править его вручную - не имеет смысла.
+    */
+
 {{step_fields}}
 
     public function __construct(

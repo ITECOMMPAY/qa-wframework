@@ -23,6 +23,13 @@ use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 
 class {{facade_class_short}}
 {
+   /**
+    * Этот файл генерируется автоматически при запуске тестов или при вызове команды:
+    * ./vendor/bin/codecept WBuild -c путь_к_codeception.yml
+    * 
+    * Править его вручную - не имеет смысла.
+    */
+    
     /** @var {{page_object_class_short}} */
     protected $pageObject;
 
