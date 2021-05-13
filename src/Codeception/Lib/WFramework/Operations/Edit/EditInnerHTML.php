@@ -5,6 +5,7 @@ namespace Codeception\Lib\WFramework\Operations\Edit;
 
 
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
@@ -48,6 +49,6 @@ class EditInnerHTML extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        $pageObject->returnSeleniumElement()->executeScriptOnThis('arguments[0].innerHTML = arguments[1];', [$this->text]);
+        $pageObject->accept(new ExecuteScriptOnThis('arguments[0].innerHTML = arguments[1];', [$this->text]));
     }
 }

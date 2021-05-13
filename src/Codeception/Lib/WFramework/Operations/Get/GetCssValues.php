@@ -46,7 +46,7 @@ class GetCssValues extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -61,8 +61,6 @@ class GetCssValues extends AbstractOperation
         {
             $result[] = $pageObject->accept(new GetCssValue($property));
         }
-
-        WLogger::logDebug($this, 'CSS-свойства имеют значения: ' . implode(', ', $result));
 
         return $result;
     }

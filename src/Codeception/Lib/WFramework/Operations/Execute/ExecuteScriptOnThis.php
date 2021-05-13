@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Execute;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -67,7 +68,7 @@ class ExecuteScriptOnThis extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - если скрипт возвращает значение, то массив значений скрипта.
+     * @return \Ds\Sequence - если скрипт возвращает значение, то массив значений скрипта.
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -77,6 +78,7 @@ class ExecuteScriptOnThis extends AbstractOperation
     protected function apply(WPageObject $pageObject)
     {
         return $pageObject
+                    ->should(new Exist())
                     ->returnSeleniumElement()
                     ->executeScriptOnThis($this->script, $this->arguments)
                     ;

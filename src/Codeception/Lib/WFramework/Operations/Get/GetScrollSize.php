@@ -5,6 +5,7 @@ namespace Codeception\Lib\WFramework\Operations\Get;
 
 
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
@@ -37,7 +38,7 @@ class GetScrollSize extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -46,9 +47,7 @@ class GetScrollSize extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WebDriverDimension
     {
-        $size = $pageObject->returnSeleniumElement()->executeScriptOnThis('return {"width": arguments[0].scrollWidth, "height": arguments[0].scrollHeight};');
-
-        WLogger::logDebug($this, 'Реальный размер элемента: ' . $size['width'] . 'x' . $size['height']);
+        $size = $pageObject->accept(new ExecuteScriptOnThis('return {"width": arguments[0].scrollWidth, "height": arguments[0].scrollHeight};'));
 
         return new WebDriverDimension($size['width'], $size['height']);
     }

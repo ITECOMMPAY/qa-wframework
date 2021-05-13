@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Find;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
@@ -48,6 +49,7 @@ class FindElement extends AbstractOperation
     protected function apply(WPageObject $pageObject) : ProxyWebElement
     {
         return $pageObject
+                    ->should(new Exist())
                     ->returnSeleniumElement()
                     ->findElement($this->by)
                     ;

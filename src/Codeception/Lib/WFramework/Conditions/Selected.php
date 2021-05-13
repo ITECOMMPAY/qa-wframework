@@ -35,6 +35,6 @@ class Selected extends AbstractCondition
 
     protected function apply(WPageObject $pageObject) : bool
     {
-        return $pageObject->returnSeleniumElement()->isSelected();
+        return $pageObject->should(new Exist())->returnSeleniumElement()->isSelected();
     }
 }

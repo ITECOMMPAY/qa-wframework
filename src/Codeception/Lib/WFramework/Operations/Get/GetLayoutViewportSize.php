@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
@@ -36,9 +37,7 @@ class GetLayoutViewportSize extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WebDriverDimension
     {
-        $size = $pageObject->returnSeleniumElement()->executeScript('return {"width": window.innerWidth, "height": window.innerHeight};');
-
-        WLogger::logDebug($this, 'Viewport имеет размер: ' . $size['width'] . 'x' . $size['height']);
+        $size = $pageObject->should(new Exist())->returnSeleniumElement()->executeScript('return {"width": window.innerWidth, "height": window.innerHeight};');
 
         return new WebDriverDimension($size['width'], $size['height']);
     }

@@ -26,8 +26,8 @@ class WaitUntil extends AbstractOperation
      * Ожидает, пока для данного PageObject'а начнут выполняться условия,
      * или не пройдёт, заданный в настройках модуля, elementTimeout / collectionTimeout.
      *
-     * @param AbstractCondition $condition - условие
-     * @throws WaitUntilElement - не удалось дождаться выполнения условий для данного элемента
+     * @param \Codeception\Lib\WFramework\Conditions\AbstractCondition $condition - условие
+     * @throws \Codeception\Lib\WFramework\Exceptions\WaitUntilElement - не удалось дождаться выполнения условий для данного элемента
      */
     public function __construct(AbstractCondition $condition)
     {

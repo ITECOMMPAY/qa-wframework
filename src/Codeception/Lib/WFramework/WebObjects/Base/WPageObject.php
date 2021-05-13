@@ -13,7 +13,6 @@ use Codeception\Lib\WFramework\Conditions\Value;
 use Codeception\Lib\WFramework\Conditions\ValueContains;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\Composite;
-use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Execute\ExecuteActions;
 use Codeception\Lib\WFramework\Operations\Get\GetTextRaw;
@@ -222,17 +221,6 @@ abstract class WPageObject extends Composite implements IPageObject
         $this->accept(new MouseScrollTo());
 
         return $this;
-    }
-
-    /**
-     * @param PageObjectVisitor $visitor
-     * @return mixed
-     */
-    public function accept($visitor)
-    {
-        WLogger::logDebug($this, $visitor->getName());
-
-        return parent::accept($visitor);
     }
 
     public function getTimeout() : int

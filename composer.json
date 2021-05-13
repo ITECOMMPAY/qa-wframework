@@ -17,18 +17,12 @@
     "require": {
         "php": "^7.4.0",
         "ext-curl": "*",
-        "ext-dom": "*",
         "ext-imagick": "*",
         "ext-json": "*",
-        "ext-libxml": "*",
         "ext-mbstring": "*",
         "ext-pcre": "*",
         "ext-phar": "*",
         "ext-posix": "*",
-        "ext-simplexml": "*",
-        "ext-tokenizer": "*",
-        "ext-xml": "*",
-        "ext-xmlwriter": "*",
         "ext-zip": "*",
         "aws/aws-sdk-php": "^3.147.2",
         "browserstack/browserstack-local": "^1.1.0",
@@ -41,7 +35,6 @@
         "monolog/monolog": "^2.0.2",
         "php-ds/php-ds": "^1.2.0",
         "phpunit/phpunit": "^9.2.5",
-        "ramsey/uuid": "^3.9.2",
         "symfony/process": "^4.4.10"
     },
     "autoload": {

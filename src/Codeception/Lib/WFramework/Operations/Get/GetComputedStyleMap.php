@@ -4,16 +4,14 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
-use Codeception\Lib\WFramework\Logger\WLogger;
-use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use Ds\Map;
 use Ds\Sequence;
 
-class GetCssMap extends AbstractOperation
+class GetComputedStyleMap extends AbstractOperation
 {
     public function getName() : string
     {
@@ -48,7 +46,7 @@ class GetCssMap extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -57,9 +55,7 @@ class GetCssMap extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Map
     {
-        $element = $pageObject->returnSeleniumElement();
-
-        $computedStyles = $element->executeScriptOnThis(static::SCRIPT_GET_COMPUTED_STYLE, [$this->pseudoElement]);
+        $computedStyles = $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_GET_COMPUTED_STYLE, [$this->pseudoElement]));
 
         return new Map($computedStyles);
     }

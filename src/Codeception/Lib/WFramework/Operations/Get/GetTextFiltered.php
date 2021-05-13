@@ -52,7 +52,7 @@ class GetTextFiltered extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -75,8 +75,6 @@ class GetTextFiltered extends AbstractOperation
         }
 
         $index = empty($this->groupName) ? 1 : $this->groupName;
-
-        WLogger::logDebug($this, 'Получили отфильтрованный текст: ' . $matches[$index]);
 
         return $matches[$index];
     }

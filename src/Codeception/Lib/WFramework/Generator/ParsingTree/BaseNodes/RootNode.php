@@ -54,6 +54,12 @@ class RootNode extends AbstractNode
         return $node;
     }
 
+    public function addPageObjectNodeExisting(PageObjectNode $node) : PageObjectNode
+    {
+        $this->addChild($node);
+        return $node;
+    }
+
     public function addStepsNode(string $name) : StepsNode
     {
         $node = new StepsNode($name, $this);

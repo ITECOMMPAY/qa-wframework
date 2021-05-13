@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Execute;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebDriverProxies\ProxyWebElementActions;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
@@ -49,6 +50,7 @@ class ExecuteActions extends AbstractOperation
     protected function apply(WPageObject $pageObject) : ProxyWebElementActions
     {
         return $pageObject
+                    ->should(new Exist())
                     ->returnSeleniumElement()
                     ->executeActions()
                     ;

@@ -31,9 +31,16 @@ class WLocator extends WebDriverBy
         return false;
     }
 
+    private $htmlRoot = null;
+
     public function isHtmlRoot() : bool
     {
-        return $this->getValue() === '/html';
+        if ($this->htmlRoot === null)
+        {
+            $this->htmlRoot = '/html' === $this->getValue();
+        }
+
+        return $this->htmlRoot;
     }
 
     public function __toString() : string

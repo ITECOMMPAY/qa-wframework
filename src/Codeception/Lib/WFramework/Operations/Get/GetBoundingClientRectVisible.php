@@ -7,6 +7,7 @@ namespace Codeception\Lib\WFramework\Operations\Get;
 use Codeception\Lib\WFramework\Helpers\Rect;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
 class GetBoundingClientRectVisible extends AbstractOperation
@@ -33,11 +34,7 @@ class GetBoundingClientRectVisible extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Rect
     {
-        $rect = Rect::fromDOMRect($pageObject->returnSeleniumElement()->executeScriptOnThis(static::GET_VISIBLE_BOUNDING_CLIENT_RECT));
-
-        WLogger::logDebug($this, 'Получили видимый boundingClientRect элемента: ' . $rect);
-
-        return $rect;
+        return Rect::fromDOMRect($pageObject->accept(new ExecuteScriptOnThis(static::GET_VISIBLE_BOUNDING_CLIENT_RECT)));
     }
 
     protected const GET_VISIBLE_BOUNDING_CLIENT_RECT = <<<EOF

@@ -4,7 +4,7 @@
 namespace Codeception\Lib\WFramework\Conditions;
 
 
-use Codeception\Lib\WFramework\Operations\Get\GetCssMap;
+use Codeception\Lib\WFramework\Operations\Get\GetComputedStyleMap;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Ds\Map;
 
@@ -62,7 +62,7 @@ class CssPropertyWithValue extends AbstractCondition
 
     protected function apply(WPageObject $pageObject) : bool
     {
-        $this->actual = $pageObject->accept(new GetCssMap());
+        $this->actual = $pageObject->accept(new GetComputedStyleMap());
 
         if (!$this->actual->hasKey($this->property))
         {

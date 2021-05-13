@@ -123,9 +123,4 @@ abstract class AbstractCondition extends PageObjectVisitor
 
         return $formatter;
     }
-
-    public function __call($name, $arguments) : bool
-    {
-        return parent::__call($name, $arguments);
-    }
 }

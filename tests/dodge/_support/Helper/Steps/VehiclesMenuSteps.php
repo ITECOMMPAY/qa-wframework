@@ -37,7 +37,7 @@ class VehiclesMenuSteps extends StepsGroup
     {
         $this->I->logNotice($this, 'Проверяем, что меню Vehicles - отобразилось');
 
-        $this->vehiclesMenuBlock->shouldBeDisplayed();
+        $this->vehiclesMenuBlock->shouldBeDisplayed(true);
 
         return $this;
     }

@@ -6,6 +6,7 @@ namespace Codeception\Lib\WFramework\Operations\Get;
 
 use Codeception\Lib\WFramework\Helpers\Rect;
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
@@ -37,7 +38,7 @@ class GetBoundingClientRect extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -46,10 +47,6 @@ class GetBoundingClientRect extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : Rect
     {
-        $rect = Rect::fromDOMRect($pageObject->returnSeleniumElement()->executeScriptOnThis('return arguments[0].getBoundingClientRect();'));
-
-        WLogger::logDebug($this, 'Получили boundingClientRect элемента: ' . $rect);
-
-        return $rect;
+        return Rect::fromDOMRect($pageObject->accept(new ExecuteScriptOnThis('return arguments[0].getBoundingClientRect();')));
     }
 }

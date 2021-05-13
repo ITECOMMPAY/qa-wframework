@@ -4,6 +4,8 @@
 namespace Codeception\Lib\WFramework\Operations\Mouse;
 
 
+use Codeception\Lib\WFramework\Exceptions\UsageException;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
@@ -32,6 +34,11 @@ class MouseClickAtCoordinates extends AbstractOperation
     {
         $this->x = $x;
         $this->y = $y;
+
+        if ($x < 0 || $y < 0)
+        {
+            throw new UsageException($this . " -> Координаты не могут быть отрицательными: X: $x, Y: $y");
+        }
     }
 
     public function acceptWBlock($block)
@@ -46,12 +53,16 @@ class MouseClickAtCoordinates extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
-        $pageObject->returnSeleniumElement()->executeScriptOnThis(static::CLICK_AT_COORDINATES, [$this->x, $this->y]);
+        $pageObject->accept(new ExecuteScriptOnThis(static::CLICK_AT_COORDINATES, [$this->x, $this->y]));
     }
 
     protected const CLICK_AT_COORDINATES = <<<EOF
 function clickAtCoordinates(x,y){
     var el = document.elementFromPoint(x,y);
+    
+    if (el === null){
+        throw 'Can\'t find element at the given coordinates';
+    }
     
     var ev = document.createEvent("MouseEvent");
     ev.initMouseEvent(

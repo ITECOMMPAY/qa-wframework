@@ -51,9 +51,9 @@ class BuildModelSteps extends StepsGroup
     {
         $this->I->logNotice($this, 'Проверяем, что страница настройки модели авто - отобразилась');
 
-        $this->titleBlock->shouldBeDisplayed();
-        $this->exteriorColorBlock->shouldBeDisplayed();
-        $this->stripesAndDecalsBlock->shouldBeDisplayed();
+        $this->titleBlock->shouldBeDisplayed(true);
+        $this->exteriorColorBlock->shouldBeDisplayed(true);
+        $this->stripesAndDecalsBlock->shouldBeDisplayed(true);
 
         return $this;
     }
@@ -70,7 +70,7 @@ class BuildModelSteps extends StepsGroup
                             ->getCurrentValueString()
                             ;
 
-        $this->I->assertContains($expectedModel, $actualModel);
+        $this->I->assertStringContainsString($expectedModel, $actualModel);
 
         return $this;
     }

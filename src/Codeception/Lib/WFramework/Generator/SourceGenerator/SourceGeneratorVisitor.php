@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Generator\SourceGenerator;
 
 
+use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\CollectionNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\FacadeNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\OperationGroupNode;
 use Codeception\Lib\WFramework\Generator\ParsingTree\BaseNodes\OperationNode;
@@ -28,6 +29,7 @@ use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Element
 use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\ImageSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\LabelSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\LinkSource;
+use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\SomeElementSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Elements\TextBoxSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Steps\FrontPageStepsSource;
 use Codeception\Lib\WFramework\Generator\SourceGenerator\ExampleEntities\Steps\LoginStepsSource;
@@ -53,7 +55,7 @@ class SourceGeneratorVisitor extends CompositeVisitor
             (new ElementSource($node))->generate(); return;
         }
 
-        if ($node->getName() === 'Collection')
+        if ($node instanceof CollectionNode)
         {
             (new CollectionSource($node))->generate(); return;
         }
@@ -113,6 +115,11 @@ class SourceGeneratorVisitor extends CompositeVisitor
         if ($node->getName() === 'TextBox')
         {
             (new TextBoxSource($node))->generate(); return;
+        }
+
+        if ($node->getName() === 'SomeElement')
+        {
+            (new SomeElementSource($node))->generate(); return;
         }
 
         if ($node instanceof LoginBlockNode)

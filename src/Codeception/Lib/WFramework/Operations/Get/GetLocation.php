@@ -4,14 +4,13 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
-use Codeception\Lib\WFramework\Logger\WLogger;
-use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 use Ds\Sequence;
 use Facebook\WebDriver\WebDriverPoint;
+
 
 class GetLocation extends AbstractOperation
 {
@@ -37,7 +36,7 @@ class GetLocation extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -46,13 +45,10 @@ class GetLocation extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WebDriverPoint
     {
-        $result = $pageObject
+        return $pageObject
+                        ->should(new Exist())
                         ->returnSeleniumElement()
                         ->getLocation()
                         ;
-
-        WLogger::logDebug($this, sprintf("Координаты элемента: x:%d , y:%d", $result->getX(), $result->getY()));
-
-        return $result;
     }
 }

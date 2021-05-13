@@ -5,6 +5,7 @@ namespace Codeception\Lib\WFramework\Operations\Get;
 
 
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
@@ -36,7 +37,7 @@ class GetTextRaw extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -45,14 +46,7 @@ class GetTextRaw extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : string
     {
-        $result = $pageObject
-                        ->returnSeleniumElement()
-                        ->executeScriptOnThis(static::SCRIPT_GET_TEXT)
-                        ;
-
-        WLogger::logDebug($this, 'Получили сырой текст: ' . $result);
-
-        return $result;
+        return $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_GET_TEXT));
     }
 
     const SCRIPT_GET_TEXT = <<<EOF

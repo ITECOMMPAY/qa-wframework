@@ -59,7 +59,7 @@ class FrontPageSteps extends StepsGroup
     {
         $this->I->logNotice($this, 'Проверяем, что главная страница отобразилась');
 
-        $this->headerBlock->shouldBeDisplayed();
+        $this->headerBlock->shouldBeDisplayed(true);
 
         return $this;
     }

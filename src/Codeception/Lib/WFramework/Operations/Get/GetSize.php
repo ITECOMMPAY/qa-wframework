@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -37,7 +38,7 @@ class GetSize extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -46,13 +47,10 @@ class GetSize extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : WebDriverDimension
     {
-        $result = $pageObject
+        return $pageObject
+                        ->should(new Exist())
                         ->returnSeleniumElement()
                         ->getSize()
                         ;
-
-        WLogger::logDebug($this, 'Элемент имеет размер: ' . $result->getWidth() . 'x' . $result->getHeight());
-
-        return $result;
     }
 }

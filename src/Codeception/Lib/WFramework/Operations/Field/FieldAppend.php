@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Field;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Mouse\MouseClickWithLeftButton;
 use Codeception\Lib\WFramework\Operations\Mouse\MouseScrollTo;
@@ -50,6 +51,8 @@ class FieldAppend extends AbstractOperation
 
     protected function apply(WPageObject $pageObject)
     {
+        $pageObject->should(new Exist());
+
         if ($this->animationTimeout > 0)
         {
             $pageObject->accept(new MouseScrollTo());

@@ -23,6 +23,7 @@ use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use Facebook\WebDriver\WebDriverPoint;
 
+
 class ProxyWebElement extends RemoteWebElement
 {
     /** @var RemoteWebElement|null */
@@ -130,29 +131,7 @@ class ProxyWebElement extends RemoteWebElement
 
         WLogger::logDebug($this, "Ищем элемент с $locatorMechanism: '$locatorValue'");
 
-        try
-        {
-            $this->remoteWebElement = $this->getNewRemoteWebElement();
-            return;
-        }
-        catch (NoSuchElementException $e)
-        {
-//            if ($this->hasDebugInfo())
-//            {
-//                throw new NoSuchElementException((new DebugHelper())->diagnoseLocator($this->debugInfo, DebugHelper::EXIST));
-//            }
-
-            throw $e;
-        }
-        catch (StaleElementReferenceException $e)
-        {
-//            if ($this->hasDebugInfo())
-//            {
-//                throw new StaleElementReferenceException((new DebugHelper())->diagnoseLocator($this->debugInfo, DebugHelper::EXIST));
-//            }
-
-            throw $e;
-        }
+        $this->remoteWebElement = $this->getNewRemoteWebElement();
     }
 
     protected function getNewRemoteWebElement() : RemoteWebElement
@@ -279,12 +258,12 @@ class ProxyWebElement extends RemoteWebElement
 
     public function getLocation() : WebDriverPoint
     {
-        return $this->returnRemoteWebElement()->getLocation();
+        return ProxyWebDriverPoint::fromWebDriverPoint($this->returnRemoteWebElement()->getLocation());
     }
 
     public function getLocationOnScreenOnceScrolledIntoView() : WebDriverPoint
     {
-        return $this->returnRemoteWebElement()->getLocationOnScreenOnceScrolledIntoView();
+        return ProxyWebDriverPoint::fromWebDriverPoint($this->returnRemoteWebElement()->getLocationOnScreenOnceScrolledIntoView());
     }
 
     public function getCoordinates() : WebDriverCoordinates
@@ -294,7 +273,7 @@ class ProxyWebElement extends RemoteWebElement
 
     public function getSize() : WebDriverDimension
     {
-        return $this->returnRemoteWebElement()->getSize();
+        return ProxyWebDriverDimension::fromWebDriverDimension($this->returnRemoteWebElement()->getSize());
     }
 
     public function getTagName() : string

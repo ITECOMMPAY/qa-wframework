@@ -14,9 +14,12 @@ use Codeception\Lib\WFramework\Conditions\Not_;
 use Codeception\Lib\WFramework\Conditions\Visible;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Exceptions\WaitUntilElement;
+use Codeception\Lib\WFramework\Helpers\EmptyComposite;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Wait\WaitUntil;
+use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 /**
  * Trait PageObjectBaseMethods
@@ -34,6 +37,43 @@ trait PageObjectBaseMethods
     abstract public function traverseDepthFirst() : \Generator;
 
     abstract public function getParent();
+
+    abstract public function returnCodeceptionActor();
+
+    abstract public function returnSeleniumServer() : RemoteWebDriver;
+
+    public function getFullXPath() : string
+    {
+        /** @var IPageObject $element */
+        $element = $this;
+        $result = '';
+
+        while (!$element instanceof EmptyComposite)
+        {
+            if ('xpath' !== $element->getLocator()->getMechanism())
+            {
+                throw new UsageException($element . ' -> имеет не Xpath локатор');
+            }
+
+            $locator = trim($element->getLocator()->getValue());
+
+            if (isset($locator[0]) && mb_strpos($locator, '.') === 0)
+            {
+                $locator = mb_substr($locator, 1);
+            }
+
+            $result = $locator . $result;
+
+            if (isset($locator[0]) && mb_strpos($locator, '(') === 0)
+            {
+                break;
+            }
+
+            $element = $element->getParent();
+        }
+
+        return $result;
+    }
 
     /**
      * Метод валит тест
@@ -63,6 +103,37 @@ trait PageObjectBaseMethods
         ;
     }
 
+    public function accept($visitor)
+    {
+        WLogger::logDebug($this, $visitor);
+
+        $result = parent::accept($visitor);
+
+        if ($result !== null)
+        {
+            WLogger::logDebug($this, $visitor . ' => ' . $this->printAcceptResult($result));
+        }
+
+        return $result;
+    }
+
+    private function printAcceptResult($result) : string
+    {
+        if (method_exists($result, '__toString'))
+        {
+            return $result;
+        }
+
+        $resultText = json_encode($result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        if (is_string($resultText) && mb_strlen($resultText) > 64)
+        {
+            $resultText = substr($resultText, 0, 64) . ' ...';
+        }
+
+        return $resultText;
+    }
+
     /**
      * Ждёт выполнение заданного условия для данного PageObject'а.
      *
@@ -80,6 +151,11 @@ trait PageObjectBaseMethods
         /** @var WPageObject $selfOrChild */
         foreach ($this->traverseDepthFirst() as $selfOrChild)
         {
+            if ($selfOrChild->getLocator()->isHtmlRoot())
+            {
+                continue;
+            }
+
             if ($deep && !$condition->applicable($selfOrChild))
             {
                 continue;
@@ -123,6 +199,11 @@ trait PageObjectBaseMethods
         /** @var WPageObject $selfOrChild */
         foreach ($this->traverseDepthFirst() as $selfOrChild)
         {
+            if ($selfOrChild->getLocator()->isHtmlRoot())
+            {
+                continue;
+            }
+
             if ($deep && !$condition->applicable($selfOrChild))
             {
                 continue;
@@ -161,6 +242,11 @@ trait PageObjectBaseMethods
         /** @var WPageObject $selfOrChild */
         foreach ($this->traverseDepthFirst() as $selfOrChild)
         {
+            if ($selfOrChild->getLocator()->isHtmlRoot())
+            {
+                continue;
+            }
+
             if ($deep && !$condition->applicable($selfOrChild))
             {
                 continue;
@@ -181,42 +267,66 @@ trait PageObjectBaseMethods
     }
 
 
-    public function shouldExist(bool $deep = true)
+    /**
+     * @return $this
+     */
+    public function shouldExist(bool $deep = false)
     {
         return $this->should(new Exist(), $deep);
     }
 
-    public function shouldNotExist(bool $deep = true)
+    /**
+     * @return $this
+     */
+    public function shouldNotExist(bool $deep = false)
     {
         return $this->should(new Not_(new Exist()), $deep);
     }
 
-    public function shouldBeDisplayed(bool $deep = true)
+    /**
+     * @return $this
+     */
+    public function shouldBeDisplayed(bool $deep = false)
     {
         return $this->should(new Visible(), $deep);
     }
 
-    public function shouldBeHidden(bool $deep = true)
+    /**
+     * @return $this
+     */
+    public function shouldBeHidden(bool $deep = false)
     {
         return $this->should(new Hidden(), $deep);
     }
 
-    public function shouldBeEnabled(bool $deep = true)
+    /**
+     * @return $this
+     */
+    public function shouldBeEnabled(bool $deep = false)
     {
         return $this->should(new Enabled(), $deep);
     }
 
-    public function shouldBeDisabled(bool $deep = true)
+    /**
+     * @return $this
+     */
+    public function shouldBeDisabled(bool $deep = false)
     {
         return $this->should(new Disabled(), $deep);
     }
 
-    public function shouldBeInViewport(bool $deep = true)
+    /**
+     * @return $this
+     */
+    public function shouldBeInViewport(bool $deep = false)
     {
         return $this->should(new FullyVisible(), $deep);
     }
 
-    public function shouldBeOutOfViewport(bool $deep = true)
+    /**
+     * @return $this
+     */
+    public function shouldBeOutOfViewport(bool $deep = false)
     {
         return $this->should(new Not_(new FullyVisible()), $deep);
     }
@@ -224,42 +334,42 @@ trait PageObjectBaseMethods
 
 
 
-    public function finallyExist(bool $deep = true) : bool
+    public function finallyExist(bool $deep = false) : bool
     {
         return $this->finally_(new Exist(), $deep);
     }
 
-    public function finallyNotExist(bool $deep = true) : bool
+    public function finallyNotExist(bool $deep = false) : bool
     {
         return $this->finally_(new Not_(new Exist()), $deep);
     }
 
-    public function finallyDisplayed(bool $deep = true) : bool
+    public function finallyDisplayed(bool $deep = false) : bool
     {
         return $this->finally_(new Visible(), $deep);
     }
 
-    public function finallyHidden(bool $deep = true) : bool
+    public function finallyHidden(bool $deep = false) : bool
     {
         return $this->finally_(new Hidden(), $deep);
     }
 
-    public function finallyEnabled(bool $deep = true) : bool
+    public function finallyEnabled(bool $deep = false) : bool
     {
         return $this->finally_(new Enabled(), $deep);
     }
 
-    public function finallyDisabled(bool $deep = true) : bool
+    public function finallyDisabled(bool $deep = false) : bool
     {
         return $this->finally_(new Disabled(), $deep);
     }
 
-    public function finallyInViewport(bool $deep = true) : bool
+    public function finallyInViewport(bool $deep = false) : bool
     {
         return $this->finally_(new FullyVisible(), $deep);
     }
 
-    public function finallyOutOfViewport(bool $deep = true) : bool
+    public function finallyOutOfViewport(bool $deep = false) : bool
     {
         return $this->finally_(new Not_(new FullyVisible()), $deep);
     }
@@ -267,42 +377,42 @@ trait PageObjectBaseMethods
 
 
 
-    public function isExist(bool $deep = true) : bool
+    public function isExist(bool $deep = false) : bool
     {
         return $this->is(new Exist(), $deep);
     }
 
-    public function isNotExist(bool $deep = true) : bool
+    public function isNotExist(bool $deep = false) : bool
     {
         return $this->is(new Not_(new Exist()), $deep);
     }
 
-    public function isDisplayed(bool $deep = true) : bool
+    public function isDisplayed(bool $deep = false) : bool
     {
         return $this->is(new Visible(), $deep);
     }
 
-    public function isHidden(bool $deep = true) : bool
+    public function isHidden(bool $deep = false) : bool
     {
         return $this->is(new Hidden(), $deep);
     }
 
-    public function isEnabled(bool $deep = true) : bool
+    public function isEnabled(bool $deep = false) : bool
     {
         return $this->is(new Enabled(), $deep);
     }
 
-    public function isDisabled(bool $deep = true) : bool
+    public function isDisabled(bool $deep = false) : bool
     {
         return $this->is(new Disabled(), $deep);
     }
 
-    public function isInViewport(bool $deep = true) : bool
+    public function isInViewport(bool $deep = false) : bool
     {
         return $this->is(new FullyVisible(), $deep);
     }
 
-    public function isOutOfViewport(bool $deep = true) : bool
+    public function isOutOfViewport(bool $deep = false) : bool
     {
         return $this->is(new Not_(new FullyVisible()), $deep);
     }

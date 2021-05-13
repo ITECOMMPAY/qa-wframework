@@ -19,9 +19,17 @@ namespace {{namespace}};
 
 
 use {{page_object_class_full}};
+use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 
 class {{facade_class_short}}
 {
+    /**
+     * Этот файл генерируется автоматически при запуске тестов или при вызове команды:
+     * ./vendor/bin/codecept WBuild -c путь_к_codeception.yml
+     * 
+     * Править его вручную - не имеет смысла.
+     */
+    
     /** @var {{page_object_class_short}} */
     protected $pageObject;
 
@@ -30,9 +38,9 @@ class {{facade_class_short}}
         $this->pageObject = $pageObject;
     }
     
-    public function getPageObject() : {{page_object_class_short}}
+    public function accept(PageObjectVisitor $operation)
     {
-        return $this->pageObject;
+        return $this->pageObject->accept($operation);
     }
 
     {{groups}}

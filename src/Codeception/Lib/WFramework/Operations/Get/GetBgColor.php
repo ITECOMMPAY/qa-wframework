@@ -37,7 +37,7 @@ class GetBgColor extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -48,10 +48,6 @@ class GetBgColor extends AbstractOperation
     {
         $bgColor = $pageObject->accept(new GetCssValue('background-color'));
 
-        $result = Color::fromString($bgColor);
-
-        WLogger::logDebug($this, 'Получили цвет фона: ' . $result);
-
-        return $result;
+        return Color::fromString($bgColor);
     }
 }

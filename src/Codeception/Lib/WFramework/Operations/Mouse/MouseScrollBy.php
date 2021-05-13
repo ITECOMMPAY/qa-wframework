@@ -5,6 +5,7 @@ namespace Codeception\Lib\WFramework\Operations\Mouse;
 
 
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
@@ -51,7 +52,7 @@ class MouseScrollBy extends AbstractOperation
 
     public function apply(WPageObject $pageObject)
     {
-        $pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_SCROLL_BY, [$this->x, $this->y]);
+        $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_SCROLL_BY, [$this->x, $this->y]));
     }
 
     protected const SCRIPT_SCROLL_BY = <<<EOF

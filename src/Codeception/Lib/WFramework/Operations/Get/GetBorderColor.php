@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Helpers\Color;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
@@ -37,7 +38,7 @@ class GetBorderColor extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -47,14 +48,11 @@ class GetBorderColor extends AbstractOperation
     protected function apply(WPageObject $pageObject) : Color
     {
         $borderColor = $pageObject
+                            ->should(new Exist())
                             ->returnSeleniumElement()
                             ->getCSSValue('border-top-color')
                             ;
 
-        $result = Color::fromString($borderColor);
-
-        WLogger::logDebug($this, 'Получили цвет обводки: ' . $result);
-
-        return $result;
+        return Color::fromString($borderColor);
     }
 }

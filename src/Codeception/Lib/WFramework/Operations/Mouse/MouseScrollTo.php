@@ -5,6 +5,7 @@ namespace Codeception\Lib\WFramework\Operations\Mouse;
 
 
 use Codeception\Lib\WFramework\Logger\WLogger;
+use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
@@ -53,7 +54,7 @@ class MouseScrollTo extends AbstractOperation
             return;
         }
 
-        $pageObject->returnSeleniumElement()->executeScriptOnThis(static::SCRIPT_SCROLL_INTO_VIEW, [$this->topOffset]);
+        $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_SCROLL_INTO_VIEW, [$this->topOffset]));
     }
 
     protected const SCRIPT_SCROLL_INTO_VIEW = <<<EOF

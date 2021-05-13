@@ -5,6 +5,7 @@ namespace Codeception\Lib\WFramework\Operations\Mouse;
 
 
 use Codeception\Lib\WFramework\Conditions\Clickable;
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
@@ -47,6 +48,7 @@ class MouseClick extends AbstractOperation
         try
         {
             $pageObject
+                ->should(new Exist())
                 ->returnSeleniumElement()
                 ->click()
                 ;

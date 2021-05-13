@@ -24,6 +24,13 @@ use Codeception\Lib\WFramework\Steps\StepsGroup;
 
 class {{steps_class_short}} extends StepsGroup
 {
+    /**
+     * Этот файл генерируется автоматически при запуске тестов или при вызове команды:
+     * ./vendor/bin/codecept WBuild -c путь_к_codeception.yml
+     * 
+     * Править его вручную - не имеет смысла.
+     */
+
 {{step_fields}}
 
     public function __construct(
@@ -70,7 +77,7 @@ EOF;
         foreach ($this->node->getRootNode()->getStepObjectClassesFull() as $stepObjectClassFull)
         {
             $stepObjectClassShort = ClassHelper::getShortName($stepObjectClassFull);
-            $stepObjectVariableName = lcfirst($stepObjectClassShort);
+            $stepObjectVariableName = $this->lowerCamelCase($stepObjectClassShort);
 
             if ($stepObjectClassShort === $this->node->getEntityClassShort())
             {
@@ -107,5 +114,15 @@ EOF;
                         ->produce();
 
         $this->node->setSource($source);
+    }
+
+    protected function lowerCamelCase(string $input) : string
+    {
+        if (preg_match('%^(?\'prefix\'[A-Z]+)(?\'word\'[A-Z].*)$%m', $input, $matches) === 1)
+        {
+            return strtolower($matches['prefix']) . $matches['word'];
+        }
+
+        return lcfirst($input);
     }
 }

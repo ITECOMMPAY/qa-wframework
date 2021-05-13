@@ -54,7 +54,7 @@ class GetSecondaryColor extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -75,10 +75,6 @@ class GetSecondaryColor extends AbstractOperation
         $keys = array_keys($stat);
         $key = $keys[1] ?? $keys[0];
 
-        $secondaryColor = $stat[$key];
-
-        WLogger::logDebug($this, 'Получили второстепенный цвет: ' . $secondaryColor);
-
-        return $secondaryColor;
+        return $stat[$key];
     }
 }

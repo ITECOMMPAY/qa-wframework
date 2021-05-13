@@ -3,6 +3,8 @@
 
 namespace Codeception\Lib\WFramework\WebObjects\Base\Interfaces;
 
+use Codeception\Actor;
+use Codeception\Lib\WFramework\Actor\ImaginaryActor;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
@@ -10,6 +12,7 @@ use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
 use Codeception\Lib\WFramework\WLocator\WLocator;
 use Ds\Map;
 use Ds\Sequence;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 /**
  * Interface IPageObject
@@ -28,6 +31,18 @@ use Ds\Sequence;
  */
 interface IPageObject
 {
+    /**
+     * С помощью этого метода можно обратиться к методам главного актора Codeception
+     *
+     * @return Actor|ImaginaryActor
+     */
+    public function returnCodeceptionActor();
+
+    /**
+     * С помощью этого метода можно обратиться к методам Сервера Селениума
+     */
+    public function returnSeleniumServer() : RemoteWebDriver;
+
     /**
      * Возвращает полное имя своего класса
      *
@@ -82,6 +97,13 @@ interface IPageObject
      * @return bool
      */
     public function isRelative() : bool;
+
+    /**
+     * Возвращает полный XPath-локатор.
+     *
+     * @return string
+     */
+    public function getFullXPath() : string;
 
     /**
      * Возвращает детей узла в следующем порядке, включая этот узел (1 - этот узел):
@@ -160,7 +182,7 @@ interface IPageObject
     public function getFirstParentWithClass(string $class);
 
     /**
-     * Принимает визитор ().
+     * Принимает визитор.
      *
      * Визитор позволяет динамически навешивать на объект новые операции. Для этого он оборачивает их в отдельный объект.
      *

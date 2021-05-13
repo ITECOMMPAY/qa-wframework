@@ -4,6 +4,7 @@
 namespace Codeception\Lib\WFramework\Operations\Get;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
 use Codeception\Lib\WFramework\WebObjects\Base\WCollection\WCollection;
@@ -37,7 +38,7 @@ class GetValue extends AbstractOperation
 
     /**
      * @param WCollection $collection
-     * @return Sequence - массив результатов применения операции для каждого элемента коллекции
+     * @return \Ds\Sequence - массив результатов применения операции для каждого элемента коллекции
      */
     public function acceptWCollection($collection) : Sequence
     {
@@ -46,7 +47,7 @@ class GetValue extends AbstractOperation
 
     protected function apply(WPageObject $pageObject) : string
     {
-        $element = $pageObject->returnSeleniumElement();
+        $element = $pageObject->should(new Exist())->returnSeleniumElement();
 
         $tag = $element->getTagName();
 
@@ -64,10 +65,6 @@ class GetValue extends AbstractOperation
             $result = $element->getAttribute('value');
         }
 
-        $result = $result ?? '';
-
-        WLogger::logDebug($this, 'Получили значение: ' . $result);
-
-        return $result;
+        return $result ?? '';
     }
 }

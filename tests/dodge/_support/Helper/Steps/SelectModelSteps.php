@@ -40,7 +40,7 @@ class SelectModelSteps extends StepsGroup
     {
         $this->I->logNotice($this, 'Проверяем, что страница выбора модели авто - отобразилась');
 
-        $this->selectModelBlock->shouldBeDisplayed();
+        $this->selectModelBlock->shouldBeDisplayed(true);
 
         return $this;
     }

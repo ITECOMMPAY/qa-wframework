@@ -21,7 +21,7 @@ class DodgeModelCard extends DodgeButton
     {
         $this->title = DodgeLabel::fromXpath('Название модели', ".//div[contains(@class, 'vehicle-title')]");
 
-        $this->buildButton = DodgeButton::fromXpath('Build', ".//div[text()='Build']");
+        $this->buildButton = DodgeButton::fromXpath('Build', ".//span[text()='Build']");
 
         parent::__construct($importer);
     }
