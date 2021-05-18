@@ -112,7 +112,9 @@ EOF;
         {
             $name = $param->getName();
 
-            $result[] = "$$name";
+            $variadic = $param->isVariadic() ? '...' : '';
+
+            $result[] = "$variadic$$name";
         }
 
         return implode(', ', $result);
