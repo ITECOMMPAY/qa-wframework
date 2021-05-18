@@ -77,6 +77,11 @@ EOF;
 
             $name = $param->getName();
 
+            if ($param->isVariadic())
+            {
+                $name = "...$name";
+            }
+
             $defaultValue = '';
 
             if ($param->isDefaultValueAvailable())
