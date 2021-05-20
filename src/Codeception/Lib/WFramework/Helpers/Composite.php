@@ -117,6 +117,11 @@ abstract class Composite extends ModernObject
         $child->setParent($this);
     }
 
+    public function removeChild(string $name)
+    {
+        $this->children->remove($name);
+    }
+
     public function addChildren(Composite ...$children)
     {
         foreach ($children as $child)

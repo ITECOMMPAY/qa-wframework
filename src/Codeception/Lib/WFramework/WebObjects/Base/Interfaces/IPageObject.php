@@ -5,10 +5,12 @@ namespace Codeception\Lib\WFramework\WebObjects\Base\Interfaces;
 
 use Codeception\Actor;
 use Codeception\Lib\WFramework\Actor\ImaginaryActor;
+use Codeception\Lib\WFramework\Conditions\AbstractCondition;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
 use Codeception\Lib\WFramework\Helpers\Composite;
 use Codeception\Lib\WFramework\Helpers\EmptyComposite;
 use Codeception\Lib\WFramework\Helpers\PageObjectVisitor;
+use Codeception\Lib\WFramework\WebObjects\Base\Traits\PageObjectBaseMethods;
 use Codeception\Lib\WFramework\WLocator\WLocator;
 use Ds\Map;
 use Ds\Sequence;
@@ -212,6 +214,18 @@ interface IPageObject
     public function getTimeout() : int;
 
     /**
+     * Ждёт выполнение заданного условия для данного PageObject'а.
+     *
+     * Если условие не было выполнено в течении заданного таймаута (elementTimeout/collectionTimeout) - валит тест.
+     *
+     * @param AbstractCondition $condition - условие
+     * @param bool $deep - вызывает should-метод для всех PageObject'ов, которые объявлены внутри данного PageObject'а
+     * @return $this
+     * @throws UsageException
+     */
+    public function should(AbstractCondition $condition, bool $deep = false);
+
+    /**
      * PageObject должен существовать.
      *
      * Для этого элемент на который ссылается локатор PageObject'а должен присутствовать в коде страницы.
@@ -400,6 +414,18 @@ interface IPageObject
      */
     public function shouldBeOutOfViewport(bool $deep = true);
 
+
+    /**
+     * Ждёт выполнение заданного условия для данного PageObject'а.
+     *
+     * Если условие не было выполнено в течении заданного таймаута (elementTimeout/collectionTimeout) - возвращает false.
+     *
+     * @param AbstractCondition $condition - условие
+     * @param bool $deep - вызывает finally_-метод для всех PageObject'ов, которые объявлены внутри данного PageObject'а
+     * @return bool
+     */
+    public function finally_(AbstractCondition $condition, bool $deep = false) : bool;
+
     /**
      * PageObject должен существовать.
      *
@@ -545,6 +571,16 @@ interface IPageObject
      */
     public function finallyOutOfViewport(bool $deep = true) : bool;
 
+
+    /**
+     * Проверяет условие для данного PageObject'а.
+     *
+     * @param AbstractCondition $condition - условие
+     * @param bool $deep - вызывает is-метод для всех PageObject'ов, которые объявлены внутри данного PageObject'а
+     * @return bool
+     * @throws UsageException
+     */
+    public function is(AbstractCondition $condition, bool $deep = false) : bool;
 
     /**
      * PageObject существует?

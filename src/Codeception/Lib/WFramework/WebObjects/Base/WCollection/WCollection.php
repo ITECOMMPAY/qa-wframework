@@ -102,8 +102,8 @@ abstract class WCollection extends Composite implements IPageObject
 
     protected $proxyWebElementsStateId = 0;
 
-    /** @var AbstractCondition|null */
-    protected $elementFilter;
+    /** @var bool */
+    protected $filtered = false;
 
     /**
      * Создаёт коллекцию веб-элементов из объявления одиночного элемента.
@@ -204,51 +204,55 @@ abstract class WCollection extends Composite implements IPageObject
         $this->returnSeleniumElements()->refresh();
         $this->updateFromProxyWebElements();
 
-        return $this;
-    }
-
-    /**
-     * Задаёт фильтрацию коллекции элементов по условию
-     *
-     * @param AbstractCondition $condition
-     * @return $this
-     */
-    public function filterSet(AbstractCondition $condition)
-    {
-        WLogger::logAction($this, "задаём фильтрацию по условию: " . $condition->getName());
-
-        $this->elementFilter = $condition;
+        $this->filtered = false;
 
         return $this;
     }
 
     /**
-     * Удаляет все фильтры
+     * После обновления коллекции через refresh() с помощью этого метода можно выгрузить лишние элементы,
+     * которые не подпадают под заданные условия.
+     *
+     * @param AbstractCondition ...$conditions
      *
      * @return $this
      */
-    public function filterRemove()
+    public function filter(AbstractCondition ...$conditions)
     {
-        WLogger::logAction($this, "удаляем все фильтры");
+        $conditionDescription = [];
 
-        $this->elementFilter = null;
+        foreach ($conditions as $condition)
+        {
+            $conditionDescription []= (string) $condition;
+        }
+
+        $conditionsPassed = function (IPageObject $element) use ($conditions) {
+            foreach ($conditions as $condition)
+            {
+                if (!$element->is($condition))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        WLogger::logAction($this, "удаляем элементы которые не соответствуют условиям: " . implode(', ', $conditionDescription));
+
+        foreach ($this->getChildren() as $name => $child)
+        {
+            if ($conditionsPassed($child))
+            {
+                continue;
+            }
+
+            $this->removeChild($name);
+        }
+
+        $this->filtered = true;
 
         return $this;
-    }
-
-    private function mustBeFilteredOut(WElement $element) : bool
-    {
-        if ($this->elementFilter === null)
-        {
-            return false;
-        }
-
-        if (!$this->elementFilter->applicable($element))
-        {
-            return false;
-        }
-
-        return $element->accept($this->elementFilter);
     }
 
     /**
@@ -270,11 +274,6 @@ abstract class WCollection extends Composite implements IPageObject
         foreach ($this->returnSeleniumElements()->getElementsArray() as $index => $proxyWebElement)
         {
             $webElement = $this->wrapInPageObject($index, $proxyWebElement);
-
-            if ($this->mustBeFilteredOut($webElement))
-            {
-                continue;
-            }
 
             $this->addChild($webElement);
             $webElement->setParent($this->getParent());
@@ -419,6 +418,11 @@ abstract class WCollection extends Composite implements IPageObject
     public function getFirstElement() : WElement
     {
         WLogger::logAction($this, 'получаем первый элемент');
+
+        if ($this->filtered)
+        {
+            return $this->getElementsArray()->first();
+        }
 
         return $this->firstElement;
     }
