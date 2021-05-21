@@ -30,6 +30,9 @@ use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Ds\Sequence;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 use Codeception\Lib\WFramework\Helpers\Composite;
+use Ds\Stack;
+use Ds\Traits\GenericSequence;
+use Ds\Vector;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use function array_keys;
 use Codeception\Lib\WFramework\Exceptions\UsageException;
@@ -105,6 +108,9 @@ abstract class WCollection extends Composite implements IPageObject
     /** @var bool */
     protected $filtered = false;
 
+    /** @var Stack */
+    protected $filteredOutItems;
+
     /**
      * Создаёт коллекцию веб-элементов из объявления одиночного элемента.
      *
@@ -133,6 +139,9 @@ abstract class WCollection extends Composite implements IPageObject
         $this->firstElement = $importer->getFirstElement();
 
         $this->name = 'Коллекция элементов: ' . $this->firstElement->getName();
+
+        $this->filtered = false;
+        $this->filteredOutItems = new Stack();
     }
 
     public function setParent(Composite $parent)
@@ -205,6 +214,7 @@ abstract class WCollection extends Composite implements IPageObject
         $this->updateFromProxyWebElements();
 
         $this->filtered = false;
+        $this->filteredOutItems->clear();
 
         return $this;
     }
@@ -217,7 +227,7 @@ abstract class WCollection extends Composite implements IPageObject
      *
      * @return $this
      */
-    public function filter(AbstractCondition ...$conditions)
+    public function filterLoadedItems(AbstractCondition ...$conditions)
     {
         $conditionDescription = [];
 
@@ -225,6 +235,8 @@ abstract class WCollection extends Composite implements IPageObject
         {
             $conditionDescription []= (string) $condition;
         }
+
+        WLogger::logAction($this, "отфильтровываем загруженные элементы которые не соответствуют условиям: " . implode(', ', $conditionDescription));
 
         $conditionsPassed = function (IPageObject $element) use ($conditions) {
             foreach ($conditions as $condition)
@@ -238,7 +250,6 @@ abstract class WCollection extends Composite implements IPageObject
             return true;
         };
 
-        WLogger::logAction($this, "удаляем элементы которые не соответствуют условиям: " . implode(', ', $conditionDescription));
 
         foreach ($this->getChildren() as $name => $child)
         {
@@ -248,9 +259,27 @@ abstract class WCollection extends Composite implements IPageObject
             }
 
             $this->removeChild($name);
+            $this->filteredOutItems->push($child);
         }
 
-        $this->filtered = true;
+        if (!$this->filteredOutItems->isEmpty())
+        {
+            $this->filtered = true;
+        }
+
+        return $this;
+    }
+
+    public function filtersReset()
+    {
+        WLogger::logAction($this, "снимаем фильтры с загруженных элементов");
+
+        while (!$this->filteredOutItems->isEmpty())
+        {
+            $this->addChild($this->filteredOutItems->pop());
+        }
+
+        $this->filtered = false;
 
         return $this;
     }
