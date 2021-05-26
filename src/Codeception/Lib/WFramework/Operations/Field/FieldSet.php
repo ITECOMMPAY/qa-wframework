@@ -5,10 +5,8 @@ namespace Codeception\Lib\WFramework\Operations\Field;
 
 
 use Codeception\Lib\WFramework\Conditions\Exist;
-use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Mouse\MouseClickWithLeftButton;
 use Codeception\Lib\WFramework\Operations\Mouse\MouseScrollTo;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 
@@ -62,9 +60,10 @@ class FieldSet extends AbstractOperation
             usleep($this->animationTimeout);
         }
 
+        $pageObject->accept(new FieldClear($this->animationTimeout));
+
         $pageObject
             ->returnSeleniumElement()
-            ->clear()
             ->sendKeys($this->value)
             ;
     }
