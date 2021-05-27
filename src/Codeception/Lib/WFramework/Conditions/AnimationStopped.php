@@ -6,6 +6,7 @@ namespace Codeception\Lib\WFramework\Conditions;
 
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
+use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
 class AnimationStopped extends AbstractCondition
@@ -41,18 +42,22 @@ class AnimationStopped extends AbstractCondition
     {
         $timeout = time();
 
-        $animationTime = ((int) $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_GET_TIMEOUT_MS))) / 1000;
+        $animationTimeMs = (int) $pageObject->accept(new ExecuteScriptOnThis(static::SCRIPT_GET_TIMEOUT_MS));
+
+        WLogger::logDebug($this, "получили время анимации: $animationTimeMs мс");
+
+        $animationTime = $animationTimeMs / 1000;
+
+        $elementTimeout = (int) TestProperties::mustGetValue('elementTimeout');
 
         if ($animationTime < 0)
         {
             $animationTime = 0;
         }
-        elseif ($animationTime > 5 * 60)
+        elseif ($animationTime > $elementTimeout)
         {
-            $animationTime = 5 * 60;
+            $animationTime = $elementTimeout;
         }
-
-        WLogger::logDebug($this, "получили время анимации: $animationTime секунд");
 
         return $timeout + $animationTime;
     }
