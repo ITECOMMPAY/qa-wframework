@@ -109,7 +109,7 @@ if (animatedElement === null) {
     return 0;
 }
 
-return getTimeInMs(animatedElement.style.animation-delay) + getTimeInMs(animatedElement.style.animation-duration);
+return getTimeInMs(animatedElement.style.animationDelay) + getTimeInMs(animatedElement.style.animationDuration);
 EOF;
 
 }
