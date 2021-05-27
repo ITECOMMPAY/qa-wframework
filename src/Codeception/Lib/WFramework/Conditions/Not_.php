@@ -46,6 +46,11 @@ class Not_ extends AbstractCondition implements IWrapOtherCondition
         return !$pageObject->accept($this->condition);
     }
 
+    protected function explainWhy(AbstractCondition $condition, IPageObject $pageObject, bool $actualValue) : array
+    {
+        return parent::explainWhy($condition, $pageObject, !$actualValue);
+    }
+
     public function getWrappedCondition() : AbstractCondition
     {
         return $this->condition;

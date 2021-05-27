@@ -9,6 +9,15 @@ use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 
+/**
+ * Class AnimationStopped
+ *
+ * Должен вызываться непосредственно для ноды на которую повешена анимация.
+ *
+ * Скрипт слегка умный. Если такая нода является единственным ребёнком текущей, то он её найдёт, но не более того.
+ *
+ * @package Codeception\Lib\WFramework\Conditions
+ */
 class AnimationStopped extends AbstractCondition
 {
     public function getName() : string
