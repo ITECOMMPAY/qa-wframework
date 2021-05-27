@@ -75,7 +75,7 @@ function* getSoleChildren(element) {
 
 function findAnimatedElement(element) {
     for (const childOrSelf of getSoleChildren(element)) {
-        if (childOrSelf.style.animationName.trim() !== '') {
+        if (childOrSelf.style.animationDuration !== '') {
             return childOrSelf;
         }
     }
