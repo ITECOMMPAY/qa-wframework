@@ -166,7 +166,7 @@ abstract class Composite extends ModernObject
     {
         if (!$this->hasChild($name))
         {
-            throw new UsageException("У узла нет ребёнка с именем: $name, есть только: " . implode(', ', $this->children->keys()));
+            throw new UsageException("У узла нет ребёнка с именем: $name, есть только: " . implode(', ', $this->children->keys()->toArray()));
         }
 
         return $this->children->get($name);
