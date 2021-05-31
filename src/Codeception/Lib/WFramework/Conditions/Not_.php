@@ -5,8 +5,6 @@ namespace Codeception\Lib\WFramework\Conditions;
 
 
 use Codeception\Lib\WFramework\Conditions\Interfaces\IWrapOtherCondition;
-use Codeception\Lib\WFramework\Explanations\Formatter\Why;
-use Codeception\Lib\WFramework\Explanations\Result\ExplanationResultAggregate;
 use Codeception\Lib\WFramework\WebObjects\Base\Interfaces\IPageObject;
 
 class Not_ extends AbstractCondition implements IWrapOtherCondition
