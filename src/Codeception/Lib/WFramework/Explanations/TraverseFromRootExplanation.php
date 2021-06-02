@@ -71,10 +71,10 @@ class TraverseFromRootExplanation extends AbstractExplanation
             $checkResult = $parentOrSelf->accept($this->condition); // Затем - само условие
             $result->addNext($parentOrSelf, $this->condition, $checkResult);
 
-//            if ($checkResult === false) // Дошли до первого невалидного элемента - дальше идти смысла нет
-//            {
-//                break;
-//            }
+            if ($checkResult === false) // Дошли до первого невалидного элемента - дальше идти смысла нет
+            {
+                break;
+            }
         }
 
         $result->setProblemNotFound($checkResult !== $this->conditionResult);
