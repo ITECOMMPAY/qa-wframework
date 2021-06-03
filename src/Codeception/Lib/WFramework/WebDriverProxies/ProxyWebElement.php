@@ -308,7 +308,17 @@ class ProxyWebElement extends RemoteWebElement
 
     public function sendKeys($value) : ProxyWebElement
     {
-        $this->returnRemoteWebElement()->sendKeys($value);
+        try
+        {
+            $this->returnRemoteWebElement()->sendKeys($value);
+        }
+        catch (\Facebook\WebDriver\Exception\ElementNotInteractableException $e)
+        {
+            WLogger::logWarning($this, "Элемент не доступен для взаимодействия: " . $this->locator);
+
+            throw $e;
+        }
+
         return $this;
     }
 
