@@ -14,7 +14,7 @@ class GetComputedStyleValue extends AbstractOperation
 {
     public function getName() : string
     {
-        return "получаем стиль: $this->style" . isset($this->pseudoElement) ? " ($this->pseudoElement)" : '';
+        return "получаем стиль: $this->style" . (isset($this->pseudoElement) ? " ($this->pseudoElement)" : '');
     }
 
     /**
