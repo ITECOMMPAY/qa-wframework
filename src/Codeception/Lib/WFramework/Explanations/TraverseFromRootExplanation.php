@@ -51,6 +51,11 @@ class TraverseFromRootExplanation extends AbstractExplanation
         /** @var IPageObject $parentOrSelf */
         foreach ($pageObject->traverseFromRoot() as $parentOrSelf)
         {
+            if ($parentOrSelf->getLocator()->isHtmlRoot())
+            {
+                continue;
+            }
+
             if (!$this->condition instanceof Exist) // Сначала проверяем что элемент вообще есть в коде страницы
             {
                 $existCondition = new Exist();

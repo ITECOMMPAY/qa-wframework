@@ -76,7 +76,7 @@ abstract class AbstractCondition extends PageObjectVisitor
             $condition = $this->getWrappedCondition();
         }
 
-        $resultAggregate = new ExplanationResultAggregate($pageObject, $condition, $actualValue);
+        $resultAggregate = new ExplanationResultAggregate($pageObject, $this, $actualValue);
 
         $resultsOfExplanations = $this->withDisabledAutoScroll(
             function () use ($condition, $pageObject, $actualValue) {

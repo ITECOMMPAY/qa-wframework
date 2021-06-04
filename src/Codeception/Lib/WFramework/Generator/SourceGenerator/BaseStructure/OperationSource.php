@@ -22,7 +22,7 @@ class OperationSource implements IGenerator
     }
 EOF;
 
-    protected const PARAM_TEMPLATE = '{{type}}${{name}}{{default_value}}';
+    protected const PARAM_TEMPLATE = '{{type}}{{variadic}}${{name}}{{default_value}}';
 
     protected OperationNode $node;
 
@@ -77,6 +77,8 @@ EOF;
 
             $name = $param->getName();
 
+            $variadic = $param->isVariadic() ? '...' : '';
+
             $defaultValue = '';
 
             if ($param->isDefaultValueAvailable())
@@ -86,6 +88,7 @@ EOF;
 
             $result[] = (new Template(static::PARAM_TEMPLATE))
                                         ->place('type', $type)
+                                        ->place('variadic', $variadic)
                                         ->place('name', $name)
                                         ->place('default_value', $defaultValue)
                                         ->produce();
@@ -109,7 +112,9 @@ EOF;
         {
             $name = $param->getName();
 
-            $result[] = "$$name";
+            $variadic = $param->isVariadic() ? '...' : '';
+
+            $result[] = "$variadic$$name";
         }
 
         return implode(', ', $result);
