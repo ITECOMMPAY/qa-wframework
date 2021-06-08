@@ -12,320 +12,408 @@
 
             <script>
 
-                const LogLevelsEnum = {
-                    "debug": 100,
-                    "info": 200,
-                    "notice": 250,
-                    "warning": 300,
-                    "error": 400,
-                    "critical": 500,
-                    "alert": 550,
-                    "emergency": 600
-                }
+                const logVideoBlock = document.getElementById("video-insert");
+                const logVideoSource = document.getElementById("video-insert-source");
+                const logScreenshotBlock = document.getElementById("image-insert");
 
-                Object.freeze(LogLevelsEnum);
+                const leftPanel = document.getElementsByClassName('left-panel')[0];
+                const rightPanel = document.getElementsByClassName('right-panel')[0];
 
-                var screenshotNumberToElement = [];
+                class LogNode {
+                    constructor(level, div) {
+                        this.parent = null;
+                        this.children = [];
 
-                function updateScreenshotsList() {
-                    for (const key in LogLevelsEnum) {
-                        let elements = document.getElementsByClassName(key);
+                        this.level = level;
+                        this.div = null;
+                        this.shotNumber = null;
+                        this.shotFilename = null;
 
-                        for (i = 0; i < elements.length; i++) {
-                            let element = elements[i];
-
-                            let screenshotNumber = getScreenshotNumber(element);
-
-                            if (screenshotNumber === null) {
-                                continue;
-                            }
-
-                            screenshotNumberToElement[screenshotNumber] = element;
-
-                            element.addEventListener("mouseover", onHoverSeekVideoCallback);
+                        if (div instanceof Element) {
+                            this.div = div;
+                            div.logNode = this;
+                            this.parseShotNumber();
                         }
                     }
 
-                    if (screenshotNumberToElement.length === 0) {
-                        hideRightPanel();
-                    }
-                }
-
-                function hideRightPanel() {
-                    let leftPanel = document.getElementsByClassName('left-panel');
-                    leftPanel[0].style.width = "100%";
-
-                    let rightPanel = document.getElementsByClassName('right-panel');
-                    rightPanel[0].style.width = "0%";
-                }
-
-                function hideVideo() {
-                    logVideo.style.display = "none";
-                    logScreenshot.style.display = "inline-block";
-                }
-
-                function hideScreenshot() {
-                    logVideo.style.display = "inline-block";
-                    logScreenshot.style.display = "none";
-                }
-
-                function getScreenshotNumber(element) {
-                    if (!element.hasAttribute("data-shot")) {
-                        return null;
-                    }
-
-                    let result = parseInt(element.getAttribute("data-shot"), 10);
-
-                    if (Number.isNaN(result)) {
-                        return null;
-                    }
-
-                    return result;
-                }
-
-                function canBeFolded(key) {
-                    return key === "info" || key === 'notice';
-                }
-
-                function addAccordions() {
-                    for (const key in LogLevelsEnum) {
-                        if (!canBeFolded(key)) {
-                            continue;
-                        }
-
-                        let elements = document.getElementsByClassName(key);
-
-                        for (i = 0; i < elements.length; i++) {
-
-                            let element = elements[i];
-
-                                if (!hasSubLevels(element, key)) {
-                                    if (!!window.chrome == false) {
-                                        element.classList.remove("accordion")
-                                    }
-                                    continue;
-                                }
-
-                            element.addEventListener("click", function () {
-                                if (this.classList.toggle("active")) {
-                                    expandSubLevels(this, key);
-                                }
-                                else {
-                                    collapseSubLevels(this, key);
-                                }
-                            });
-                        }
-                    }
-                }
-
-                function hasSubLevels(element, levelName) {
-                    let nextSibling = element.nextElementSibling;
-                    let levelCriticality = LogLevelsEnum[levelName];
-
-                    if (nextSibling == null) {
+                    cantHaveChildren() {
                         return false;
                     }
 
-                    let classList = nextSibling.classList;
-
-                    if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
-                        let subLevelName = classList[0];
-                        let subLevelCriticality = LogLevelsEnum[subLevelName];
-
-                        if (subLevelCriticality >= levelCriticality && canBeFolded(subLevelName)) {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-
-                function collapseSubLevels(element, levelName) {
-                    let nextSibling = element.nextElementSibling;
-                    let levelCriticality = LogLevelsEnum[levelName];
-
-                    while (nextSibling != null) {
-                        let classList = nextSibling.classList;
-
-                        if (classList.contains(levelName)) {
-                            break;
-                        }
-
-                        if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
-                            let subLevelName = classList[0];
-                            let subLevelCriticality = LogLevelsEnum[subLevelName];
-
-                            if (subLevelCriticality > levelCriticality && canBeFolded(subLevelName)) {
-                                break;
-                            }
-
-                            if (subLevelCriticality < levelCriticality) {
-                                nextSibling.classList.remove("active");
-                                nextSibling.style.display = "none";
-                            }
-                        }
-
-                        nextSibling = nextSibling.nextElementSibling;
-                    }
-                }
-
-                function expandSubLevels(element, levelName) {
-                    let nextSibling = element.nextElementSibling;
-                    let levelCriticality = LogLevelsEnum[levelName];
-
-                    let levelIndex = Object.keys(LogLevelsEnum).indexOf(levelName);
-                    let previousLevel = Object.keys(LogLevelsEnum)[levelIndex - 1];
-
-                    if (previousLevel === undefined) {
-                        return;
-                    }
-
-                    while (nextSibling != null) {
-                        let classList = nextSibling.classList;
-
-                        if (classList.contains(levelName)) {
-                            break;
-                        }
-
-                        if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
-                            let subLevelName = classList[0];
-                            let subLevelCriticality = LogLevelsEnum[classList[0]];
-
-                            if (subLevelCriticality > levelCriticality && canBeFolded(subLevelName)) {
-                                break;
-                            }
-
-                            if (classList[0] == previousLevel) {
-                                nextSibling.style.display = "block";
-                            }
-                        }
-
-                        nextSibling = nextSibling.nextElementSibling;
-                    }
-                }
-
-                function expandParentLevels(element) {
-                    let classList = element.classList;
-
-                    if (classList[0] === undefined || !(classList[0] in LogLevelsEnum)) {
-                        return;
-                    }
-
-                    let levelName = classList[0];
-                    let levelCriticality = LogLevelsEnum[levelName];
-
-                    let previousSibling = element.previousElementSibling;
-
-                    while (previousSibling != null) {
-                        let classList = previousSibling.classList;
-
-                        if (levelCriticality >= LogLevelsEnum["notice"]) {
+                    parseShotNumber() {
+                        if (!this.div.hasAttribute("data-shot")) {
                             return;
                         }
 
-                        if (classList[0] !== undefined && classList[0] in LogLevelsEnum) {
-                            let previousSiblingLevelName = classList[0];
-                            let previousSiblingCriticality = LogLevelsEnum[classList[0]];
+                        let shotName = this.div.getAttribute("data-shot");
 
-                            if (previousSiblingCriticality > levelCriticality && previousSiblingCriticality <= LogLevelsEnum["notice"])
-                            {
-                                expandSubLevels(previousSibling, previousSiblingLevelName);
+                        let shotNumber = parseInt(shotName, 10);
 
-                                if (previousSibling.classList.toggle("active")) {
-                                    expandSubLevels(previousSibling, previousSiblingLevelName);
-                                }
-
-                                levelCriticality = previousSiblingCriticality;
-                            }
+                        if (Number.isNaN(shotNumber)) {
+                            return;
                         }
 
-                        previousSibling = previousSibling.previousElementSibling;
+                        this.div.addEventListener("mouseover", onHoverSeekVideoCallback);
+
+                        this.shotNumber = shotNumber;
+                        this.shotFilename = `./screenshots/${shotName}.png`;
+                    }
+
+                    static fromDiv(div) {
+                        let classList = div.classList;
+
+                        if (classList[0] === undefined) {
+                            return null;
+                        }
+
+                        if (classList[0] === 'debug') {
+                            return new LogDebug(div);
+                        }
+
+                        if (classList[0] === 'info') {
+                            return new LogInfo(div);
+                        }
+
+                        if (classList[0] === 'notice') {
+                            return new LogNotice(div);
+                        }
+
+                        if (classList[0] === 'warning') {
+                            return new LogWarning(div);
+                        }
+
+                        if (classList[0] === 'error') {
+                            return new LogError(div);
+                        }
+
+                        if (classList[0] === 'critical') {
+                            return new LogCritical(div);
+                        }
+
+                        if (classList[0] === 'alert') {
+                            return new LogAlert(div);
+                        }
+
+                        if (classList[0] === 'emergency') {
+                            return new LogEmergency(div);
+                        }
+
+                        return null;
+                    }
+
+                    addChild(node) {
+                        this.children.push(node);
+                        node.parent = this;
+                    }
+
+                    registerNodeReturnIt(node) {
+                        if (node.level < this.level) {
+                            this.addChild(node);
+                            return node;
+                        }
+
+                        if (this.parent === null) {
+                            return null;
+                        }
+
+                        return this.parent.registerNodeReturnIt(node);
+                    }
+
+                    *traverseDepthFirst() {
+                        const buffer = [];
+
+                        buffer.push(... this.children);
+
+                        while (buffer.length !== 0) {
+                            var node = buffer.shift();
+                            yield node;
+                            buffer.unshift(... node.children);
+                        }
+                    }
+
+                    *traverseToRoot() {
+                        var parent = this.parent;
+
+                        while (parent !== null) {
+                            yield parent;
+                            parent = parent.parent;
+                        }
+                    }
+
+                    addAccordion() {
+                        this.div.classList.add('accordion');
+
+                        this.div.addEventListener('click', function () {
+                                if (this.classList.toggle('active')) {
+                                    this.logNode.expand();
+                                } else {
+                                    this.logNode.collapse();
+                                }
+                            });
+                    }
+
+                    removeAccordion() {
+                        this.div.classList.remove('accordion');
+                    }
+
+                    expand() {
+                        this.show();
+
+                        this.div.classList.add('active');
+
+                        for (const child of this.children) {
+                            child.show();
+                        }
+                    }
+
+                    collapse() {
+                        this.div.classList.remove('active');
+
+                        for (const child of this.traverseDepthFirst()) {
+                            child.hide();
+                        }
+                    }
+
+                    expandParents() {
+                        for (const parent of this.traverseToRoot()) {
+                            if (parent.div === null) {
+                                continue;
+                            }
+
+                            parent.expand();
+                        }
+                    }
+
+                    show() {
+                        this.div.style.display = 'block';
+                    }
+
+                    hide() {
+                        this.collapse();
+
+                        this.div.style.display = 'none';
+                    }
+
+                    markAsCurrentVideoFrame() {
+                        this.div.classList.add('current-frame');
+                    }
+
+                    unmarkAsCurrentVideoFrame() {
+                        this.div.classList.remove('current-frame');
                     }
                 }
 
+                class LogDebug extends LogNode {
+                    constructor(div) {
+                        super(100, div);
+                    }
+                }
+
+                class LogInfo extends LogNode {
+                    constructor(div) {
+                        super(200, div);
+                    }
+                }
+
+                class LogNotice extends LogNode {
+                    constructor(div) {
+                        super(250, div);
+                    }
+                }
+
+                class LogWarning extends LogNode {
+                    constructor(div) {
+                        super(300, div);
+                    }
+
+                    cantHaveChildren() {
+                        return true;
+                    }
+                }
+
+                class LogError extends LogNode {
+                    constructor(div) {
+                        super(400, div);
+                    }
+
+                    cantHaveChildren() {
+                        return true;
+                    }
+                }
+
+                class LogCritical extends LogNode {
+                    constructor(div) {
+                        super(500, div);
+                    }
+
+                    cantHaveChildren() {
+                        return true;
+                    }
+                }
+
+                class LogAlert extends LogNode {
+                    constructor(div) {
+                        super(550, div);
+                    }
+
+                    cantHaveChildren() {
+                        return true;
+                    }
+                }
+
+                class LogEmergency extends LogNode {
+                    constructor(div) {
+                        super(600, div);
+                    }
+                }
+
+                class LogRoot extends LogNode {
+                    constructor() {
+                        super(1000, null);
+                    }
+                }
+
+                function initLogTree() {
+                    const leftPanel = document.getElementsByClassName('left-panel')[0];
+
+                    const root = new LogRoot();
+
+                    var currentNode = root;
+
+                    for (const child of leftPanel.children) {
+                        var logNode = LogNode.fromDiv(child);
+
+                        if (logNode === null) {
+                            continue;
+                        }
+
+                        if (logNode.cantHaveChildren()) {
+                            root.addChild(logNode);
+                            continue;
+                        }
+
+                        currentNode = currentNode.registerNodeReturnIt(logNode) ?? currentNode;
+                    }
+
+                    return root;
+                }
+
+                const logTree = initLogTree(); // Parse the log into a tree
+
+                function addAccordions(logTree) {
+                    for (const node of logTree.traverseDepthFirst()) {
+                        if (node.children.length === 0) {
+                            node.removeAccordion();
+                            continue;
+                        }
+
+                        node.addAccordion();
+                    }
+                }
+
+                addAccordions(logTree); // After the log tree constructed add styles for accordions to nodes that have children
+
                 function checkResult() {
-                    let errors = document.getElementsByClassName("error");
+                    const errors = document.getElementsByClassName("error");
 
                     if (errors.length > 0) {
                         return;
                     }
 
-                    let elements = document.querySelectorAll('.title');
+                    const title = document.querySelectorAll('.title')[0];
 
-                    for (i = 0; i < elements.length; i++) {
-                        elements[i].style.backgroundColor = "#1de9b6";
+                    title.style.backgroundColor = "#1de9b6";
+                }
+
+                checkResult(); // Mark test as passed if no errors were found
+
+                function hideRightPanel() {
+                    leftPanel.style.width = "100%";
+
+                    rightPanel.style.width = "0%";
+                }
+
+                const shotNumberToLogNode = new Map();
+
+                function checkScreenshots() {
+                    for (const node of logTree.traverseDepthFirst()) {
+                        if (node.shotNumber === null) {
+                            continue;
+                        }
+
+                        shotNumberToLogNode.set(node.shotNumber, node);
+                    }
+
+                    if (shotNumberToLogNode.size === 0) {
+                        hideRightPanel();
                     }
                 }
 
-                var logVideo = document.getElementById("video-insert");
-                var logVideoSource = document.getElementById("video-insert-source");
-                var logScreenshot = document.getElementById("image-insert");
+                checkScreenshots(); // Hide right panel if no screenshots were found
 
-                addAccordions();
-                updateScreenshotsList();
-                checkResult();
+                function onVideoErrorCallback() {
+                    hideVideoBlock();
+                }
 
-                logVideo.ontimeupdate = function () { onTimeUpdateCallback() };
+                function hideVideoBlock() {
+                    logVideoBlock.style.display = "none";
+                    logScreenshotBlock.style.display = "inline-block";
+                }
 
-                logVideoSource.onerror = function () { onVideoError() };
+                logVideoSource.onerror = function () { onVideoErrorCallback() }; // Hide video on error
 
-                var previousTime = -1;
+                //Next we add scrolling the log to the current video frame and vice-versa
 
-                function removePreviousSeekMark() {
-                    previousDiv = screenshotNumberToElement[previousTime];
+                let previousFrameNode = null;
 
-                    if (previousDiv != null) {
-                        previousDiv.classList.remove("current-frame");
+                logVideoBlock.ontimeupdate = function () { onTimeUpdateCallback() };
+
+                function addSeekMark(logNode) {
+                    if (previousFrameNode !== null) {
+                        previousFrameNode.unmarkAsCurrentVideoFrame();
                     }
+
+                    logNode.markAsCurrentVideoFrame();
+                    previousFrameNode = logNode;
                 }
 
                 function onTimeUpdateCallback() {
-                    let currentTime = Math.floor(logVideo.currentTime);
+                    const shotNumber = Math.floor(logVideoBlock.currentTime);
 
-                    if (currentTime === previousTime) {
+                    if (shotNumber === previousFrameNode.shotNumber) {
                         return;
                     }
 
-                    removePreviousSeekMark();
-
-                    previousTime = currentTime;
-
-                    let screenshotDiv = screenshotNumberToElement[currentTime];
-
-                    if (screenshotDiv == null) {
+                    if (!shotNumberToLogNode.has(shotNumber)) {
                         return;
                     }
 
-                    expandParentLevels(screenshotDiv);
+                    const logNode = shotNumberToLogNode.get(shotNumber);
 
-                    screenshotDiv.scrollIntoView(true);
+                    addSeekMark(logNode);
 
-                    screenshotDiv.classList.add("current-frame");
-                }
+                    logNode.expandParents();
 
-                function onVideoError() {
-                    hideVideo();
+                    logNode.div.scrollIntoView(true);
                 }
 
                 function onHoverSeekVideoCallback(event) {
-                    element = event.currentTarget;
+                    const element = event.currentTarget;
 
-                    let currentTime = getScreenshotNumber(element);
-                    let name = element.getAttribute("data-shot");
-
-                    if (currentTime === null) {
+                    if (element.logNode === undefined) {
                         return;
                     }
 
-                    removePreviousSeekMark();
+                    const logNode = element.logNode;
 
-                    previousTime = currentTime;
+                    if (logNode.shotNumber === null || logNode.shotFilename === null) {
+                        return;
+                    }
 
-                    logVideo.currentTime = currentTime;
-                    logScreenshot.src=`./screenshots/${name}.png`;
+                    addSeekMark(logNode);
 
-                    let screenshotDiv = screenshotNumberToElement[currentTime];
-                    screenshotDiv.classList.add("current-frame");
+                    logVideoBlock.currentTime = logNode.shotNumber;
+                    logScreenshotBlock.src = logNode.shotFilename;
                 }
             </script>
 
