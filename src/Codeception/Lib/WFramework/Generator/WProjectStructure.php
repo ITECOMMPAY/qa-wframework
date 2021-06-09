@@ -88,14 +88,12 @@ class WProjectStructure
             throw new UsageException('Не найден composer.json');
         }
 
-        $dir = dirname($dir);
-
         if (file_exists("$dir/composer.json"))
         {
             return $dir;
         }
 
-        return $this->findComposerRootDir($dir);
+        return $this->findComposerRootDir(dirname($dir));
     }
 
     protected function getCodeceptionConfigSubdir(string $projectDirFull) : string
