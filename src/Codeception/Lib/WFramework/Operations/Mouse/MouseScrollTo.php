@@ -4,11 +4,10 @@
 namespace Codeception\Lib\WFramework\Operations\Mouse;
 
 
+use Codeception\Lib\WFramework\Conditions\Exist;
 use Codeception\Lib\WFramework\Logger\WLogger;
 use Codeception\Lib\WFramework\Operations\Execute\ExecuteScriptOnThis;
 use Codeception\Lib\WFramework\Properties\TestProperties;
-use Codeception\Lib\WFramework\WebObjects\Base\WBlock\WBlock;
-use Codeception\Lib\WFramework\WebObjects\Base\WElement\WElement;
 use Codeception\Lib\WFramework\WebObjects\Base\WPageObject;
 use Codeception\Lib\WFramework\Operations\AbstractOperation;
 
@@ -51,6 +50,13 @@ class MouseScrollTo extends AbstractOperation
         if ($forceScrollToOff)
         {
             WLogger::logDebug($this, 'Скроллинг к элементу запрещён (forceScrollToOff: true)');
+            return;
+        }
+
+        if (!$pageObject->finally_(new Exist()))
+        {
+            //Операция MouseScrollTo слишком важна для функционирования всего фреймворка чтобы падать в ней.
+            WLogger::logDebug($this, 'Не к чему скроллить - элемента не существует');
             return;
         }
 

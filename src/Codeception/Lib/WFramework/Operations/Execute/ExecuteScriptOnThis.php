@@ -17,7 +17,7 @@ class ExecuteScriptOnThis extends AbstractOperation
 {
     public function getName() : string
     {
-        return "выполняем скрипт для данного PageObject'а: '" . substr($this->script, 0, 64) . "' c аргументами: " . implode(', ', $this->arguments);
+        return "выполняем скрипт для данного PageObject'а: '" . substr($this->script, 0, 64) . "' c аргументами: " . implode(', ', array_map(function($v){return json_encode($v);}, $this->arguments));
     }
 
     /**
