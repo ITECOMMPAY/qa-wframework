@@ -33,6 +33,6 @@ abstract class AbstractWaitForTimeout extends AbstractOperation
 
     protected function apply(IPageObject $pageObject)
     {
-        usleep($this->getTimeout($pageObject));
+        usleep($this->getTimeout($pageObject) * 1000000);
     }
 }

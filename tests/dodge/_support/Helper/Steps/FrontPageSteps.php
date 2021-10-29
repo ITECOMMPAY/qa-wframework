@@ -4,10 +4,12 @@
 namespace dodge\Helper\Steps;
 
 
+use Codeception\Lib\WFramework\Properties\TestProperties;
 use Codeception\Lib\WFramework\Steps\StepsGroup;
 use dodge\DodgeTester;
 use dodge\Helper\Blocks\FrontPage\ChooseYourSiteBlock;
 use dodge\Helper\Blocks\Common\HeaderBlock;
+use dodge\Helper\Blocks\VehiclePage\EnterYourZipBlock;
 
 class FrontPageSteps extends StepsGroup
 {
@@ -20,15 +22,20 @@ class FrontPageSteps extends StepsGroup
     /** @var ChooseYourSiteBlock */
     public $chooseYourSiteBlock;
 
+    /** @var EnterYourZipBlock */
+    public $enterYourZipBlock;
+
     public function __construct(
         DodgeTester $I,
         HeaderBlock $headerBlock,
-        ChooseYourSiteBlock $chooseYourSiteBlock
+        ChooseYourSiteBlock $chooseYourSiteBlock,
+        EnterYourZipBlock $enterYourZipBlock
     )
     {
         $this->I = $I;
         $this->headerBlock = $headerBlock;
         $this->chooseYourSiteBlock = $chooseYourSiteBlock;
+        $this->enterYourZipBlock = $enterYourZipBlock;
     }
 
     public function openSite() : FrontPageSteps
@@ -38,8 +45,6 @@ class FrontPageSteps extends StepsGroup
         $this->I->amOnPage('/');
 
         $this->setCookies();
-
-        $this->shouldBeDisplayed();
 
         return $this;
     }
@@ -83,6 +88,33 @@ class FrontPageSteps extends StepsGroup
                 ->shouldBeHidden()
                 ;
         }
+
+        return $this;
+    }
+
+    public function setZip(string $zip = '85009') : FrontPageSteps
+    {
+        $this->I->logNotice($this, 'Ожидаем всплывающее окно для ввода ZIP-кода и вводим в него: ' . $zip);
+
+        $this
+            ->enterYourZipBlock
+            ->shouldBeDisplayed()
+            ->getZipField()
+            ->set($zip)
+        ;
+
+        $this
+            ->enterYourZipBlock
+            ->getSubmitButton()
+            ->click()
+        ;
+
+        $this
+            ->enterYourZipBlock
+            ->shouldBeHidden()
+        ;
+
+        TestProperties::setValue('currentZip', $zip);
 
         return $this;
     }

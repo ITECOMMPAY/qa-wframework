@@ -63,10 +63,10 @@ class exampleCest
         $steps::$frontPageSteps
                         ->openSite()
                         ->closePopup()
+                        ->setZip()
                         ->openVehiclesMenu()
                         ->checkPrices()
                         ->selectVehicle('Alias: Challenger')
-                        ->setZip()
                         ->checkZip()
                         ->startBuildingModel()
                         ->selectBuyOption()

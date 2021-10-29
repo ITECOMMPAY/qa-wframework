@@ -19,22 +19,17 @@ class VehiclePageSteps extends StepsGroup
     /** @var HeaderBlock */
     public $headerBlock;
 
-    /** @var EnterYourZipBlock */
-    public $enterYourZipBlock;
-
     /** @var PricingBlock */
     public $pricingBlock;
 
     public function __construct(
         DodgeTester $I,
         HeaderBlock $headerBlock,
-        EnterYourZipBlock $enterYourZipBlock,
         PricingBlock $pricingBlock
     )
     {
         $this->I = $I;
         $this->headerBlock = $headerBlock;
-        $this->enterYourZipBlock = $enterYourZipBlock;
         $this->pricingBlock = $pricingBlock;
     }
 
@@ -43,38 +38,6 @@ class VehiclePageSteps extends StepsGroup
         $this->I->logNotice($this, 'Проверяем, что страница авто отобразилась');
 
         $this->headerBlock->shouldBeDisplayed(true);
-
-        return $this;
-    }
-
-    public function setZip(string $zip = '85009') : VehiclePageSteps
-    {
-        $this->I->logNotice($this, 'Ожидаем всплывающее окно для ввода ZIP-кода и вводим в него: ' . $zip);
-
-        $this
-            ->enterYourZipBlock
-            ->shouldBeDisplayed()
-            ->getZipField()
-            ->set($zip)
-            ;
-
-        $this
-            ->enterYourZipBlock
-            ->getSubmitButton()
-            ->click()
-            ;
-
-        $this
-            ->enterYourZipBlock
-            ->shouldBeHidden()
-            ;
-
-        $this
-            ->pricingBlock
-            ->shouldBeDisplayed()
-            ;
-
-        TestProperties::setValue('currentZip', $zip);
 
         return $this;
     }

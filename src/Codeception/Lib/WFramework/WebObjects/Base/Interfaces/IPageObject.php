@@ -207,7 +207,7 @@ interface IPageObject
     public function accept($visitor);
 
     /**
-     * Возвращает связанный с данным типом PageObject'ов таймаут ожидания (используется в should и finally методах)
+     * Возвращает связанный с данным типом PageObject'ов таймаут ожидания в секундах (используется в should и finally методах)
      *
      * @return int
      */

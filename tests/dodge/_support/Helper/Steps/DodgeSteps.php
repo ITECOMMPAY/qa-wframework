@@ -13,6 +13,13 @@ use dodge\Helper\Steps\VehiclesMenuSteps;
 
 class DodgeSteps extends StepsGroup
 {
+    /**
+     * Этот файл генерируется автоматически при запуске тестов или при вызове команды:
+     * ./vendor/bin/codecept WBuild -c путь_к_codeception.yml
+     * 
+     * Править его вручную - не имеет смысла.
+     */
+
     /** @var BuildModelSteps */
     public static $buildModelSteps;
     

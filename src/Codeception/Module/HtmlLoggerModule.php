@@ -271,14 +271,17 @@ EOF;
 
     protected function finalizeLog()
     {
-        $this->screenshotsToVideo();
+        if (is_writable($this->logDirectory))
+        {
+            $this->screenshotsToVideo();
+            TestProperties::save($this->logDirectory . '/test_properties.json');
+        }
 
-        TestProperties::save($this->logDirectory . '/test_properties.json');
-
-        echo PHP_EOL . 'Ссылка на HTML-лог прогона: ' . PHP_EOL . "file://$this->logFilename" . PHP_EOL;
+        if (file_exists($this->logFilename))
+        {
+            echo PHP_EOL . 'Ссылка на HTML-лог прогона: ' . PHP_EOL . "file://$this->logFilename" . PHP_EOL;
+        }
     }
-
-
 
     public function logAssertHard(string $message, array $context = [])
     {
